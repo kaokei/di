@@ -358,8 +358,8 @@ export class Injector {
    */
   dispose() {
     this.providerMap.forEach(value => {
-      if (value && value.dispose) {
-        value.dispose();
+      if (value && value.useValue && value.useValue.dispose) {
+        value.useValue.dispose();
       }
     });
     this.providerMap = null as any;
