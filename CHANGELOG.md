@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 1.0.22 (2021-10-07)
+
+
+### Bug Fixes
+
+* **bugfix:** 修复dispose的bug ([eb5116d](https://github.com/kaokei/di/commit/eb5116d28139ad7c21738e089ce764e76609b3c6))
+
 ### [1.0.21](https://github.com/kaokei/di/compare/v1.0.20...v1.0.21) (2021-09-16)
 
 
