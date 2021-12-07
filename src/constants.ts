@@ -10,7 +10,6 @@ export const DECORATOR_KEYS = {
   SELF: 'self',
   SKIP_SELF: 'skip',
   OPTIONAL: 'optional',
-  DEFAULT_VALUE: 'defaultValue',
 };
 
 export const SERVICE_STATUS = {

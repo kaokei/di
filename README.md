@@ -26,11 +26,12 @@
 - 支持属性注入
 - 支持部分循环依赖，对于不支持的循环依赖会有相应的提示
 - 支持类型提示，以及 InjectionKey 的类型提示
+- 支持@Optional 以及初始值作为默认值
 
 ### 不支持的特性
 
 - 不支持 multi-injection
-- 不支持不能自己 new 的注入，比如 react 类组件的实例化过程我们干预不了
+- 不支持不能自己 new 的注入，比如 react 类组件的实例化过程我们干预不了，因为 Injector 容器内部非常重要的一个工作就是 new 一个对象。
 - 对于类的继承没有过多的支持
 - 没有 InversifyJS 中复杂的 binding 的 API，尽量采用`new Injector([providers])`，也就是一次性声明所有的`providers`
 - 暂时不实现 providers 中使用 forwardRef，主要是不了解使用场景，目前只支持在@Inject 中使用 forwardRef
@@ -40,7 +41,6 @@
 
 ### 待支持特性
 
-- 删除了@DefauleValue，使用 ts 自带的默认参数
 - 自定义装饰器@Prev @Post
 - postConstruct 代替 onInit
 - middleware

@@ -79,11 +79,8 @@ export class Injector {
         // 就必须要考虑self的限制
         return this.getServiceByClass(token, token);
       } else {
-        if (
-          DECORATOR_KEYS.OPTIONAL in options ||
-          DECORATOR_KEYS.DEFAULT_VALUE in options
-        ) {
-          return options.defaultValue;
+        if (DECORATOR_KEYS.OPTIONAL in options) {
+          return void 0;
         } else {
           throw new Error(`${token} ${ERROR_TOKEN_NOT_FOUND}`);
         }
@@ -93,11 +90,8 @@ export class Injector {
       if (this.parent) {
         return this.parent.get(token, options);
       } else {
-        if (
-          DECORATOR_KEYS.OPTIONAL in options ||
-          DECORATOR_KEYS.DEFAULT_VALUE in options
-        ) {
-          return options.defaultValue;
+        if (DECORATOR_KEYS.OPTIONAL in options) {
+          return void 0;
         } else {
           throw new Error(`${token} ${ERROR_TOKEN_NOT_FOUND}`);
         }
@@ -118,11 +112,8 @@ export class Injector {
     ) {
       return this.getServiceByClass(token, token);
     } else {
-      if (
-        DECORATOR_KEYS.OPTIONAL in options ||
-        DECORATOR_KEYS.DEFAULT_VALUE in options
-      ) {
-        return options.defaultValue;
+      if (DECORATOR_KEYS.OPTIONAL in options) {
+        return void 0;
       } else {
         throw new Error(`${token} ${ERROR_TOKEN_NOT_FOUND}`);
       }
