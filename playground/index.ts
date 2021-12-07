@@ -1,5 +1,9 @@
 import { Inject, Optional, Injector, Injectable } from '../src/index';
 
+interface ABC {
+  abc: string;
+}
+
 @Injectable()
 class Logger {
   public log(msg: string) {
@@ -20,6 +24,8 @@ class User {
   @Inject('NOT_FOUND_THEME')
   public theme = 'red';
 
+  public constructor(public test: ABC) {}
+
   public say() {
     console.log(`${this.name} ${this.age}`);
   }
@@ -31,7 +37,7 @@ const injector = new Injector([
     useClass: User,
   },
   {
-    provide: 'NOT_FOUND_THEME1',
+    provide: 'NOT_FOUND_THEME',
     useValue: 'blue',
   },
 ]);

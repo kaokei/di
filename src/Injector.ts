@@ -13,9 +13,6 @@ type Ret<T> = T extends new (...args: any) => infer S
   : T;
 
 import {
-  SERVICE_INJECTED_PARAMS,
-  SERVICE_INJECTED_PROPS,
-  SERVICE_PARAM_TYPES,
   ERROR_CIRCULAR_DEPENDENCY,
   ERROR_TOKEN_NOT_FOUND,
   ERROR_INJECT_NOT_VALID,
@@ -145,10 +142,11 @@ export class Injector {
    */
   getContructorParametersMetas(token: any) {
     // 构造函数的参数的类型数据-原始数据-是一个数组
-    const params = Reflect.getMetadata(SERVICE_PARAM_TYPES, token) || [];
+    const params =
+      Reflect.getMetadata(DECORATOR_KEYS.SERVICE_PARAM_TYPES, token) || [];
     // 构造函数的参数的类型数据-通过@Inject等装饰器实现-是一个对象-key是数字-对应第几个参数的类型数据
     const propertiesMetadatas =
-      Reflect.getMetadata(SERVICE_INJECTED_PARAMS, token) || {};
+      Reflect.getMetadata(DECORATOR_KEYS.SERVICE_INJECTED_PARAMS, token) || {};
     return params.map((paramType: any, index: any) => {
       // 查找当前index对应的参数有没有使用装饰器
       const propertyMetadatas: any[] = propertiesMetadatas[index] || [];
@@ -207,7 +205,7 @@ export class Injector {
   getInjectPropertiesMetas(token: any) {
     // 获取注入属性的metas-类型是Recors<string, Array>
     const propertiesMetadatas =
-      Reflect.getMetadata(SERVICE_INJECTED_PROPS, token) || {};
+      Reflect.getMetadata(DECORATOR_KEYS.SERVICE_INJECTED_PROPS, token) || {};
     const propertiesMetas: any = [];
     for (const key in propertiesMetadatas) {
       if (has(propertiesMetadatas, key)) {

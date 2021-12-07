@@ -38,9 +38,5 @@
 - 不支持异步实例化，即该实例对象的状态和数据依赖服务器端数据，需要异步获取，等待获取数据成功之后才实例化对象。对于这种场景建议在实例对象中维护类似 loading/ready/inited 这种字段来表明数据是否准备完毕。
 - 不支持 LazyInject
 - 原来是导出了 autobind，后续删除了该导出，有业务需要可以自己 npm install 即可
-
-### 待支持特性
-
-- 自定义装饰器@Prev @Post
-- postConstruct 代替 onInit
-- middleware
+- 不支持中间件，后续可以考虑完善中间件
+- 不支持自定义装饰器，比如@Prev、@Post 等装饰器，类似 autobind，应该独立维护

@@ -1,10 +1,12 @@
-export const DESIGN_PARAM_TYPES = 'design:paramtypes'; // ts自带的类的构造函数的参数的类型信息的key
-
-export const SERVICE_PARAM_TYPES = 'service:paramtypes'; // 构造函数原始的类型数据，可能会被@Inject等覆盖
-export const SERVICE_INJECTED_PARAMS = 'service:injected:params'; // 构造函数使用@Inject注入的数据
-export const SERVICE_INJECTED_PROPS = 'service:injected:props'; // @Inject注入的properties
-
 export const DECORATOR_KEYS = {
+  // ts自带的类的构造函数的参数的类型信息的key
+  DESIGN_PARAM_TYPES: 'design:paramtypes',
+  // 构造函数原始的类型数据，可能会被@Inject等覆盖
+  SERVICE_PARAM_TYPES: 'service:paramtypes',
+  // 构造函数使用@Inject注入的数据
+  SERVICE_INJECTED_PARAMS: 'service:injected:params',
+  // @Inject注入的properties
+  SERVICE_INJECTED_PROPS: 'service:injected:props',
   INJECT: Symbol('inject'),
   INJECTABLE: Symbol('injectable'),
   SELF: 'self',
