@@ -46,7 +46,6 @@ function createConfig(fileSuffix) {
       // 暂时没有用上globals
       postcss: 'postcss',
       jquery: '$',
-      'autobind-decorator': 'AutoBindDecorator',
       '@rollup/plugin-babel': 'helloWorldPluginBabel',
     },
   };
