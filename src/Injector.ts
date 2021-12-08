@@ -31,20 +31,21 @@ const NOOP = (n: any) => n;
 // 第四步：执行constructed方法
 
 export class Injector {
-  providerMap = new Map<any, any>();
-  parentToken = null as any;
-  parent?: Injector;
-  options?: any;
-  postHook?: any;
-  mergeHook?: any;
+  public parent?: Injector;
+
+  public providerMap = new Map<any, any>();
+
+  public beforeCacheHook?: any;
+  public mergePropertyHook?: any;
 
   constructor(providers: any[] = [], parent?: Injector, options: any = {}) {
     this.parent = parent;
-    this.options = options;
-    // 在获取服务实例之后，在更新provider.useValue之前，使服务响应化
-    this.postHook = options.postHook || NOOP;
-    this.mergeHook = options.mergeHook || merge;
-    this.resolveProviders(providers);
+
+    // 在获取服务实例之后，在更新provider.useCacheValue之前，使服务响应化
+    this.beforeCacheHook = options.beforeCacheHook || NOOP;
+    this.mergePropertyHook = options.mergePropertyHook || merge;
+
+    this.addProviders(providers);
   }
 
   /**
@@ -58,13 +59,19 @@ export class Injector {
   get<T>(token: InjectionKey<T>, options?: any): T;
   get<R, T = unknown>(token: T, options?: any): T extends R ? Ret<T> : Ret<R>;
   get(token: any, options: any = {}): any {
-    if (options.self) {
+    if (options.skip) {
+      if (this.parent) {
+        return this.parent.get(token, { ...options, skip: false });
+      } else {
+        if (!options.optional) {
+          throw new Error(`${token} ${ERROR_TOKEN_NOT_FOUND}`);
+        }
+      }
+    } else if (options.self) {
       if (this.providerMap.has(token)) {
         const provider = this.providerMap.get(token);
         if (provider.status === SERVICE_STATUS.INITING) {
-          throw new Error(
-            `${ERROR_CIRCULAR_DEPENDENCY} ${token} and ${this.parentToken} depent on each other.`
-          );
+          this.throwCircularDependencyError(provider);
         }
         return this.getServiceByProvider(provider, options);
       } else if (
@@ -74,31 +81,17 @@ export class Injector {
       ) {
         // 如果当前Injector已经是根Injector
         // 就必须要考虑self的限制
-        return this.getServiceByClass(token, token);
+        const provider = this.getProviderByToken(token);
+        return this.getServiceByProvider(provider, options);
       } else {
-        if (DECORATOR_KEYS.OPTIONAL in options) {
-          return void 0;
-        } else {
-          throw new Error(`${token} ${ERROR_TOKEN_NOT_FOUND}`);
-        }
-      }
-    } else if (options.skip) {
-      options.skip = false;
-      if (this.parent) {
-        return this.parent.get(token, options);
-      } else {
-        if (DECORATOR_KEYS.OPTIONAL in options) {
-          return void 0;
-        } else {
+        if (!options.optional) {
           throw new Error(`${token} ${ERROR_TOKEN_NOT_FOUND}`);
         }
       }
     } else if (this.providerMap.has(token)) {
       const provider = this.providerMap.get(token);
       if (provider.status === SERVICE_STATUS.INITING) {
-        throw new Error(
-          `${ERROR_CIRCULAR_DEPENDENCY} ${token} and ${this.parentToken} depent on each other.`
-        );
+        this.throwCircularDependencyError(provider);
       }
       return this.getServiceByProvider(provider, options);
     } else if (this.parent) {
@@ -107,46 +100,185 @@ export class Injector {
       typeof token === 'function' &&
       Reflect.getMetadata(DECORATOR_KEYS.INJECTABLE, token)
     ) {
-      return this.getServiceByClass(token, token);
+      const provider = this.getProviderByToken(token);
+      return this.getServiceByProvider(provider, options);
     } else {
-      if (DECORATOR_KEYS.OPTIONAL in options) {
-        return void 0;
-      } else {
+      if (!options.optional) {
         throw new Error(`${token} ${ERROR_TOKEN_NOT_FOUND}`);
       }
     }
   }
 
   /**
-   * 获取构造函数的参数-返回数组
-   * @done
+   * 如果token对应的provider不存在
+   * 那么就创建一个
+   * 调用该方法之前需要保证token对应的provider已经存在或者token本身是一个可注入的类
+   *
    * @param {*} token
    * @return {*}
    * @memberof Injector
    */
-  getContructorParameters(token: any) {
-    const currentParentToken = this.parentToken;
-    this.parentToken = token;
-    const params = this.getContructorParametersMetas(token);
-    const result = params.map((meta: any) => this.get(meta.key, meta.value));
-    this.parentToken = currentParentToken;
+  getProviderByToken(token: any) {
+    if (!this.providerMap.has(token)) {
+      this.addProvider(token);
+    }
+    return this.providerMap.get(token);
+  }
+
+  throwCircularDependencyError(provider: any) {
+    const tokenArr = [];
+    let currentProvider = provider;
+    while (currentProvider && currentProvider.provide) {
+      tokenArr.push(currentProvider.provide);
+      currentProvider = currentProvider.parent;
+    }
+    const tokenListText = tokenArr.join(' <-- ');
+    throw new Error(`${ERROR_CIRCULAR_DEPENDENCY} ${tokenListText}`);
+  }
+
+  /**
+   * 通过provider直接获取service实例
+   * @done
+   * @param {*} provider
+   * @param {*} options
+   * @return {*}
+   * @memberof Injector
+   */
+  getServiceByProvider(provider: any, options: any) {
+    if ('useCacheValue' in provider) {
+      return provider.useCacheValue;
+    } else if ('useValue' in provider) {
+      return this.getServiceUseValueWithProvider(provider, options);
+    } else if (provider.useClass) {
+      return this.getServiceUseClassWithProvider(provider, options);
+    } else if (provider.useExisting) {
+      return this.getServiceUseExistingWithProvider(provider, options);
+    } else if (provider.useFactory) {
+      return this.getServiceUseFactoryWithProvider(provider, options);
+    } else {
+      throw new Error(ERROR_PROVIDER_NOT_VALID);
+    }
+  }
+
+  /**
+   * 通过useValue获取服务实例
+   *
+   * @param {*} provider
+   * @return {*}
+   * @memberof Injector
+   */
+  getServiceUseValueWithProvider(provider: any, options: any) {
+    const cacheValue = this.beforeCacheHook(provider.useValue);
+    provider.useCacheValue = cacheValue;
+    return cacheValue;
+  }
+
+  /**
+   * 通过useClass获取服务实例
+   * @done
+   * @template T
+   * @param {new (...args: any[]) => T} ClassName
+   * @param {*} options
+   * @return {*}
+   * @memberof Injector
+   */
+  getServiceUseClassWithProvider<T>(provider: any, options: any) {
+    provider.parent = options.provider;
+
+    provider.status = SERVICE_STATUS.INITING;
+    const ClassName = provider.useClass;
+
+    const params = this.getContructorParameters(ClassName, provider);
+    const cacheValue = this.beforeCacheHook(new ClassName(...params));
+
+    provider.useCacheValue = cacheValue;
+    provider.status = SERVICE_STATUS.CONSTRUCTED;
+
+    const properties = this.getInjectProperties(ClassName, provider);
+    this.mergePropertyHook(cacheValue, properties);
+
+    provider.status = SERVICE_STATUS.MERGED;
+
+    provider.parent = void 0;
+
+    return cacheValue;
+  }
+
+  /**
+   * 通过useExisting获取服务实例
+   *
+   * @param {*} provider
+   * @param {*} options
+   * @return {*}
+   * @memberof Injector
+   */
+  getServiceUseExistingWithProvider(provider: any, options: any) {
+    provider.parent = options.provider;
+    provider.status = SERVICE_STATUS.INITING;
+
+    const cacheValue = this.get(provider.useExisting, { ...options, provider });
+    provider.useCacheValue = cacheValue;
+
+    provider.status = SERVICE_STATUS.CONSTRUCTED;
+    provider.parent = void 0;
+
+    return cacheValue;
+  }
+
+  /**
+   * 通过useFactory获取服务实例
+   *
+   * @param {*} provider
+   * @param {*} options
+   * @return {*}
+   * @memberof Injector
+   */
+  getServiceUseFactoryWithProvider(provider: any, options: any) {
+    provider.parent = options.provider;
+    provider.status = SERVICE_STATUS.INITING;
+
+    const deps = provider.deps || [];
+    const args = deps.map((dep: any) => this.get(dep, { provider }));
+    const serviceValue = provider.useFactory(...args);
+    const cacheValue = this.beforeCacheHook(serviceValue);
+    provider.useCacheValue = cacheValue;
+
+    provider.status = SERVICE_STATUS.CONSTRUCTED;
+    provider.parent = void 0;
+
+    return cacheValue;
+  }
+
+  /**
+   * 获取构造函数的参数-返回数组
+   * @done
+   * @param {*} ClassName
+   * @return {*}
+   * @memberof Injector
+   */
+  getContructorParameters(ClassName: any, provider: any) {
+    const params = this.getContructorParametersMetas(ClassName);
+    const result = params.map((meta: any) =>
+      this.get(meta.key, { ...meta.value, provider })
+    );
     return result;
   }
 
   /**
    * 获取构造函数的参数的装饰器元数据
    * @done
-   * @param {*} token
+   * @param {*} ClassName
    * @return {*}
    * @memberof Injector
    */
-  getContructorParametersMetas(token: any) {
+  getContructorParametersMetas(ClassName: any) {
     // 构造函数的参数的类型数据-原始数据-是一个数组
     const params =
-      Reflect.getMetadata(DECORATOR_KEYS.SERVICE_PARAM_TYPES, token) || [];
+      Reflect.getMetadata(DECORATOR_KEYS.SERVICE_PARAM_TYPES, ClassName) || [];
     // 构造函数的参数的类型数据-通过@Inject等装饰器实现-是一个对象-key是数字-对应第几个参数的类型数据
     const propertiesMetadatas =
-      Reflect.getMetadata(DECORATOR_KEYS.SERVICE_INJECTED_PARAMS, token) || {};
+      Reflect.getMetadata(DECORATOR_KEYS.SERVICE_INJECTED_PARAMS, ClassName) ||
+      {};
     return params.map((paramType: any, index: any) => {
       // 查找当前index对应的参数有没有使用装饰器
       const propertyMetadatas: any[] = propertiesMetadatas[index] || [];
@@ -171,26 +303,21 @@ export class Injector {
   /**
    * 获取注入的实例属性-返回对象
    * @done
-   * @param {*} token
+   * @param {*} ClassName
    * @return {*}
    * @memberof Injector
    */
-  getInjectProperties(token: any) {
-    const currentParentToken = this.parentToken;
-    this.parentToken = token;
-
-    const metas = this.getInjectPropertiesMetas(token);
+  getInjectProperties(ClassName: any, provider: any) {
+    const metas = this.getInjectPropertiesMetas(ClassName);
 
     const properties = {} as any;
 
     metas.forEach((meta: any) => {
-      const property = this.get(meta.provide, meta.value);
-      if (!(property === undefined && meta.value?.optional)) {
-        properties[meta.key] = this.get(meta.provide, meta.value);
+      const property = this.get(meta.provide, { ...meta.value, provider });
+      if (!(property === void 0 && meta.value?.optional)) {
+        properties[meta.key] = property;
       }
     });
-
-    this.parentToken = currentParentToken;
 
     return properties;
   }
@@ -237,84 +364,12 @@ export class Injector {
   }
 
   /**
-   * 通过provider直接获取service实例
-   * @done
-   * @param {*} provider
-   * @param {*} options
-   * @return {*}
-   * @memberof Injector
-   */
-  getServiceByProvider(provider: any, options: any) {
-    if ('useValue' in provider) {
-      return provider.useValue;
-    } else if (provider.useClass) {
-      const serviceValue = this.getServiceByClass(
-        provider.useClass,
-        provider.provide
-      );
-      provider.useValue = this.postHook(serviceValue);
-      return provider.useValue;
-    } else if (provider.useExisting) {
-      const serviceValue = this.get(provider.useExisting, options);
-      provider.useValue = this.postHook(serviceValue);
-      return provider.useValue;
-    } else if (provider.useFactory) {
-      const deps = provider.deps || [];
-      const args = deps.map((dep: any) => this.get(dep));
-      const serviceValue = provider.useFactory(...args);
-      provider.useValue = this.postHook(serviceValue);
-      return provider.useValue;
-    } else {
-      throw new Error(ERROR_PROVIDER_NOT_VALID);
-    }
-  }
-
-  /**
-   * 通过类名获取服务实例
-   * @done
-   * @template T
-   * @param {new (...args: any[]) => T} ClassName
-   * @param {*} options
-   * @return {*}
-   * @memberof Injector
-   */
-  getServiceByClass<T>(ClassName: new (...args: any[]) => T, provide: any) {
-    let provider = this.providerMap.get(provide);
-    if (!provider) {
-      this.addProvider({
-        provide,
-        useClass: ClassName,
-      });
-      provider = this.providerMap.get(provide);
-    }
-    provider.status = SERVICE_STATUS.INITING;
-
-    const params = this.getContructorParameters(ClassName);
-    const service = this.postHook(new ClassName(...params));
-
-    provider.useValue = service;
-    provider.status = SERVICE_STATUS.CONSTRUCTED;
-
-    const properties = this.getInjectProperties(ClassName);
-    this.mergeHook(service, properties);
-
-    provider.status = SERVICE_STATUS.MERGED;
-
-    if ((<any>service).onInit && typeof (<any>service).onInit === 'function') {
-      (<any>service).onInit();
-    }
-    provider.status = SERVICE_STATUS.INITED;
-
-    return service;
-  }
-
-  /**
    * 把providers数组转换成map，避免后续的遍历
    * @done
    * @param {any[]} providers
    * @memberof Injector
    */
-  resolveProviders(providers: any[]) {
+  addProviders(providers: any[]) {
     providers.forEach(provider => {
       this.addProvider(provider);
     });
@@ -328,9 +383,6 @@ export class Injector {
    */
   addProvider(provider: any) {
     if (provider.provide) {
-      if ('useValue' in provider) {
-        provider.useValue = this.postHook(provider.useValue);
-      }
       this.providerMap.set(provider.provide, provider);
     } else {
       this.providerMap.set(provider, {
@@ -342,13 +394,14 @@ export class Injector {
 
   /**
    * 释放当前Injector中的所有服务实例
+   * todo，先销毁子injector，做深度遍历
    *
    * @memberof Injector
    */
   dispose() {
     this.providerMap.forEach(value => {
-      if (value && value.useValue && value.useValue.dispose) {
-        value.useValue.dispose();
+      if (value && value.useCacheValue && value.useCacheValue.dispose) {
+        value.useCacheValue.dispose();
       }
     });
     this.providerMap = null as any;
