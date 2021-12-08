@@ -29,7 +29,10 @@ import { ERROR_DISABLE_MULTIPLE_INJECTABLE, DECORATOR_KEYS } from './constants';
  * @param {*} [defaultValue] 该装饰器函数的默认参数
  * @return {*} 一个装饰器
  */
-function createDecorator(decoratorKey: string | symbol, defaultValue?: any) {
+export function createDecorator(
+  decoratorKey: string | symbol,
+  defaultValue?: any
+) {
   // 因为装饰器本身作为一个函数是有参数的，此处的decoratorValue就是实际使用装饰器的实参
   return function (decoratorValue?: any) {
     // 目前的装饰器只支持类的构造函数参数装饰器和类的实例属性装饰器
@@ -70,11 +73,15 @@ function createDecorator(decoratorKey: string | symbol, defaultValue?: any) {
         value: decoratorValue || defaultValue,
       };
 
-      if (__DEV__) {
+      if (!isParameterDecorator) {
         if (decoratorKey === DECORATOR_KEYS.INJECT) {
           if (decoratorValue === void 0) {
-            throw new Error(
-              `Inject decorator required one parameter at class ${Ctor.name} at property/parameter ${key}`
+            // 是实例属性装饰器，且是Inject装饰器，且没有指定参数
+            // 需要获取默认的类型数据
+            metadata.value = Reflect.getMetadata(
+              DECORATOR_KEYS.DESIGN_PROPERTY_TYPE,
+              target,
+              targetKey
             );
           }
         }
@@ -91,12 +98,7 @@ function createDecorator(decoratorKey: string | symbol, defaultValue?: any) {
 }
 
 // 可以使用在类构造函数的参数中和类的实例属性中
-// todo，这里的类型定义是否是必须的
-export const Inject: (
-  decoratorValue: any
-) => (target: any, targetKey: string, index?: number) => void = createDecorator(
-  DECORATOR_KEYS.INJECT
-);
+export const Inject = createDecorator(DECORATOR_KEYS.INJECT);
 
 // 指定只在当前injector中寻找服务
 export const Self = createDecorator(DECORATOR_KEYS.SELF, true);
