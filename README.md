@@ -41,3 +41,7 @@
 - 不支持中间件，后续可以考虑完善中间件
 - 不支持自定义装饰器，比如@Prev、@Post 等装饰器，类似 autobind，应该独立维护
 - 不支持 onInit 生命周期钩子，虽然 Spring 中时支持的，但是实际场景中并不常用，[参考这里](https://github.com/angular/angular/issues/23235)
+
+### todo
+
+多次 Injectable 不需要报错

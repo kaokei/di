@@ -12,16 +12,14 @@ type Ret<T> = T extends new (...args: any) => infer S
   ? { [P in keyof T]: Ret<T[P]> }
   : T;
 
-import {
-  ERROR_CIRCULAR_DEPENDENCY,
-  ERROR_TOKEN_NOT_FOUND,
-  ERROR_INJECT_NOT_VALID,
-  ERROR_PROVIDER_NOT_VALID,
-  SERVICE_STATUS,
-  DECORATOR_KEYS,
-} from './constants';
+import { SERVICE_STATUS, DECORATOR_KEYS } from './constants';
 import { merge, has } from './utils';
 import { resolveForwardRef } from './forwardRef';
+
+import { CircularDependencyError } from './errors/CircularDependencyError';
+import { TokenNotFoundError } from './errors/TokenNotFoundError';
+import { InjectFailedError } from './errors/InjectFailedError';
+import { ProviderNotValidError } from './errors/ProviderNotValidError';
 
 const NOOP = (n: any) => n;
 
@@ -39,10 +37,13 @@ export class Injector {
   public mergePropertyHook?: any;
 
   constructor(providers: any[] = [], parent?: Injector, options: any = {}) {
+    // 引用父级Injector
     this.parent = parent;
 
-    // 在获取服务实例之后，在更新provider.useCacheValue之前，使服务响应化
+    // 在把服务实例放到缓存中之前，可以调用这个钩子让服务响应化
     this.beforeCacheHook = options.beforeCacheHook || NOOP;
+
+    // 在注入实例属性时，需要把属性merge到服务实例对象上，合并过程需要保持响应式
     this.mergePropertyHook = options.mergePropertyHook || merge;
 
     this.addProviders(providers);
@@ -64,14 +65,14 @@ export class Injector {
         return this.parent.get(token, { ...options, skip: false });
       } else {
         if (!options.optional) {
-          throw new Error(`${token} ${ERROR_TOKEN_NOT_FOUND}`);
+          throw new TokenNotFoundError(token);
         }
       }
     } else if (options.self) {
       if (this.providerMap.has(token)) {
         const provider = this.providerMap.get(token);
         if (provider.status === SERVICE_STATUS.INITING) {
-          this.throwCircularDependencyError(provider);
+          throw new CircularDependencyError(provider);
         }
         return this.getServiceByProvider(provider, options);
       } else if (
@@ -85,13 +86,13 @@ export class Injector {
         return this.getServiceByProvider(provider, options);
       } else {
         if (!options.optional) {
-          throw new Error(`${token} ${ERROR_TOKEN_NOT_FOUND}`);
+          throw new TokenNotFoundError(token);
         }
       }
     } else if (this.providerMap.has(token)) {
       const provider = this.providerMap.get(token);
       if (provider.status === SERVICE_STATUS.INITING) {
-        this.throwCircularDependencyError(provider);
+        throw new CircularDependencyError(provider);
       }
       return this.getServiceByProvider(provider, options);
     } else if (this.parent) {
@@ -104,7 +105,7 @@ export class Injector {
       return this.getServiceByProvider(provider, options);
     } else {
       if (!options.optional) {
-        throw new Error(`${token} ${ERROR_TOKEN_NOT_FOUND}`);
+        throw new TokenNotFoundError(token);
       }
     }
   }
@@ -123,17 +124,6 @@ export class Injector {
       this.addProvider(token);
     }
     return this.providerMap.get(token);
-  }
-
-  throwCircularDependencyError(provider: any) {
-    const tokenArr = [];
-    let currentProvider = provider;
-    while (currentProvider && currentProvider.provide) {
-      tokenArr.push(currentProvider.provide);
-      currentProvider = currentProvider.parent;
-    }
-    const tokenListText = tokenArr.join(' <-- ');
-    throw new Error(`${ERROR_CIRCULAR_DEPENDENCY} ${tokenListText}`);
   }
 
   /**
@@ -156,7 +146,7 @@ export class Injector {
     } else if (provider.useFactory) {
       return this.getServiceUseFactoryWithProvider(provider, options);
     } else {
-      throw new Error(ERROR_PROVIDER_NOT_VALID);
+      throw new ProviderNotValidError(provider);
     }
   }
 
@@ -282,10 +272,14 @@ export class Injector {
     return params.map((paramType: any, index: any) => {
       // 查找当前index对应的参数有没有使用装饰器
       const propertyMetadatas: any[] = propertiesMetadatas[index] || [];
-      // 查找装饰器列表中有没有@Inject
-      const ctor = propertyMetadatas.find(
+      // 查找装饰器列表中有没有@Inject装饰器的数据
+      const injectMeta = propertyMetadatas.find(
         meta => meta.key === DECORATOR_KEYS.INJECT
       );
+      if ((injectMeta && injectMeta.value === Object) || paramType === Object) {
+        // 构造函数的参数可以不使用@Inject，但是一定不能是interface
+        throw new InjectFailedError(injectMeta, ClassName, index, paramType);
+      }
       // 把装饰器列表收集为对象，并且排除掉@Inject
       const options = propertyMetadatas.reduce((acc, meta) => {
         if (meta.key !== DECORATOR_KEYS.INJECT) {
@@ -294,7 +288,7 @@ export class Injector {
         return acc;
       }, {} as any);
       return {
-        key: resolveForwardRef(ctor && ctor.value) || paramType,
+        key: resolveForwardRef(injectMeta && injectMeta.value) || paramType,
         value: options,
       };
     });
@@ -325,26 +319,27 @@ export class Injector {
   /**
    * 获取注入属性的装饰器数据
    * @done
-   * @param {*} token
+   * @param {*} ClassName
    * @return {*}
    * @memberof Injector
    */
-  getInjectPropertiesMetas(token: any) {
+  getInjectPropertiesMetas(ClassName: any) {
     // 获取注入属性的metas-类型是Recors<string, Array>
     const propertiesMetadatas =
-      Reflect.getMetadata(DECORATOR_KEYS.SERVICE_INJECTED_PROPS, token) || {};
+      Reflect.getMetadata(DECORATOR_KEYS.SERVICE_INJECTED_PROPS, ClassName) ||
+      {};
     const propertiesMetas: any = [];
     for (const key in propertiesMetadatas) {
       if (has(propertiesMetadatas, key)) {
         // 当前key属性对应的所有的装饰器
         const propertyMetadatas = propertiesMetadatas[key] || [];
-        // 当前key属性对应的@Inject
-        const ctor = propertyMetadatas.find(
+        // 当前key属性对应的@Inject装饰器的数据
+        const injectMeta = propertyMetadatas.find(
           (meta: any) => meta.key === DECORATOR_KEYS.INJECT
         );
-        if (!ctor) {
+        if (!injectMeta || injectMeta.value === Object) {
           // 属性一定要手动指定@Inject
-          throw new Error(ERROR_INJECT_NOT_VALID);
+          throw new InjectFailedError(injectMeta, ClassName, key);
         }
         const options = propertyMetadatas.reduce((acc: any, meta: any) => {
           if (meta.key !== DECORATOR_KEYS.INJECT) {
@@ -355,7 +350,7 @@ export class Injector {
 
         propertiesMetas.push({
           key,
-          provide: resolveForwardRef(ctor.value),
+          provide: resolveForwardRef(injectMeta.value),
           value: options,
         });
       }

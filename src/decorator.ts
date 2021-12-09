@@ -18,7 +18,7 @@
  *   实例访问器：原型, 方法名, 属性描述符
  */
 
-import { ERROR_DISABLE_MULTIPLE_INJECTABLE, DECORATOR_KEYS } from './constants';
+import { DECORATOR_KEYS } from './constants';
 
 /**
  * 创建装饰器的高阶函数
@@ -119,10 +119,6 @@ export const Optional = createDecorator(DECORATOR_KEYS.OPTIONAL, true);
  */
 export function Injectable() {
   return function (target: any) {
-    if (Reflect.hasOwnMetadata(DECORATOR_KEYS.INJECTABLE, target)) {
-      throw new Error(ERROR_DISABLE_MULTIPLE_INJECTABLE);
-    }
-
     // 标记这个类可以注入
     Reflect.defineMetadata(DECORATOR_KEYS.INJECTABLE, true, target);
 
