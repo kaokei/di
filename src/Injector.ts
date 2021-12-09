@@ -401,7 +401,11 @@ export class Injector {
   dispose() {
     this.providerMap.forEach(value => {
       if (value && value.useCacheValue && value.useCacheValue.dispose) {
-        value.useCacheValue.dispose();
+        try {
+          value.useCacheValue.dispose();
+        } catch (error) {
+          console.error(error);
+        }
       }
     });
     this.providerMap = null as any;
