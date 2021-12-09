@@ -27,16 +27,3 @@ export const SERVICE_STATUS = {
   MERGED: Symbol('merged'),
   INITED: Symbol('inited'),
 };
-
-// 以下是error message常量
-export const ERROR_CIRCULAR_DEPENDENCY =
-  'CIRCULAR DEPENDENCY DETECTED. PLEASE FIX IT MANUALLY.';
-
-export const ERROR_DISABLE_MULTIPLE_INJECTABLE =
-  'Use multiple @Injectable on same class is not valid.';
-
-export const ERROR_TOKEN_NOT_FOUND = 'Token not found.';
-
-export const ERROR_INJECT_NOT_VALID = `You may forget to use @Inject on class property or @Injects's parameter is undefined.`;
-
-export const ERROR_PROVIDER_NOT_VALID = `Provider is not valid.`;

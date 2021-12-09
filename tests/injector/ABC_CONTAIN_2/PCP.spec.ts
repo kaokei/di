@@ -4,7 +4,7 @@ import {
   Injector,
   Injectable,
   forwardRef,
-  ERROR_CIRCULAR_DEPENDENCY,
+  CircularDependencyError,
 } from '@/index';
 
 interface IA {
@@ -70,7 +70,7 @@ describe('cyclic dependency ABC_CONTAIN_2_PCP', () => {
   test('injector.get(B) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
     expect(() => {
       injector.get(B);
-    }).toThrow(ERROR_CIRCULAR_DEPENDENCY);
+    }).toThrowError(CircularDependencyError);
   });
 
   test('injector.get(C) should work correctly', async () => {

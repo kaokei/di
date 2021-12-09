@@ -4,11 +4,8 @@ import {
   Injector,
   Injectable,
   forwardRef,
-  Self,
   Skip,
-  Optional,
-  ERROR_CIRCULAR_DEPENDENCY,
-  ERROR_TOKEN_NOT_FOUND,
+  TokenNotFoundError,
 } from '@/index';
 
 interface IA {
@@ -89,18 +86,18 @@ describe('Options Combination 4: self + optional', () => {
   test('injector.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       injector.get(A);
-    }).toThrow(ERROR_TOKEN_NOT_FOUND);
+    }).toThrowError(TokenNotFoundError);
   });
 
   test('injector.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       injector.get(B);
-    }).toThrow(ERROR_TOKEN_NOT_FOUND);
+    }).toThrowError(TokenNotFoundError);
   });
 
   test('injector.get(C) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       injector.get(C);
-    }).toThrow(ERROR_TOKEN_NOT_FOUND);
+    }).toThrowError(TokenNotFoundError);
   });
 });

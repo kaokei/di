@@ -1,11 +1,5 @@
 import 'reflect-metadata';
-import {
-  Inject,
-  Injector,
-  Injectable,
-  forwardRef,
-  ERROR_CIRCULAR_DEPENDENCY,
-} from '@/index';
+import { Inject, Injector, Injectable, forwardRef } from '@/index';
 
 interface IA {
   name: string;

@@ -16,10 +16,12 @@ import { SERVICE_STATUS, DECORATOR_KEYS } from './constants';
 import { merge, has } from './utils';
 import { resolveForwardRef } from './forwardRef';
 
-import { CircularDependencyError } from './errors/CircularDependencyError';
-import { TokenNotFoundError } from './errors/TokenNotFoundError';
-import { InjectFailedError } from './errors/InjectFailedError';
-import { ProviderNotValidError } from './errors/ProviderNotValidError';
+import {
+  CircularDependencyError,
+  TokenNotFoundError,
+  InjectFailedError,
+  ProviderNotValidError,
+} from './errors';
 
 const NOOP = (n: any) => n;
 

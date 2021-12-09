@@ -5,10 +5,7 @@ import {
   Injectable,
   forwardRef,
   Self,
-  Skip,
-  Optional,
-  ERROR_CIRCULAR_DEPENDENCY,
-  ERROR_TOKEN_NOT_FOUND,
+  TokenNotFoundError,
 } from '@/index';
 
 interface IA {
@@ -91,7 +88,7 @@ describe('Options Combination 2: self + optional', () => {
     // 但是在injector中找不到B，所以抛出异常
     expect(() => {
       injector.get(A);
-    }).toThrow(ERROR_TOKEN_NOT_FOUND);
+    }).toThrowError(TokenNotFoundError);
   });
 
   test('injector.get(B) should work correctly', async () => {
