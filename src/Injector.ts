@@ -278,7 +278,10 @@ export class Injector {
       const injectMeta = propertyMetadatas.find(
         meta => meta.key === DECORATOR_KEYS.INJECT
       );
-      if ((injectMeta && injectMeta.value === Object) || paramType === Object) {
+      if (
+        (injectMeta && injectMeta.value === Object) ||
+        (!injectMeta && paramType === Object)
+      ) {
         // 构造函数的参数可以不使用@Inject，但是一定不能是interface
         throw new InjectFailedError(injectMeta, ClassName, index, paramType);
       }
