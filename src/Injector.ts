@@ -74,7 +74,7 @@ export class Injector {
       if (this.providerMap.has(token)) {
         const provider = this.providerMap.get(token);
         if (provider.status === SERVICE_STATUS.INITING) {
-          throw new CircularDependencyError(provider);
+          throw new CircularDependencyError(provider, options);
         }
         return this.getServiceByProvider(provider, options);
       } else if (
@@ -94,7 +94,7 @@ export class Injector {
     } else if (this.providerMap.has(token)) {
       const provider = this.providerMap.get(token);
       if (provider.status === SERVICE_STATUS.INITING) {
-        throw new CircularDependencyError(provider);
+        throw new CircularDependencyError(provider, options);
       }
       return this.getServiceByProvider(provider, options);
     } else if (this.parent) {

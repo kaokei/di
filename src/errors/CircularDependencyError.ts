@@ -3,11 +3,11 @@ export class CircularDependencyError extends Error {
 
   public message = this.name;
 
-  constructor(provider: any) {
+  constructor(provider: any, options: any) {
     super();
 
-    const tokenArr = [];
-    let currentProvider = provider;
+    const tokenArr = [provider.provide];
+    let currentProvider = options?.provider;
     while (currentProvider && currentProvider.provide) {
       tokenArr.push(currentProvider.provide);
       currentProvider = currentProvider.parent;
