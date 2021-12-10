@@ -70,7 +70,7 @@ export function createDecorator(
         key: decoratorKey,
         // 装饰器的值，即装饰器函数的实参
         // 很多装饰器具有默认值，可以不提供实参，而是使用默认值
-        value: decoratorValue || defaultValue,
+        value: decoratorValue === void 0 ? defaultValue : decoratorValue,
       };
 
       if (!isParameterDecorator) {

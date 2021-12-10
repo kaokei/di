@@ -45,3 +45,5 @@
 ### todo
 
 多次 Injectable 不需要报错
+
+https://github.com/topics/dependency-injection?l=typescript
