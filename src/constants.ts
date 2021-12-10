@@ -25,5 +25,4 @@ export const SERVICE_STATUS = {
   INITING: Symbol('initing'),
   CONSTRUCTED: Symbol('constructed'),
   MERGED: Symbol('merged'),
-  INITED: Symbol('inited'),
 };

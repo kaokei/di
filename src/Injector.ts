@@ -394,7 +394,6 @@ export class Injector {
 
   /**
    * 释放当前Injector中的所有服务实例
-   * todo，先销毁子injector，做深度遍历
    *
    * @memberof Injector
    */
