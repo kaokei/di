@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.23](https://github.com/kaokei/di/compare/v1.0.22...v1.0.23) (2021-12-10)
+
+
+### Features
+
+* **default:** 删除了defaultValue ([7cae1d0](https://github.com/kaokei/di/commit/7cae1d039298b39ec7fccd793a804743ec43ab6c))
+
+
+### Bug Fixes
+
+* **fix:** catch dispose error ([2ee9b4a](https://github.com/kaokei/di/commit/2ee9b4a69158e8a5741144170615beb25c2e84a7))
+* **fix:** 修复了判断InjectFailed场景的错误 ([c97f092](https://github.com/kaokei/di/commit/c97f092744e178236b1317aab108f92d337eb943))
+
 ### 1.0.22 (2021-10-07)
 
 
