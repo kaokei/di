@@ -1,6 +1,6 @@
 {
   "name": "@kaokei/di",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "description": "Tiny di library depend on typescript and reflect-metadata",
   "main": "./dist/index.cjs.runtime.min.js",
   "module": "./dist/index.esm.runtime.min.js",
