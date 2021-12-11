@@ -6,21 +6,21 @@
 
 </div>
 
-## 文档
+## 灵感
 
-[Document](https://www.kaokei.com/project/di/)
-
-## 解决了什么问题？
-
-基于 typescript 实现依赖注入能力。类似的目前比较流行的 library 是`InversifyJS`。
+Inspired by [Spring](https://spring.io/), [Angular](https://angular.io/), [typedi](https://github.com/typestack/typedi), [InversifyJS](https://github.com/inversify/InversifyJS)
 
 其他类似的 library 可以[参考这里](https://github.com/topics/ioc?l=typescript)和[参考这里](https://github.com/topics/dependency-injection?l=typescript)
 
-### playground
+## 解决了什么问题？
 
-https://codesandbox.io/s/di-playground-zjnyv
+基于 typescript 实现依赖注入能力。类似的目前比较流行的 library 是`InversifyJS`和`typedi`。
 
-### 已经支持的特性
+[详细文档地址](https://www.kaokei.com/project/di/)
+
+[online playground](https://codesandbox.io/s/di-playground-zjnyv)
+
+## 已经支持的特性
 
 - 支持类，Symbol，字符串等作为服务的 token
 - 支持类，值，工厂函数等作为服务
@@ -34,7 +34,7 @@ https://codesandbox.io/s/di-playground-zjnyv
 - 支持类型提示，以及 InjectionKey 的类型提示
 - 支持 dispose 生命周期钩子
 
-### 不支持的特性
+## 不支持的特性
 
 - 不支持 multi-injection
 - 不支持不能自己 new 的注入，比如 react 类组件的实例化过程我们干预不了，因为 Injector 容器内部非常重要的一个工作就是 new 一个对象。
