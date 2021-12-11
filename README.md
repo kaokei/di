@@ -42,7 +42,7 @@ https://codesandbox.io/s/di-playground-zjnyv
 - 暂时不实现 providers 中使用 forwardRef，主要是不了解使用场景，目前只支持在@Inject 中使用 forwardRef
 - 不支持异步实例化，即该实例对象的状态和数据依赖服务器端数据，需要异步获取，等待获取数据成功之后才实例化对象。对于这种场景建议在实例对象中维护类似 loading/ready/inited 这种字段来表明数据是否准备完毕。
 - 不支持 LazyInject
-- 不支持 onInit 生命周期钩子，虽然 Spring 中时支持的，但是实际场景中并不常用，[参考这里](https://github.com/angular/angular/issues/23235)
+- 不支持 onInit 生命周期钩子，虽然 Spring 中是支持的，但是实际场景中并不常用，[参考这里](https://github.com/angular/angular/issues/23235)
 - 不支持自定义装饰器，比如@Prev、@Post 等装饰器，类似 autobind，应该独立维护
 - 原来确实导出了 autobind，后续删除了该导出，有业务需要可以自己 `npm install autobind-decorator` 即可
 - 不支持中间件
