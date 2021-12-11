@@ -53,7 +53,7 @@ export class Injector {
 
   /**
    * 对外暴露的接口 - 获取服务对象
-   * @done
+   *
    * @param {*} token
    * @param {*} options
    * @return {*}  {*}
@@ -130,7 +130,7 @@ export class Injector {
 
   /**
    * 通过provider直接获取service实例
-   * @done
+   *
    * @param {*} provider
    * @param {*} options
    * @return {*}
@@ -140,7 +140,7 @@ export class Injector {
     if ('useCacheValue' in provider) {
       return provider.useCacheValue;
     } else if ('useValue' in provider) {
-      return this.getServiceUseValueWithProvider(provider, options);
+      return this.getServiceUseValueWithProvider(provider);
     } else if (provider.useClass) {
       return this.getServiceUseClassWithProvider(provider, options);
     } else if (provider.useExisting) {
@@ -159,7 +159,7 @@ export class Injector {
    * @return {*}
    * @memberof Injector
    */
-  getServiceUseValueWithProvider(provider: any, options: any) {
+  getServiceUseValueWithProvider(provider: any) {
     const cacheValue = this.beforeCacheHook(provider.useValue);
     provider.useCacheValue = cacheValue;
     return cacheValue;
@@ -167,14 +167,13 @@ export class Injector {
 
   /**
    * 通过useClass获取服务实例
-   * @done
-   * @template T
-   * @param {new (...args: any[]) => T} ClassName
+   *
+   * @param {*} provider
    * @param {*} options
    * @return {*}
    * @memberof Injector
    */
-  getServiceUseClassWithProvider<T>(provider: any, options: any) {
+  getServiceUseClassWithProvider(provider: any, options: any) {
     provider.parent = options.provider;
 
     provider.status = SERVICE_STATUS.INITING;
@@ -243,8 +242,9 @@ export class Injector {
 
   /**
    * 获取构造函数的参数-返回数组
-   * @done
+   *
    * @param {*} ClassName
+   * @param {*} provider
    * @return {*}
    * @memberof Injector
    */
@@ -258,7 +258,7 @@ export class Injector {
 
   /**
    * 获取构造函数的参数的装饰器元数据
-   * @done
+   *
    * @param {*} ClassName
    * @return {*}
    * @memberof Injector
@@ -301,8 +301,9 @@ export class Injector {
 
   /**
    * 获取注入的实例属性-返回对象
-   * @done
+   *
    * @param {*} ClassName
+   * @param {*} provider
    * @return {*}
    * @memberof Injector
    */
@@ -323,7 +324,7 @@ export class Injector {
 
   /**
    * 获取注入属性的装饰器数据
-   * @done
+   *
    * @param {*} ClassName
    * @return {*}
    * @memberof Injector
@@ -365,7 +366,7 @@ export class Injector {
 
   /**
    * 把providers数组转换成map，避免后续的遍历
-   * @done
+   *
    * @param {any[]} providers
    * @memberof Injector
    */
@@ -377,7 +378,7 @@ export class Injector {
 
   /**
    * 添加新的provider
-   * @done
+   *
    * @param {*} provider
    * @memberof Injector
    */
