@@ -52,7 +52,8 @@ describe('injector useValue', () => {
   let injector: Injector;
 
   beforeEach(() => {
-    injector = new Injector([]);
+    // injector = new Injector([]);
+    injector = new Injector();
   });
 
   test('injector.get(A) should work correctly', async () => {

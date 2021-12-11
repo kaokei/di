@@ -338,7 +338,7 @@ export class Injector {
     for (const key in propertiesMetadatas) {
       if (has(propertiesMetadatas, key)) {
         // 当前key属性对应的所有的装饰器
-        const propertyMetadatas = propertiesMetadatas[key] || [];
+        const propertyMetadatas = propertiesMetadatas[key];
         // 当前key属性对应的@Inject装饰器的数据
         const injectMeta = propertyMetadatas.find(
           (meta: any) => meta.key === DECORATOR_KEYS.INJECT
