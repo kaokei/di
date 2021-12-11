@@ -34,7 +34,12 @@ export class B {
   public id = 2;
 }
 
-describe('errors -> PROVIDER_NOT_VALID', () => {
+export class C {
+  public name = 'C';
+  public id = 3;
+}
+
+describe('errors -> TOKEN_NOT_FOUND', () => {
   let injector: Injector;
 
   beforeEach(() => {
@@ -53,5 +58,11 @@ describe('errors -> PROVIDER_NOT_VALID', () => {
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);
     expect(b.name).toBe('B');
+  });
+
+  test('injector.get(C) should throw TokenNotFoundError', async () => {
+    expect(() => {
+      injector.get(C);
+    }).toThrowError(TokenNotFoundError);
   });
 });

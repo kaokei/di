@@ -14,6 +14,6 @@ export class CircularDependencyError extends Error {
     }
     const tokenListText = tokenArr.join(' <-- ');
 
-    this.message = `CIRCULAR DEPENDENCY DETECTED. PLEASE FIX IT MANUALLY. ${tokenListText}`;
+    this.message = `CIRCULAR DEPENDENCY DETECTED. PLEASE FIX IT MANUALLY. \n ${tokenListText}`;
   }
 }
