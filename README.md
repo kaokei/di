@@ -12,6 +12,12 @@ Inspired by [Spring](https://spring.io/), [Angular](https://angular.io/), [typed
 
 其他类似的 library 可以[参考这里](https://github.com/topics/ioc?l=typescript)和[参考这里](https://github.com/topics/dependency-injection?l=typescript)
 
+最初接触依赖注入是从 Spring 中开始的，依稀记得我的第一份工作是 java 开发，在第一次开发业务需求的时候，还只知道`new`一个类来获取对象。然后我就在代码中 new 了很多实例对象。不出意外的出现问题了，组长就开始帮我调试代码，最终组长告诉我不要自己手动`new`实例对象，只需要在`XML`文件中配置对应的 bean 对象即可。这给当时的我留下了深刻的印象。现在回想起来，如果我是当时的组长，我肯定会非常生气，连这么基础的东西都不知道。
+
+后来又接触到 Angular，第一次了解到依赖注入在前端的应用。最关键的是我之前有使用过 vue 和 react，先入为主的认为 Angular 中一定也有一个全局的 store，但是却怎么也找不到这个 store 对象，反而都是碎片化的 service。后来才反应过来，多 service 其实可以理解为多 store，如果整个项目只有一个 service，那么不就退化成和 vue 以及 react 一样了吗？只不过 service 在 Angular 中非常方便使用而且易于控制作用范围，相对的 vue 中的 store 的 module 本质还是全局范围可见的不同命名空间而已。
+
+所以我的想法就是要把 angular 的 service 特性迁移到 vue 和 react 中。本库作为一个基础库，被[user-vue-service](https://github.com/kaokei/use-vue-service)等库依赖。
+
 ## 解决了什么问题？
 
 基于 typescript 实现依赖注入能力。类似的目前比较流行的 library 是`InversifyJS`和`typedi`。
