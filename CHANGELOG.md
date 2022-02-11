@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/kaokei/di/compare/v1.0.25...v1.1.0) (2022-02-11)
+
+
+### Bug Fixes
+
+* **typo:** 修复文字错误 ([2fdb91f](https://github.com/kaokei/di/commit/2fdb91ff95eab8c1c13153e5c267ce584bcf985b))
+
 ### [1.0.25](https://github.com/kaokei/di/compare/v1.0.24...v1.0.25) (2021-12-11)
 
 ### [1.0.24](https://github.com/kaokei/di/compare/v1.0.23...v1.0.24) (2021-12-11)
