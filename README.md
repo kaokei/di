@@ -6,6 +6,14 @@
 
 </div>
 
+- [documentation](https://kaokei.com/project/di/)
+- [online playground](https://codesandbox.io/s/di-playground-zjnyv)
+- [online demo](https://kaokei.com/project/di/)
+
+```bash
+npm install @kaokei/di reflect-metadata
+```
+
 ## 灵感
 
 Inspired by [Spring](https://spring.io/), [Angular](https://angular.io/), [typedi](https://github.com/typestack/typedi), [InversifyJS](https://github.com/inversify/InversifyJS)
@@ -21,10 +29,6 @@ Inspired by [Spring](https://spring.io/), [Angular](https://angular.io/), [typed
 ## 解决了什么问题？
 
 基于 typescript 实现依赖注入能力。类似的目前比较流行的 library 是`InversifyJS`和`typedi`。
-
-[详细文档地址](https://kaokei.com/project/di/)
-
-[online playground](https://codesandbox.io/s/di-playground-zjnyv)
 
 ## 已经支持的特性
 
