@@ -59,3 +59,21 @@ Inspired by [Spring](https://spring.io/), [Angular](https://angular.io/), [typed
 - 不支持中间件，有需要可以[参考这里](https://github.com/inversify/InversifyJS/blob/master/wiki/middleware.md)
 - 原来确实导出了 autobind，后续删除了该导出，有业务需要可以自己 `npm install autobind-decorator` 即可。
 - 没有实现自定义装饰器，比如@Prev、@Post、@Aop 等装饰器，类似 autobind，应该独立维护。
+
+## 已知问题
+
+循环依赖导致的问题运行时报错。
+
+- [Design:type metadata for cyclic dependencies throw at runtime #27519](https://github.com/microsoft/TypeScript/issues/27519)
+- [Support for classes](https://github.com/inversify/InversifyJS/blob/master/wiki/classes_as_id.md#known-limitation-classes-as-identifiers-and-circular-dependencies)
+
+经过一番探究，有不同的场景会导致这个问题。
+
+问题一：A 类和 B 类循环依赖。
+
+解决方案：使用 forwardRef 解藕 A 和 B 的实例化过程。类似 InversifyJS 中的 lazyInject。
+
+问题二：已经使用 forawrdRef 解藕了 A 和 B。仍然有运行时错误。
+
+解决方案：这是因为 tsconfig.json 中的 target 不是 es5。通过测试发现只有设置为 es5 才能避免这个问题。
+可以[参考这个项目](https://github.com/kaokei/test-webpack-typescript)
