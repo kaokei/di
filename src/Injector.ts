@@ -1,19 +1,14 @@
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+// eslint-disable-next-line @typescript-eslint/ban-types
 export interface InjectionKey<T> extends Symbol {}
-
-interface Meta {
-  key: any;
-  value: any;
-}
 
 type Ret<T> = T extends new (...args: any) => infer S
   ? S
   : T extends Array<any>
-  ? { [P in keyof T]: Ret<T[P]> }
-  : T;
+    ? { [P in keyof T]: Ret<T[P]> }
+    : T;
 
 import { SERVICE_STATUS, DECORATOR_KEYS } from './constants';
-import { merge, has } from './utils';
+import { merge, has, isInjectableToken } from './utils';
 import { resolveForwardRef } from './forwardRef';
 
 import {
@@ -33,9 +28,10 @@ const NOOP = (n: any) => n;
 export class Injector {
   public parent?: Injector;
 
-  public providerMap = new Map<any, any>();
+  public providerMap = new Map<any, any>(); // <token, provider>
 
   public beforeCacheHook?: any;
+
   public mergePropertyHook?: any;
 
   constructor(providers: any[] = [], parent?: Injector, options: any = {}) {
@@ -52,6 +48,24 @@ export class Injector {
   }
 
   /**
+   * 如果没有parent则是root injector
+   */
+  isRootInjector() {
+    return !this.parent;
+  }
+
+  /**
+   * 如果没有指定当前token是可选的，则抛出异常
+   * @param token
+   * @param options
+   */
+  checkTokenNotFoundError(token: any, options: any) {
+    if (!options.optional) {
+      throw new TokenNotFoundError(token);
+    }
+  }
+
+  /**
    * 对外暴露的接口 - 获取服务对象
    *
    * @param {*} token
@@ -63,58 +77,50 @@ export class Injector {
   get<R, T = unknown>(token: T, options?: any): T extends R ? Ret<T> : Ret<R>;
   get(token: any, options: any = {}): any {
     if (options.skip) {
+      // 优先判断skip，是因为可以实现三种不同的组合
+      // 1. 只有skip
+      // 1. 只有self
+      // 1. 同时有skip和self
       if (this.parent) {
+        // 最多只能跳过一次，虽然也可以将skip设为number类型，从而可以控制跳过的次数，但是没有必要
         return this.parent.get(token, { ...options, skip: false });
       } else {
-        if (!options.optional) {
-          throw new TokenNotFoundError(token);
-        }
+        this.checkTokenNotFoundError(token, options);
       }
     } else if (options.self) {
       if (this.providerMap.has(token)) {
         const provider = this.providerMap.get(token);
-        if (provider.status === SERVICE_STATUS.INITING) {
-          throw new CircularDependencyError(provider, options);
-        }
         return this.getServiceByProvider(provider, options);
-      } else if (
-        !this.parent &&
-        typeof token === 'function' &&
-        Reflect.getMetadata(DECORATOR_KEYS.INJECTABLE, token)
-      ) {
-        // 如果当前Injector已经是根Injector
-        // 就必须要考虑self的限制
+      } else if (this.isRootInjector() && isInjectableToken(token)) {
+        // 这里的场景是 useRootService(Token, {self: true})
+        // 应该不会有人这样写代码，这里只是为了代码逻辑的完整性
+        // 正常业务代码只需要写 useRootService(Token) 即可
         const provider = this.getProviderByToken(token);
         return this.getServiceByProvider(provider, options);
       } else {
-        if (!options.optional) {
-          throw new TokenNotFoundError(token);
-        }
+        this.checkTokenNotFoundError(token, options);
       }
     } else if (this.providerMap.has(token)) {
       const provider = this.providerMap.get(token);
-      if (provider.status === SERVICE_STATUS.INITING) {
-        throw new CircularDependencyError(provider, options);
-      }
       return this.getServiceByProvider(provider, options);
     } else if (this.parent) {
       return this.parent.get(token, options);
-    } else if (
-      typeof token === 'function' &&
-      Reflect.getMetadata(DECORATOR_KEYS.INJECTABLE, token)
-    ) {
+    } else if (isInjectableToken(token)) {
+      // 这里代表是root injector
+      // 这里的意思代表所有Injectable Class都可以自动在root injector中实例化
+      // 不再需要手动调用declareRootProviders这个方法
+      // 当然declareRootProviders这个方法有其他使用场景，比如不是以Class作为token
       const provider = this.getProviderByToken(token);
       return this.getServiceByProvider(provider, options);
     } else {
-      if (!options.optional) {
-        throw new TokenNotFoundError(token);
-      }
+      this.checkTokenNotFoundError(token, options);
     }
   }
 
   /**
    * 如果token对应的provider不存在
    * 那么就创建一个
+   * 目前来看这个方法只是针对root injector使用，属于兜底策略
    * 调用该方法之前需要保证token对应的provider已经存在或者token本身是一个可注入的类
    *
    * @param {*} token
@@ -137,6 +143,10 @@ export class Injector {
    * @memberof Injector
    */
   getServiceByProvider(provider: any, options: any) {
+    if (provider.status === SERVICE_STATUS.INITING) {
+      throw new CircularDependencyError(provider, options);
+    }
+
     if ('useCacheValue' in provider) {
       return provider.useCacheValue;
     } else if ('useValue' in provider) {
@@ -174,23 +184,22 @@ export class Injector {
    * @memberof Injector
    */
   getServiceUseClassWithProvider(provider: any, options: any) {
+    provider.status = SERVICE_STATUS.INITING;
     provider.parent = options.provider;
 
-    provider.status = SERVICE_STATUS.INITING;
     const ClassName = provider.useClass;
-
     const params = this.getContructorParameters(ClassName, provider);
     const cacheValue = this.beforeCacheHook(new ClassName(...params));
 
+    // 实例化成功，此时不会再有死循环问题
     provider.useCacheValue = cacheValue;
     provider.status = SERVICE_STATUS.CONSTRUCTED;
 
     const properties = this.getInjectProperties(ClassName, provider);
     this.mergePropertyHook(cacheValue, properties);
 
-    provider.status = SERVICE_STATUS.MERGED;
-
     provider.parent = void 0;
+    provider.status = SERVICE_STATUS.MERGED;
 
     return cacheValue;
   }
@@ -204,14 +213,14 @@ export class Injector {
    * @memberof Injector
    */
   getServiceUseExistingWithProvider(provider: any, options: any) {
-    provider.parent = options.provider;
     provider.status = SERVICE_STATUS.INITING;
+    provider.parent = options.provider;
 
     const cacheValue = this.get(provider.useExisting, { ...options, provider });
     provider.useCacheValue = cacheValue;
 
-    provider.status = SERVICE_STATUS.CONSTRUCTED;
     provider.parent = void 0;
+    provider.status = SERVICE_STATUS.CONSTRUCTED;
 
     return cacheValue;
   }
@@ -225,8 +234,8 @@ export class Injector {
    * @memberof Injector
    */
   getServiceUseFactoryWithProvider(provider: any, options: any) {
-    provider.parent = options.provider;
     provider.status = SERVICE_STATUS.INITING;
+    provider.parent = options.provider;
 
     const deps = provider.deps || [];
     const args = deps.map((dep: any) => this.get(dep, { provider }));
@@ -234,8 +243,8 @@ export class Injector {
     const cacheValue = this.beforeCacheHook(serviceValue);
     provider.useCacheValue = cacheValue;
 
-    provider.status = SERVICE_STATUS.CONSTRUCTED;
     provider.parent = void 0;
+    provider.status = SERVICE_STATUS.CONSTRUCTED;
 
     return cacheValue;
   }
@@ -251,7 +260,7 @@ export class Injector {
   getContructorParameters(ClassName: any, provider: any) {
     const params = this.getContructorParametersMetas(ClassName);
     const result = params.map((meta: any) =>
-      this.get(meta.key, { ...meta.value, provider })
+      this.get(meta.provide, { ...meta.value, provider })
     );
     return result;
   }
@@ -266,7 +275,7 @@ export class Injector {
   getContructorParametersMetas(ClassName: any) {
     // 构造函数的参数的类型数据-原始数据-是一个数组
     const params =
-      Reflect.getMetadata(DECORATOR_KEYS.SERVICE_PARAM_TYPES, ClassName) || [];
+      Reflect.getMetadata(DECORATOR_KEYS.DESIGN_PARAM_TYPES, ClassName) || [];
     // 构造函数的参数的类型数据-通过@Inject等装饰器实现-是一个对象-key是数字-对应第几个参数的类型数据
     const propertiesMetadatas =
       Reflect.getMetadata(DECORATOR_KEYS.SERVICE_INJECTED_PARAMS, ClassName) ||
@@ -293,7 +302,8 @@ export class Injector {
         return acc;
       }, {} as any);
       return {
-        key: resolveForwardRef(injectMeta && injectMeta.value) || paramType,
+        key: index,
+        provide: resolveForwardRef(injectMeta && injectMeta.value) || paramType,
         value: options,
       };
     });

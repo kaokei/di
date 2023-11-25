@@ -1,8 +1,16 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import path from 'path';
+const path = require('path');
+const pkg = require('./package.json');
+const rollupJson = require('@rollup/plugin-json');
+const rollupTerser = require('@rollup/plugin-terser');
+const rollupBabel = require('@rollup/plugin-babel');
+const rollupReplace = require('@rollup/plugin-replace');
+const rollupCommonjs = require('@rollup/plugin-commonjs');
+const rollupNodeResolve = require('@rollup/plugin-node-resolve');
+const rollupTs = require('rollup-plugin-typescript2');
+const rollupPolyfillNode = require('rollup-plugin-polyfill-node');
 
 let hasTSChecked = false;
-const pkg = require('./package.json');
 const name = 'index';
 const formats = [
   'cjs',
@@ -27,11 +35,11 @@ const banner = `
  * @license ${pkg.license}
  * @link ${pkg.homepage}
  */
-`.trimLeft();
+`.trimStart();
 
 const packageConfigs = formats.map(format => createConfig(format));
 
-export default packageConfigs;
+module.exports = packageConfigs;
 
 function createConfig(fileSuffix) {
   const format = fileSuffix.split('.')[0];
@@ -98,8 +106,7 @@ function createConfig(fileSuffix) {
 }
 
 function createJsonPlugin() {
-  const json = require('@rollup/plugin-json');
-  return json({
+  return rollupJson({
     namedExports: false,
   });
 }
@@ -107,9 +114,8 @@ function createJsonPlugin() {
 function createTypescriptPlugin() {
   const hasTSChecked2 = hasTSChecked;
   hasTSChecked = true;
-  const ts = require('rollup-plugin-typescript2');
   const shouldEmitDeclarations = pkg.types && !hasTSChecked2;
-  const tsPlugin = ts({
+  const tsPlugin = rollupTs({
     check: !hasTSChecked2,
     tsconfig: path.resolve(__dirname, 'tsconfig.app.json'),
     cacheRoot: path.resolve(__dirname, 'node_modules/.rts2_cache'),
@@ -125,12 +131,11 @@ function createTypescriptPlugin() {
 }
 
 function createReplacePlugin(isProductionBuild) {
-  const replace = require('@rollup/plugin-replace');
   const replacements = {
     __VERSION__: pkg.version,
     __DEV__: !isProductionBuild,
   };
-  return replace({
+  return rollupReplace({
     values: replacements,
     preventAssignment: true,
   });
@@ -139,22 +144,22 @@ function createReplacePlugin(isProductionBuild) {
 function createNodePlugins(isCommonJSBuild) {
   return isCommonJSBuild
     ? [
-        require('@rollup/plugin-commonjs')({
+        rollupCommonjs({
           sourceMap: false,
         }),
-        require('@rollup/plugin-node-resolve').nodeResolve(),
+        rollupNodeResolve.nodeResolve(),
       ]
     : [
-        require('@rollup/plugin-commonjs')({
+        rollupCommonjs({
           sourceMap: false,
         }),
-        require('rollup-plugin-polyfill-node')(),
-        require('@rollup/plugin-node-resolve').nodeResolve(),
+        rollupPolyfillNode(),
+        rollupNodeResolve.nodeResolve(),
       ];
 }
 
 function createBabelPlugin(isESBuild, isRuntimeBuild, isGlobalBuild) {
-  const { getBabelOutputPlugin } = require('@rollup/plugin-babel');
+  const { getBabelOutputPlugin } = rollupBabel;
   return isRuntimeBuild
     ? getBabelOutputPlugin({
         allowAllFormats: isGlobalBuild,
@@ -170,8 +175,7 @@ function createBabelPlugin(isESBuild, isRuntimeBuild, isGlobalBuild) {
 }
 
 function createMinifyPlugin(isESBuild) {
-  const { terser } = require('rollup-plugin-terser');
-  return terser({
+  return rollupTerser({
     module: isESBuild,
     compress: {
       ecma: 2015,

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/kaokei/di/compare/v1.1.0...v2.0.0) (2023-11-25)
+
+
+### Features
+
+* 优化了Injector的部分逻辑 ([572df4a](https://github.com/kaokei/di/commit/572df4a5da64df657e61f212e03cce8036146a00))
+
 ## [1.1.0](https://github.com/kaokei/di/compare/v1.0.25...v1.1.0) (2022-02-11)
 
 

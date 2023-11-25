@@ -34,7 +34,7 @@ export function createDecorator(
   defaultValue?: any
 ) {
   // 因为装饰器本身作为一个函数是有参数的，此处的decoratorValue就是实际使用装饰器的实参
-  return function (decoratorValue?: any) {
+  return function (decoratorValue?: any): any {
     // 目前的装饰器只支持类的构造函数参数装饰器和类的实例属性装饰器
     // target可能是构造函数或者类的原型
     // 如果target是构造函数，targetKey是undefined，index是参数的位置下标
@@ -121,16 +121,6 @@ export function Injectable() {
   return function (target: any) {
     // 标记这个类可以注入
     Reflect.defineMetadata(DECORATOR_KEYS.INJECTABLE, true, target);
-
-    // 获取ts编译器默认的类型数据
-    // 经过测试，如果是基本类型string、number、boolean，那么会变成相对应的构造函数String，Number，Boolean
-    // 如果只是指定了interface类型，那么会变成Object构造函数
-    const types =
-      Reflect.getMetadata(DECORATOR_KEYS.DESIGN_PARAM_TYPES, target) || [];
-
-    // 存储构造函数的类型信息
-    // 这里只是转存了一下数据，并没有特殊逻辑
-    Reflect.defineMetadata(DECORATOR_KEYS.SERVICE_PARAM_TYPES, types, target);
 
     return target;
   };
