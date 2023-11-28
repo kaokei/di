@@ -19,6 +19,7 @@
  */
 
 import { DECORATOR_KEYS } from './constants';
+import { PropertyInjectMissTokenError } from './errors';
 
 /**
  * 创建装饰器的高阶函数
@@ -73,16 +74,30 @@ export function createDecorator(
         value: decoratorValue === void 0 ? defaultValue : decoratorValue,
       };
 
+      // 当项目使用esbuild不支持emitDecoratorMetadata时
+      // 这里检查了@Inject装饰器在实例属性中需要指定参数
+      // 如果是构造函数理论上也需要使用@inject装饰器，并且需要指定参数
+      // 只不过没有在这里做判断，而是在getContructorParametersMetas中判断的
       if (!isParameterDecorator) {
+        // 实例属性装饰器
         if (decoratorKey === DECORATOR_KEYS.INJECT) {
+          // 是@Inject装饰器
           if (decoratorValue === void 0) {
-            // 是实例属性装饰器，且是Inject装饰器，且没有指定参数
-            // 需要获取默认的类型数据
-            metadata.value = Reflect.getMetadata(
+            // 装饰器没有指定参数
+            // 所以需要通过Reflect获取默认的类型数据
+            const metadataValue = Reflect.getMetadata(
               DECORATOR_KEYS.DESIGN_PROPERTY_TYPE,
               target,
               targetKey
             );
+
+            if (__DEV__) {
+              if (metadataValue === void 0) {
+                throw new PropertyInjectMissTokenError(target, targetKey);
+              }
+            }
+
+            metadata.value = metadataValue;
           }
         }
       }

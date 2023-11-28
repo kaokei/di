@@ -16,6 +16,7 @@ import {
   TokenNotFoundError,
   InjectFailedError,
   ProviderNotValidError,
+  ConstructorInjectMissTokenError,
 } from './errors';
 
 const NOOP = (n: any) => n;
@@ -274,13 +275,32 @@ export class Injector {
    */
   getContructorParametersMetas(ClassName: any) {
     // 构造函数的参数的类型数据-原始数据-是一个数组
-    const params =
-      Reflect.getMetadata(DECORATOR_KEYS.DESIGN_PARAM_TYPES, ClassName) || [];
+    const params = Reflect.getMetadata(
+      DECORATOR_KEYS.DESIGN_PARAM_TYPES,
+      ClassName
+    );
     // 构造函数的参数的类型数据-通过@Inject等装饰器实现-是一个对象-key是数字-对应第几个参数的类型数据
     const propertiesMetadatas =
       Reflect.getMetadata(DECORATOR_KEYS.SERVICE_INJECTED_PARAMS, ClassName) ||
       {};
-    return params.map((paramType: any, index: any) => {
+
+    // 获取当前构造函数的形参个数
+    const classParamsLength = ClassName.length;
+
+    if (__DEV__) {
+      if (!params) {
+        // params不存在说明当前环境不支持emitDecoratorMetadata
+        const propertiesMetadatasLength = Object.keys(propertiesMetadatas);
+        if (propertiesMetadatasLength < classParamsLength) {
+          throw new ConstructorInjectMissTokenError(ClassName);
+        }
+      }
+    }
+
+    // 如果params不存在需要创建符合形参数量的数组
+    const newParams = params || [...Array(classParamsLength)];
+
+    return newParams.map((paramType: any, index: any) => {
       // 查找当前index对应的参数有没有使用装饰器
       const propertyMetadatas: any[] = propertiesMetadatas[index] || [];
       // 查找装饰器列表中有没有@Inject装饰器的数据
