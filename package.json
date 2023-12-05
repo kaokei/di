@@ -11,6 +11,27 @@
   "files": [
     "dist/**/*"
   ],
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "browser": "./dist/index.iife.js",
+      "node": {
+        "import": {
+          "production": "./dist/index.esm.runtime.min.js",
+          "development": "./dist/index.esm.js",
+          "default": "./dist/index.esm.js"
+        },
+        "require": {
+          "production": "./dist/index.cjs.runtime.min.js",
+          "development": "./dist/index.cjs.js",
+          "default": "./dist/index.cjs.js"
+        }
+      }
+    },
+    "./dist/*": "./dist/*",
+    "./package.json": "./package.json"
+  },
   "browserVariableName": "DI",
   "sideEffects": false,
   "homepage": "https://github.com/kaokei/di",
