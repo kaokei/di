@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.2](https://github.com/kaokei/di/compare/v2.0.0...v2.0.2) (2023-12-05)
+
+
+### Features
+
+* 增加exports ([13562e5](https://github.com/kaokei/di/commit/13562e591b54a4a0179aabd89d256967d3595e6b))
+* 适配不支持emitDecoratorMetadata的场景 ([299625a](https://github.com/kaokei/di/commit/299625ad222a91608905a6cf57abf50d5d9b2330))
+
 ## [2.0.0](https://github.com/kaokei/di/compare/v1.1.0...v2.0.0) (2023-11-25)
 
 
