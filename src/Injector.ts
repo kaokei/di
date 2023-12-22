@@ -290,7 +290,8 @@ export class Injector {
     if (__DEV__) {
       if (!params) {
         // params不存在说明当前环境不支持emitDecoratorMetadata
-        const propertiesMetadatasLength = Object.keys(propertiesMetadatas);
+        const propertiesMetadatasLength =
+          Object.keys(propertiesMetadatas).length;
         if (propertiesMetadatasLength < classParamsLength) {
           throw new ConstructorInjectMissTokenError(ClassName);
         }
