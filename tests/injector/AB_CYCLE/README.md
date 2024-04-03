@@ -1,7 +1,7 @@
 ## Scene description
 
-class A depend on class B
-class B depend on class A
+class A depends on class B
+class B depends on class A
 
 ## note
 

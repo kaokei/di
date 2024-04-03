@@ -1,5 +1,5 @@
 ## Scene description
 
-class A depend on class B
-class B depend on class C
-class C depend on class A
+class A depends on class B
+class B depends on class C
+class C depends on class A

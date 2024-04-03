@@ -1,3 +1,3 @@
 ## Scene description
 
-class A depend on class B
+class A depends on class B

@@ -42,7 +42,7 @@ export class User {
   }
 }
 
-describe('User depend on UserClass (no providers)', () => {
+describe('User depends on UserClass (no providers)', () => {
   let injector: Injector;
 
   beforeEach(() => {
@@ -78,7 +78,7 @@ describe('User depend on UserClass (no providers)', () => {
   });
 });
 
-describe('User depend on UserClass (same Injector)', () => {
+describe('User depends on UserClass (same Injector)', () => {
   let injector: Injector;
 
   beforeEach(() => {
@@ -114,7 +114,7 @@ describe('User depend on UserClass (same Injector)', () => {
   });
 });
 
-describe('User depend on UserClass (User inside parent Injector)', () => {
+describe('User depends on UserClass (User inside parent Injector)', () => {
   let parent: Injector;
   let injector: Injector;
 
@@ -156,7 +156,7 @@ describe('User depend on UserClass (User inside parent Injector)', () => {
   });
 });
 
-describe('User depend on UserClass (UserClass inside parent Injector)', () => {
+describe('User depends on UserClass (UserClass inside parent Injector)', () => {
   let parent: Injector;
   let injector: Injector;
 
@@ -194,7 +194,7 @@ describe('User depend on UserClass (UserClass inside parent Injector)', () => {
   });
 });
 
-describe('User depend on UserClass (use InjectionKey)', () => {
+describe('User depends on UserClass (use InjectionKey)', () => {
   let injector: Injector;
 
   type UserKey = InjectionKey<User>;
