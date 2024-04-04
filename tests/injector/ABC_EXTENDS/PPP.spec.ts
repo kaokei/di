@@ -58,6 +58,8 @@ describe('test extends ABC_CONTAIN_1_PPP', () => {
     const a = injector.get(A);
 
     // 这里说明了c属性并不是在B的原型上，而是直接属于a实例的属性
+    // 关键在于Reflect.getMetadata(DECORATOR_KEYS.SERVICE_INJECTED_PROPS, ClassName)可以直接获取到父类的属性装饰器数据，类似于原型链的访问模式
+    // 如果是Reflect.getOwnMetadata则不会访问原型链数据了
     expect(Object.prototype.hasOwnProperty.call(a, 'c')).toBe(true);
 
     expect(a).toBeInstanceOf(A);

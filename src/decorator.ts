@@ -62,7 +62,7 @@ export function createDecorator(
         Reflect.getMetadata(metadataKey, Ctor) || {};
 
       // 每个参数或者实例属性都可以有多个装饰器
-      // 所以paramsOrPropertiesMetadata这个大对象的每个key对应的value都是一个数组
+      // 所以paramsOrPropertiesMetadata这个大对象的每个key(实例属性)对应的value都是一个数组
       // 该数组中的每一个元素是一个对象，保存着每一个装饰器的数据
       const paramOrPropertyMetadata = paramsOrPropertiesMetadata[key] || [];
 
