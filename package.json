@@ -60,9 +60,6 @@
     "coverage": "open ./coverage/lcov-report/index.html",
     "commit": "git-cz"
   },
-  "peerDependencies": {
-    "reflect-metadata": "^0.2.2"
-  },
   "devDependencies": {
     "@babel/core": "^7.23.3",
     "@babel/plugin-transform-runtime": "^7.23.4",
