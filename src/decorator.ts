@@ -58,8 +58,10 @@ export function createDecorator(
       // 所以全局Map中有两个不同的metadataKey，以及对应的数据对象
       // 如果是构造函数参数装饰器，这个对象中的key是参数位置下标
       // 如果是实例属性装饰器，这个对象中的key是属性名
+      // 这里有一个坑，必须使用getOwnMetadata而不是getMetadata
+      // 否则在继承的场景中会有问题
       const paramsOrPropertiesMetadata =
-        Reflect.getMetadata(metadataKey, Ctor) || {};
+        Reflect.getOwnMetadata(metadataKey, Ctor) || {};
 
       // 每个参数或者实例属性都可以有多个装饰器
       // 所以paramsOrPropertiesMetadata这个大对象的每个key(实例属性)对应的value都是一个数组
