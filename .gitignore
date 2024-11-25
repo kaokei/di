@@ -12,6 +12,7 @@
 /build
 /lib
 /dist
+/example/dist
 
 # misc
 .DS_Store
@@ -26,7 +27,10 @@ yarn-error.log*
 *.local
 
 .project
-.codemap
 # .vscode
 
 storybook-static
+
+.vercel
+*.tgz
+*.ignore.ts
