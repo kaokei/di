@@ -5,7 +5,7 @@
 // 作为library是没有必要压缩的，除非需要输出umd格式给浏览器端使用
 // 注意reflect-metadata等库都是peerDependencies，不应该打包到当前库中
 import { resolve } from 'path';
-import { writeFileSync } from 'fs';
+import { outputFileSync } from 'fs-extra/esm';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 
@@ -16,7 +16,7 @@ export default defineConfig({
       // rollupTypes: true,
       tsconfigPath: './tsconfig.app.json',
       beforeWriteFile: (filePath, content) => {
-        writeFileSync(filePath.replace('.d.ts', '.d.cts'), content);
+        outputFileSync(filePath.replace('.d.ts', '.d.cts'), content);
         return { filePath, content };
       },
     }),
