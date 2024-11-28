@@ -34,10 +34,10 @@ export const BindingScopeEnum = {
 export const BindingTypeEnum = {
   ConstantValue: 'ConstantValue',
   DynamicValue: 'DynamicValue',
-  Factory: 'Factory',
   Instance: 'Instance',
   Invalid: 'Invalid',
 
+  Factory: 'Factory',
   Provider: 'Provider',
   Function: 'Function',
   Constructor: 'Constructor',

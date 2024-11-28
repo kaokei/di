@@ -1,11 +1,10 @@
-import { noop } from './utils';
 import { Binding } from './binding';
 
 export class Container {
   public parent?: Container;
   private bindings: Map<any, Binding> = new Map();
-  private onActivationCallback = noop;
-  private onDeactivationCallback = noop;
+  private onActivationHandler: any;
+  private onDeactivationHandler: any;
 
   public bind(serviceIdentifier: any) {
     if (this.bindings.has(serviceIdentifier)) {
@@ -19,10 +18,15 @@ export class Container {
   public unbind(serviceIdentifier: any) {
     if (this.bindings.has(serviceIdentifier)) {
       const binding = this.bindings.get(serviceIdentifier) as Binding;
+      binding.onDeactivationHandler && binding.onDeactivationHandler();
+      this.onDeactivationHandler && this.onDeactivationHandler();
       this.bindings.delete(serviceIdentifier);
-      binding.onDeactivationCallback && binding.onDeactivationCallback();
-      this.onDeactivationCallback && this.onDeactivationCallback();
     }
+  }
+
+  public rebind(serviceIdentifier: any) {
+    this.unbind(serviceIdentifier);
+    return this.bind(serviceIdentifier);
   }
 
   public unbindAll() {
@@ -36,23 +40,22 @@ export class Container {
   }
 
   public isBound(serviceIdentifier: any): boolean {
-    // 判断当前容器的binds中是否有serviceIdentifier
-    // 如果有，返回true
-    // 如果没有，判断是否有父容器，如果有，递归调用isBound
     return (
       this.isCurrentBound(serviceIdentifier) ||
       (!!this.parent && this.parent.isBound(serviceIdentifier))
     );
   }
 
-  public get<T>(serviceIdentifier: any) {}
-
-  public onActivation(onActivation: any) {
-    this.onActivationCallback = onActivation;
+  public get<T>(serviceIdentifier: any, options?: any): T {
+    return 123 as T;
   }
 
-  public onDeactivation(onDeactivation: any) {
-    this.onDeactivationCallback = onDeactivation;
+  public onActivation(handler: any) {
+    this.onActivationHandler = handler;
+  }
+
+  public onDeactivation(handler: any) {
+    this.onActivationHandler = handler;
   }
 
   public createChild() {

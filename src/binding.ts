@@ -22,10 +22,10 @@ export class Binding {
   public type: any;
 
   // On activation handler (invoked just before an instance is added to cache and injected)
-  public onActivationCallback: any;
+  public onActivationHandler: any;
 
   // On deactivation handler (invoked just before an instance is unbinded and removed from container)
-  public onDeactivationCallback: any;
+  public onDeactivationHandler: any;
 
   constructor(serviceIdentifier: any) {
     this.activated = false;
@@ -33,18 +33,21 @@ export class Binding {
     this.type = BindingTypeEnum.Invalid;
     this.cache = null;
     this.dynamicValue = null;
+    this.implementationType = null;
   }
 
-  public onActivation(onActivation: any) {
-    this.onActivationCallback = onActivation;
+  public onActivation(handler: any) {
+    this.onActivationHandler = handler;
   }
 
-  public onDeactivation(onDeactivation: any) {
-    this.onDeactivationCallback = onDeactivation;
+  public onDeactivation(handler: any) {
+    this.onDeactivationHandler = handler;
   }
 
   public to(constructor: any) {
     this.type = BindingTypeEnum.Instance;
+    this.cache = null;
+    this.dynamicValue = null;
     this.implementationType = constructor;
     return this;
   }
