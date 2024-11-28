@@ -19,3 +19,5 @@ export function isInjectableToken(token: any) {
     Reflect.getMetadata(DECORATOR_KEYS.INJECTABLE, token)
   );
 }
+
+export const noop = (n?: any) => n;

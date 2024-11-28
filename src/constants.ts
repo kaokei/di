@@ -24,3 +24,21 @@ export const SERVICE_STATUS = {
   CONSTRUCTED: Symbol('constructed'),
   MERGED: Symbol('merged'),
 };
+
+export const BindingScopeEnum = {
+  Request: 'Request',
+  Singleton: 'Singleton',
+  Transient: 'Transient',
+};
+
+export const BindingTypeEnum = {
+  ConstantValue: 'ConstantValue',
+  DynamicValue: 'DynamicValue',
+  Factory: 'Factory',
+  Instance: 'Instance',
+  Invalid: 'Invalid',
+
+  Provider: 'Provider',
+  Function: 'Function',
+  Constructor: 'Constructor',
+};
