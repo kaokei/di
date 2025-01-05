@@ -16,6 +16,11 @@ export class Container {
     return binding;
   }
 
+  public rebind(serviceIdentifier: any) {
+    this.unbind(serviceIdentifier);
+    return this.bind(serviceIdentifier);
+  }
+
   public unbind(serviceIdentifier: any) {
     if (this.bindings.has(serviceIdentifier)) {
       const binding = this.getBinding(serviceIdentifier) as Binding;
@@ -23,11 +28,6 @@ export class Container {
       this.onDeactivationHandler && this.onDeactivationHandler();
       this.bindings.delete(serviceIdentifier);
     }
-  }
-
-  public rebind(serviceIdentifier: any) {
-    this.unbind(serviceIdentifier);
-    return this.bind(serviceIdentifier);
   }
 
   public unbindAll() {
@@ -45,6 +45,12 @@ export class Container {
       this.isCurrentBound(serviceIdentifier) ||
       (!!this.parent && this.parent.isBound(serviceIdentifier))
     );
+  }
+
+  public createChild() {
+    const child = new Container();
+    child.parent = this;
+    return child;
   }
 
   public get<T>(serviceIdentifier: any, options: any = {}): T | undefined {
@@ -82,12 +88,6 @@ export class Container {
 
   public onDeactivation(handler: any) {
     this.onActivationHandler = handler;
-  }
-
-  public createChild() {
-    const child = new Container();
-    child.parent = this;
-    return child;
   }
 
   private buildBinding(serviceIdentifier: any) {
