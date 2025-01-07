@@ -30,10 +30,7 @@ import { KEYS } from './constants';
  * @param {*} [defaultValue] 该装饰器函数的默认参数
  * @return {*} 一个装饰器
  */
-export function createDecorator(
-  decoratorKey: string | symbol,
-  defaultValue?: any
-) {
+function createDecorator(decoratorKey: string | symbol, defaultValue?: any) {
   // 因为装饰器本身作为一个函数是有参数的，此处的decoratorValue就是实际使用装饰器的实参
   return function (decoratorValue?: any): any {
     // 目前的装饰器只支持类的构造函数参数装饰器和类的实例属性装饰器

@@ -2,8 +2,6 @@ import { BindingTypeEnum, KEYS, SERVICE_STATUS } from './constants';
 import { Container } from './container';
 import { getMetadata, getOwnMetadata } from './cachemap';
 import { resolveToken } from './token';
-import { CircularDependencyError } from './errors';
-import { merge } from './utils';
 
 export class Binding {
   public container!: Container;
@@ -111,7 +109,7 @@ export class Binding {
     this.status = SERVICE_STATUS.CONSTRUCTED;
 
     const properties = this.getInjectProperties(ClassName);
-    merge(cacheValue, properties);
+    Object.assign(cacheValue, properties);
 
     this.status = SERVICE_STATUS.MERGED;
 
@@ -154,6 +152,6 @@ export class Binding {
         acc[prop] = property;
       }
       return acc;
-    }, {} as any);
+    }, Object.create(null) as any);
   }
 }
