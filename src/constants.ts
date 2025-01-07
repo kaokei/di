@@ -1,20 +1,14 @@
-export const DECORATOR_KEYS = {
-  // ts自带的类的实例属性的类型的key
-  DESIGN_PROPERTY_TYPE: 'design:type',
-  // ts自带的类的构造函数的参数的类型信息的key
-  DESIGN_PARAM_TYPES: 'design:paramtypes',
+export const KEYS = {
   // 记录构造函数参数装饰器对应的数据的key
-  SERVICE_INJECTED_PARAMS: 'service:injected:params',
+  INJECTED_PARAMS: 'injected_params',
   // 记录实例属性装饰器对应的数据的key
-  SERVICE_INJECTED_PROPS: 'service:injected:props',
+  INJECTED_PROPS: 'injected_props',
   // Inject装饰器的key
-  INJECT: Symbol('inject'),
-  // Injectable装饰器的key
-  INJECTABLE: Symbol('injectable'),
+  INJECT: 'inject',
   // Self装饰器的key
   SELF: 'self',
-  // Skip装饰器的key
-  SKIP_SELF: 'skip',
+  // SkipSelf装饰器的key
+  SKIP_SELF: 'skipSelf',
   // Optional装饰器的key
   OPTIONAL: 'optional',
 };

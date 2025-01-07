@@ -1,5 +1,8 @@
-import { BindingTypeEnum } from './constants';
-import {Container} from './container'
+import { BindingTypeEnum, KEYS } from './constants';
+import { has } from './utils';
+import { Container } from './container';
+import { getMetadata, getOwnMetadata } from './cachemap';
+import { resolveToken } from './token';
 
 export class Binding {
   public container!: Container;
@@ -120,7 +123,9 @@ export class Binding {
     this.status = SERVICE_STATUS.INITING;
     this.dep = options.provider;
 
-    const serviceValue = this.dynamicValue.call(this, {container: this.container})
+    const serviceValue = this.dynamicValue.call(this, {
+      container: this.container,
+    });
     const cacheValue = this.beforeCacheHook(serviceValue);
     this.cache = cacheValue;
 
@@ -133,7 +138,7 @@ export class Binding {
   private getContructorParameters(ClassName: any, provider: any) {
     const params = this.getContructorParametersMetas(ClassName);
     const result = params.map((meta: any) =>
-      this.get(meta.provide, { ...meta.value, provider })
+      this.container.get(meta.provide, { ...meta.value, provider })
     );
     return result;
   }
@@ -201,7 +206,10 @@ export class Binding {
     const properties = {} as any;
 
     metas.forEach((meta: any) => {
-      const property = this.get(meta.provide, { ...meta.value, provider });
+      const property = this.container.get(meta.provide, {
+        ...meta.value,
+        provider,
+      });
       if (!(property === void 0 && meta.value?.optional)) {
         properties[meta.key] = property;
       }
@@ -213,8 +221,7 @@ export class Binding {
   private getInjectPropertiesMetas(ClassName: any) {
     // 获取注入属性的metas-类型是Recors<string, Array>
     const propertiesMetadatas =
-      Reflect.getMetadata(DECORATOR_KEYS.SERVICE_INJECTED_PROPS, ClassName) ||
-      {};
+      getMetadata(KEYS.INJECTED_PROPS, ClassName) || {};
     const propertiesMetas: any = [];
     for (const key in propertiesMetadatas) {
       if (has(propertiesMetadatas, key)) {
@@ -222,14 +229,14 @@ export class Binding {
         const propertyMetadatas = propertiesMetadatas[key];
         // 当前key属性对应的@Inject装饰器的数据
         const injectMeta = propertyMetadatas.find(
-          (meta: any) => meta.key === DECORATOR_KEYS.INJECT
+          (meta: any) => meta.key === KEYS.INJECT
         );
         if (!injectMeta || injectMeta.value === Object) {
           // 属性一定要手动指定@Inject
           throw new InjectFailedError(injectMeta, ClassName, key);
         }
         const options = propertyMetadatas.reduce((acc: any, meta: any) => {
-          if (meta.key !== DECORATOR_KEYS.INJECT) {
+          if (meta.key !== KEYS.INJECT) {
             acc[meta.key] = meta.value;
           }
           return acc;
@@ -237,7 +244,7 @@ export class Binding {
 
         propertiesMetas.push({
           key,
-          provide: resolveForwardRef(injectMeta.value),
+          provide: resolveToken(injectMeta.value),
           value: options,
         });
       }
