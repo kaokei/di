@@ -41,3 +41,13 @@ toAutoFactory(); // 返回内置的工厂函数
 ## 关于继承的实现
 
 https://docs.typestack.community/typedi/develop/02-basic-usage-guide/07-inheritance
+
+## 参考其他开源库
+https://github.com/owja/ioc
+https://github.com/molszanski/iti
+https://github.com/vovaspace/brandi
+https://github.com/thiagobustamante/typescript-ioc
+https://github.com/mgechev/injection-js
+https://github.com/typestack/typedi
+https://github.com/microsoft/tsyringe
+https://github.com/inversify/InversifyJS
