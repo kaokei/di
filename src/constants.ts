@@ -14,9 +14,9 @@ export const KEYS = {
 };
 
 export const SERVICE_STATUS = {
-  INITING: Symbol('initing'),
-  CONSTRUCTED: Symbol('constructed'),
-  MERGED: Symbol('merged'),
+  INITING: 'initing',
+  CONSTRUCTED: 'constructed',
+  MERGED: 'merged',
 };
 
 export const BindingScopeEnum = {

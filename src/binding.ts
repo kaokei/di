@@ -1,15 +1,16 @@
-import { BindingTypeEnum, KEYS } from './constants';
-import { has } from './utils';
+import { BindingTypeEnum, KEYS, SERVICE_STATUS } from './constants';
 import { Container } from './container';
 import { getMetadata, getOwnMetadata } from './cachemap';
 import { resolveToken } from './token';
+import { CircularDependencyError } from './errors';
+import { merge } from './utils';
 
 export class Binding {
   public container!: Container;
   // Determines weather the bindings has been already activated
   // The activation action takes place when an instance is resolved
   // If the scope is singleton it only happens once
-  public activated: boolean;
+  public status: string;
 
   // A runtime identifier because at runtime we don't have interfaces
   public serviceIdentifier: any;
@@ -33,7 +34,7 @@ export class Binding {
   public onDeactivationHandler: any;
 
   constructor(serviceIdentifier: any, container: Container) {
-    this.activated = false;
+    this.status = '';
     this.serviceIdentifier = serviceIdentifier;
     this.type = BindingTypeEnum.Invalid;
     this.cache = null;
@@ -84,36 +85,34 @@ export class Binding {
 
   public get() {
     if (this.status === SERVICE_STATUS.INITING) {
-      throw new CircularDependencyError(provider, options);
+      // throw new CircularDependencyError();
     }
 
     if (this.cache) {
       return this.cache;
     } else if (BindingTypeEnum.Instance === this.type) {
-      return this.resolveValue(binding, options);
+      return this.resolveValue();
     } else if (BindingTypeEnum.DynamicValue === this.type) {
-      return this.resolveDynamicValue(binding, options);
+      return this.resolveDynamicValue();
     } else {
-      throw new ProviderNotValidError(binding);
+      //  throw error
     }
   }
 
   private resolveValue() {
     this.status = SERVICE_STATUS.INITING;
-    this.parent = options.provider;
 
     const ClassName = this.implementationType;
-    const params = this.getContructorParameters(ClassName, provider);
-    const cacheValue = this.beforeCacheHook(new ClassName(...params));
+    const params = this.getContructorParameters(ClassName);
+    const cacheValue = this.onActivationHandler(new ClassName(...params));
 
     // 实例化成功，此时不会再有死循环问题
     this.cache = cacheValue;
     this.status = SERVICE_STATUS.CONSTRUCTED;
 
-    const properties = this.getInjectProperties(ClassName, provider);
-    this.mergePropertyHook(cacheValue, properties);
+    const properties = this.getInjectProperties(ClassName);
+    merge(cacheValue, properties);
 
-    this.parent = void 0;
     this.status = SERVICE_STATUS.MERGED;
 
     return cacheValue;
@@ -121,134 +120,40 @@ export class Binding {
 
   private resolveDynamicValue() {
     this.status = SERVICE_STATUS.INITING;
-    this.dep = options.provider;
 
     const serviceValue = this.dynamicValue.call(this, {
       container: this.container,
     });
-    const cacheValue = this.beforeCacheHook(serviceValue);
+    const cacheValue = this.onActivationHandler(serviceValue);
     this.cache = cacheValue;
 
-    this.dep = void 0;
     this.status = SERVICE_STATUS.CONSTRUCTED;
 
     return cacheValue;
   }
 
-  private getContructorParameters(ClassName: any, provider: any) {
-    const params = this.getContructorParametersMetas(ClassName);
-    const result = params.map((meta: any) =>
-      this.container.get(meta.provide, { ...meta.value, provider })
-    );
+  private getContructorParameters(ClassName: any) {
+    const params = getOwnMetadata(KEYS.INJECTED_PARAMS, ClassName);
+    const result = params.map((meta: any) => {
+      const { inject, ...rest } = meta;
+      const token = resolveToken(inject);
+      return this.container.get(token, rest);
+    });
     return result;
   }
 
-  private getContructorParametersMetas(ClassName: any) {
-    // 构造函数的参数的类型数据-原始数据-是一个数组
-    const params = Reflect.getMetadata(
-      DECORATOR_KEYS.DESIGN_PARAM_TYPES,
-      ClassName
-    );
-    // 构造函数的参数的类型数据-通过@Inject等装饰器实现-是一个对象-key是数字-对应第几个参数的类型数据
-    const propertiesMetadatas =
-      Reflect.getMetadata(DECORATOR_KEYS.SERVICE_INJECTED_PARAMS, ClassName) ||
-      {};
-
-    // 获取当前构造函数的形参个数
-    const classParamsLength = ClassName.length;
-
-    if (__DEV__) {
-      if (!params) {
-        // params不存在说明当前环境不支持emitDecoratorMetadata
-        const propertiesMetadatasLength =
-          Object.keys(propertiesMetadatas).length;
-        if (propertiesMetadatasLength < classParamsLength) {
-          throw new ConstructorInjectMissTokenError(ClassName);
-        }
-      }
-    }
-
-    // 如果params不存在需要创建符合形参数量的数组
-    const newParams = params || [...Array(classParamsLength)];
-
-    return newParams.map((paramType: any, index: any) => {
-      // 查找当前index对应的参数有没有使用装饰器
-      const propertyMetadatas: any[] = propertiesMetadatas[index] || [];
-      // 查找装饰器列表中有没有@Inject装饰器的数据
-      const injectMeta = propertyMetadatas.find(
-        meta => meta.key === DECORATOR_KEYS.INJECT
-      );
-      if (
-        (injectMeta && injectMeta.value === Object) ||
-        (!injectMeta && paramType === Object)
-      ) {
-        // 构造函数的参数可以不使用@Inject，但是一定不能是interface
-        throw new InjectFailedError(injectMeta, ClassName, index, paramType);
-      }
-      // 把装饰器列表收集为对象，并且排除掉@Inject
-      const options = propertyMetadatas.reduce((acc, meta) => {
-        if (meta.key !== DECORATOR_KEYS.INJECT) {
-          acc[meta.key] = meta.value;
-        }
-        return acc;
-      }, {} as any);
-      return {
-        key: index,
-        provide: resolveForwardRef(injectMeta && injectMeta.value) || paramType,
-        value: options,
-      };
-    });
-  }
-
-  private getInjectProperties(ClassName: any, provider: any) {
-    const metas = this.getInjectPropertiesMetas(ClassName);
-
-    const properties = {} as any;
-
-    metas.forEach((meta: any) => {
-      const property = this.container.get(meta.provide, {
-        ...meta.value,
-        provider,
-      });
+  private getInjectProperties(ClassName: any) {
+    const props = getMetadata(KEYS.INJECTED_PROPS, ClassName) || {};
+    const propKeys = Object.keys(props);
+    return propKeys.reduce((acc: any, prop: any) => {
+      const meta = props[prop];
+      const { inject, ...rest } = meta;
+      const token = resolveToken(inject);
+      const property = this.container.get(token, rest);
       if (!(property === void 0 && meta.value?.optional)) {
-        properties[meta.key] = property;
+        acc[prop] = property;
       }
-    });
-
-    return properties;
-  }
-
-  private getInjectPropertiesMetas(ClassName: any) {
-    // 获取注入属性的metas-类型是Recors<string, Array>
-    const propertiesMetadatas =
-      getMetadata(KEYS.INJECTED_PROPS, ClassName) || {};
-    const propertiesMetas: any = [];
-    for (const key in propertiesMetadatas) {
-      if (has(propertiesMetadatas, key)) {
-        // 当前key属性对应的所有的装饰器
-        const propertyMetadatas = propertiesMetadatas[key];
-        // 当前key属性对应的@Inject装饰器的数据
-        const injectMeta = propertyMetadatas.find(
-          (meta: any) => meta.key === KEYS.INJECT
-        );
-        if (!injectMeta || injectMeta.value === Object) {
-          // 属性一定要手动指定@Inject
-          throw new InjectFailedError(injectMeta, ClassName, key);
-        }
-        const options = propertyMetadatas.reduce((acc: any, meta: any) => {
-          if (meta.key !== KEYS.INJECT) {
-            acc[meta.key] = meta.value;
-          }
-          return acc;
-        }, {} as any);
-
-        propertiesMetas.push({
-          key,
-          provide: resolveToken(injectMeta.value),
-          value: options,
-        });
-      }
-    }
-    return propertiesMetas;
+      return acc;
+    }, {} as any);
   }
 }
