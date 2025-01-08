@@ -5,6 +5,7 @@ function hasParentClass(cls: any) {
   return Object.getPrototypeOf(cls) !== Function.prototype;
 }
 
+// 注意重复调用会覆盖之前的结果
 export function defineMetadata(
   metadataKey: any,
   metadataValue: any,

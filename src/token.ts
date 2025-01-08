@@ -1,3 +1,5 @@
+import type { GenericToken } from './interfaces';
+
 export class Token<T> {
   public name: T;
   constructor(name: string) {
@@ -6,8 +8,8 @@ export class Token<T> {
 }
 
 export class LazyToken<T> {
-  public callback: () => Token<T>;
-  constructor(callback: any) {
+  public callback: () => GenericToken<T>;
+  constructor(callback: () => GenericToken<T>) {
     this.callback = callback;
   }
 
@@ -17,7 +19,7 @@ export class LazyToken<T> {
 }
 
 // token可能是Token|LazyToken|其他class
-export function resolveToken(token: any) {
+export function resolveToken<T>(token: GenericToken<T>) {
   if (token instanceof LazyToken) {
     return token.resolve();
   }

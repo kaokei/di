@@ -1,3 +1,7 @@
+import type { Token, LazyToken } from '../token';
+
+export type GenericToken<T> = Token<T> | LazyToken<T> | Newable<T>;
+
 export type Newable<
   TInstance = unknown,
   TArgs extends unknown[] = any[]

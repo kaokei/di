@@ -26,11 +26,11 @@ import { KEYS } from './constants';
  * 装饰器的通用逻辑就是通过Reflect记录到全局的Map中
  * 所以可以抽象出一个通用逻辑，这里需要注意对Inject装饰器有特殊判断
  *
- * @param {(string | symbol)} decoratorKey 代表某个装饰器的名称
+ * @param {(string )} decoratorKey 代表某个装饰器的名称
  * @param {*} [defaultValue] 该装饰器函数的默认参数
  * @return {*} 一个装饰器
  */
-function createDecorator(decoratorKey: string | symbol, defaultValue?: any) {
+function createDecorator(decoratorKey: string, defaultValue?: any) {
   // 因为装饰器本身作为一个函数是有参数的，此处的decoratorValue就是实际使用装饰器的实参
   return function (decoratorValue?: any): any {
     // 目前的装饰器只支持类的构造函数参数装饰器和类的实例属性装饰器
@@ -44,13 +44,11 @@ function createDecorator(decoratorKey: string | symbol, defaultValue?: any) {
       const Ctor = isParameterDecorator ? target : target.constructor;
       // 如果是构造函数的参数装饰器，取参数位置下标，否则取实例属性的属性名
       const key = isParameterDecorator ? index : targetKey;
-
       // 区分构造函数的参数装饰器和实例属性的装饰器
       // 分别记录到全局Map的不同位置，metadataKey不一样
       const metadataKey = isParameterDecorator
         ? KEYS.INJECTED_PARAMS
         : KEYS.INJECTED_PROPS;
-
       // 这里是一个大对象，对应的key是metadataKey
       // 所以全局Map中有两个不同的metadataKey，以及对应的数据对象
       // 如果是构造函数参数装饰器，这个对象中的key是参数位置下标

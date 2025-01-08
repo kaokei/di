@@ -1,15 +1,16 @@
 import { Binding } from './binding';
 import { TokenNotFoundError } from './errors/TokenNotFoundError';
+import { IDENTITY, NOOP } from './constants';
 
 export class Container {
   public parent?: Container;
   private bindings: Map<any, Binding> = new Map();
-  private onActivationHandler: any;
-  private onDeactivationHandler: any;
+  private onActivationHandler = IDENTITY;
+  private onDeactivationHandler = NOOP;
 
   public bind(serviceIdentifier: any) {
     if (this.bindings.has(serviceIdentifier)) {
-      throw new Error('Already bound');
+      // todo: throw new Error('Already bound');
     }
     const binding = this.buildBinding(serviceIdentifier);
     this.bindings.set(serviceIdentifier, binding);
@@ -24,8 +25,8 @@ export class Container {
   public unbind(serviceIdentifier: any) {
     if (this.bindings.has(serviceIdentifier)) {
       const binding = this.getBinding(serviceIdentifier) as Binding;
-      binding.onDeactivationHandler && binding.onDeactivationHandler();
-      this.onDeactivationHandler && this.onDeactivationHandler();
+      binding.deactivate();
+      this.deactivate();
       this.bindings.delete(serviceIdentifier);
     }
   }
@@ -57,13 +58,16 @@ export class Container {
     // 优先从缓存中获取
     // 如果是DynamicValue类型的绑定，执行绑定的函数，缓存并返回函数结果
     // 如果是Instance类型的绑定，本质上是执行了new Constructor()，缓存并返回实例
-    // 关键在于new Constructor()可能需要提供参数，这些参数也需要从容器中获取，当然构造函数的参数需要通过@inject来绑定对应的服务
+    // 关键在于new Constructor()可能需要提供参数，这些参数也需要从容器中获取，当然构造函数的参数需要通过@Inject来绑定对应的服务
     // 另外new Constructor()所在的类可能还有注入的实例属性，这些实例属性也需要从容器中获取
     // 需要把这些实例性通过赋值的方式合并到实例对象上。最终在返回实例对象之前，执行onActivationHandler
     const binding = this.getBinding(serviceIdentifier) as Binding;
-    if (options.skip) {
+    if (options.skipSelf) {
       if (this.parent) {
-        return this.parent.get(serviceIdentifier, { ...options, skip: false });
+        return this.parent.get(serviceIdentifier, {
+          ...options,
+          skipSelf: false,
+        });
       } else {
         this.checkTokenNotFoundError(serviceIdentifier, options);
       }
@@ -88,6 +92,14 @@ export class Container {
 
   public onDeactivation(handler: any) {
     this.onActivationHandler = handler;
+  }
+
+  public activate(input: any) {
+    return this.onActivationHandler(input);
+  }
+
+  public deactivate() {
+    this.onDeactivationHandler();
   }
 
   private buildBinding(serviceIdentifier: any) {

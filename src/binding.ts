@@ -1,4 +1,10 @@
-import { BindingTypeEnum, KEYS, SERVICE_STATUS } from './constants';
+import {
+  BindingTypeEnum,
+  KEYS,
+  SERVICE_STATUS,
+  IDENTITY,
+  NOOP,
+} from './constants';
 import { Container } from './container';
 import { getMetadata, getOwnMetadata } from './cachemap';
 import { resolveToken } from './token';
@@ -26,10 +32,10 @@ export class Binding {
   public type: any;
 
   // On activation handler (invoked just before an instance is added to cache and injected)
-  public onActivationHandler: any;
+  public onActivationHandler = IDENTITY;
 
   // On deactivation handler (invoked just before an instance is unbinded and removed from container)
-  public onDeactivationHandler: any;
+  public onDeactivationHandler = NOOP;
 
   constructor(serviceIdentifier: any, container: Container) {
     this.status = '';
@@ -47,6 +53,14 @@ export class Binding {
 
   public onDeactivation(handler: any) {
     this.onDeactivationHandler = handler;
+  }
+
+  public activate(input: any) {
+    return this.onActivationHandler(input);
+  }
+
+  public deactivate() {
+    this.onDeactivationHandler();
   }
 
   public to(constructor: any) {
@@ -102,18 +116,19 @@ export class Binding {
 
     const ClassName = this.implementationType;
     const params = this.getContructorParameters(ClassName);
-    const cacheValue = this.onActivationHandler(new ClassName(...params));
-
+    const inst = new ClassName(...params);
+    const activation1 = this.activate(inst);
+    const activation2 = this.container.activate(activation1);
     // 实例化成功，此时不会再有死循环问题
-    this.cache = cacheValue;
+    this.cache = activation2;
     this.status = SERVICE_STATUS.CONSTRUCTED;
 
     const properties = this.getInjectProperties(ClassName);
-    Object.assign(cacheValue, properties);
+    Object.assign(activation2, properties);
 
     this.status = SERVICE_STATUS.MERGED;
 
-    return cacheValue;
+    return activation2;
   }
 
   private resolveDynamicValue() {
@@ -122,12 +137,13 @@ export class Binding {
     const serviceValue = this.dynamicValue.call(this, {
       container: this.container,
     });
-    const cacheValue = this.onActivationHandler(serviceValue);
-    this.cache = cacheValue;
+    const activation1 = this.activate(serviceValue);
+    const activation2 = this.container.activate(activation1);
+    this.cache = activation2;
 
     this.status = SERVICE_STATUS.CONSTRUCTED;
 
-    return cacheValue;
+    return activation2;
   }
 
   private getContructorParameters(ClassName: any) {
