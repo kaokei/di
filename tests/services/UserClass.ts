@@ -1,6 +1,3 @@
-import { Injectable } from '@/index';
-
-@Injectable()
 export class UserClass {
   private classNo = 302;
 

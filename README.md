@@ -14,7 +14,7 @@
 - [online demo](https://kaokei.com/project/di/)
 
 ```bash
-npm install @kaokei/di reflect-metadata
+npm install @kaokei/di
 ```
 
 ## 灵感

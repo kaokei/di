@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { Injector, Injectable, InjectionKey } from '@/index';
 
 @Injectable()

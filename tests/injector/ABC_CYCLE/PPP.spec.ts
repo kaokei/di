@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { Inject, Injector, Injectable, forwardRef } from '@/index';
 
 interface IA {

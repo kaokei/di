@@ -1,8 +1,5 @@
-import { Injectable } from '@/index';
-
 import { UserClass } from './UserClass';
 
-@Injectable()
 export class User {
   private name = 'zhangsan';
   private age = 12;

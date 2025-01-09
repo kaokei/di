@@ -1,6 +1,3 @@
-import { Injectable } from '@/index';
-
-@Injectable()
 export class Person {
   private name = '';
   private age = 0;
@@ -22,7 +19,6 @@ export class Person {
   }
 }
 
-@Injectable()
 export class Student extends Person {
   private studentId = 0;
 
@@ -35,7 +31,6 @@ export class Student extends Person {
   }
 }
 
-@Injectable()
 export class Teacher extends Person {
   private teacherId = 0;
 

@@ -1,13 +1,14 @@
-import 'reflect-metadata';
 import {
-  Skip,
+  SkipSelf,
   Self,
   Optional,
   Inject,
-  Injector,
-  Injectable,
-  forwardRef,
+  Container,
+  Token,
+  LazyToken,
 } from '@/index';
+
+import { Newable } from '@/interfaces';
 
 import { hasOwn } from '@tests/utils';
 
@@ -22,37 +23,51 @@ interface IB {
   id: number;
 }
 
-@Injectable()
-export class A {
+class A {
   public name = 'A';
   public id = 1;
 
   public constructor(
-    @Inject(forwardRef(() => B))
-    @Skip(false)
+    @Inject(B)
+    @SkipSelf(false)
     @Self(false)
     @Optional(false)
     public b: IB
   ) {}
 }
 
-@Injectable()
-export class B {
+class B {
   public name = 'B';
   public id = 2;
 }
 
 describe('options -> AB_CONTAIN -> C -> 000: A parent injector B parent injector', () => {
-  let parentInjector: Injector;
-  let injector: Injector;
+  let parent: Container;
+  let child: Container;
 
   beforeEach(() => {
-    parentInjector = new Injector([A, B]);
-    injector = new Injector([], parentInjector);
+    parent = new Container();
+    child = parent.createChild();
+    parent.bind(A).toSelf();
+    parent.bind(B).toSelf();
   });
 
   test('injector.get(A) should work correctly', async () => {
-    const a = injector.get(A);
+    type TA1 = typeof A;
+    type TA2 = Newable<A>
+    const ta1: TA1 = A;
+    const ta2: TA2 = A;
+
+    const token1 = new LazyToken<A>(() => A);
+    const a1 = child.get(token1);
+    const token2 = new Token<A>('token2');
+    const a2 = child.get(token2);
+    const token3 = new LazyToken(() => A);
+    const a3 = child.get(token3);
+    const a4 = child.get(A);
+    const b4 = child.get(B);
+
+    const a = child.get(A);
 
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);

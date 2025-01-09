@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { Inject, Injector, forwardRef, TokenNotFoundError } from '@/index';
 
 interface IA {
