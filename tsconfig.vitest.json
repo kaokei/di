@@ -28,6 +28,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["tests/**/*.ts", "tests/**/*.tsx"],
-  "references": [{ "path": "./tsconfig.app.json" }]
+  "include": ["tests/**/*.ts"]
 }

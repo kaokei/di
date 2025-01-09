@@ -12,6 +12,14 @@ import { Newable } from '@/interfaces';
 
 import { hasOwn } from '@tests/utils';
 
+class Test {}
+
+const container = new Container();
+
+container.bind(Test).toSelf();
+
+const test1 = container.get(Test);
+
 interface IA {
   name: string;
   id: number;
@@ -54,7 +62,7 @@ describe('options -> AB_CONTAIN -> C -> 000: A parent injector B parent injector
 
   test('injector.get(A) should work correctly', async () => {
     type TA1 = typeof A;
-    type TA2 = Newable<A>
+    type TA2 = Newable<A>;
     const ta1: TA1 = A;
     const ta2: TA2 = A;
 
