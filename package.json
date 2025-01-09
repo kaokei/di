@@ -38,9 +38,7 @@
   "scripts": {
     "test": "vitest",
     "coverage": "vitest run --coverage",
-    "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview",
     "clean": "rm -rf dist/*",
     "postpublish": "git push origin --follow-tags",
     "prepublishOnly": "npm run clean && npm run build",
