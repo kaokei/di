@@ -1,4 +1,11 @@
-import { SkipSelf, Inject, Container, LazyToken } from '@/index';
+import {
+  SkipSelf,
+  Self,
+  Optional,
+  Inject,
+  Container,
+  LazyToken,
+} from '@/index';
 import { TokenNotFoundError } from '@/errors';
 
 interface IA {
@@ -26,9 +33,14 @@ class A {
 
   @Inject(new LazyToken(() => B))
   @SkipSelf()
+  @Self()
+  @Optional()
   public b!: IB;
 
   @Inject(new LazyToken(() => C))
+  @SkipSelf()
+  @Self()
+  @Optional()
   public c: IC = {
     name: 'default C',
     id: 33,
@@ -71,40 +83,62 @@ describe('000', () => {
     parent.bind(C).toSelf();
   });
 
-  test('child.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      child.get(A);
-    }).toThrowError(TokenNotFoundError);
+  test('child.get(A) should work correctly', async () => {
+    const a = child.get(A);
+    expect(a).toBeInstanceOf(A);
+    expect(a.id).toBe(1);
+    expect(a.b).toBeUndefined();
+    expect(a.c).toBeDefined();
+    expect(a.c.id).toBe(33);
   });
 
-  test('child.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      child.get(B);
-    }).toThrowError(TokenNotFoundError);
+  test('child.get(B) should work correctly', async () => {
+    const b = child.get(B);
+    expect(b).toBeInstanceOf(B);
+    expect(b).toBe(b.c.b);
+    expect(b.a).toBe(b.c.a);
+    expect(b.id).toBe(2);
+    expect(b.a.id).toBe(1);
+    expect(b.c.id).toBe(3);
   });
 
-  test('child.get(C) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      child.get(C);
-    }).toThrowError(TokenNotFoundError);
+  test('child.get(C) should work correctly', async () => {
+    const c = child.get(C);
+    expect(c).toBeInstanceOf(C);
+    expect(c).toBe(c.b.c);
+    expect(c.a).toBe(c.b.a);
+    expect(c.id).toBe(3);
+    expect(c.a.id).toBe(1);
+    expect(c.b.id).toBe(2);
   });
 
-  test('parent.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      parent.get(A);
-    }).toThrowError(TokenNotFoundError);
+  test('parent.get(A) should work correctly', async () => {
+    const a = parent.get(A);
+    expect(a).toBeInstanceOf(A);
+    expect(a.id).toBe(1);
+    expect(a.b).toBeUndefined();
+    expect(a.c).toBeDefined();
+    expect(a.c.id).toBe(33);
   });
 
-  test('parent.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      parent.get(B);
-    }).toThrowError(TokenNotFoundError);
+  test('parent.get(B) should work correctly', async () => {
+    const b = parent.get(B);
+    expect(b).toBeInstanceOf(B);
+    expect(b).toBe(b.c.b);
+    expect(b.a).toBe(b.c.a);
+    expect(b.id).toBe(2);
+    expect(b.a.id).toBe(1);
+    expect(b.c.id).toBe(3);
   });
 
-  test('parent.get(C) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      parent.get(C);
-    }).toThrowError(TokenNotFoundError);
+  test('parent.get(C) should work correctly', async () => {
+    const c = parent.get(C);
+    expect(c).toBeInstanceOf(C);
+    expect(c).toBe(c.b.c);
+    expect(c.a).toBe(c.b.a);
+    expect(c.id).toBe(3);
+    expect(c.a.id).toBe(1);
+    expect(c.b.id).toBe(2);
   });
 });
 
@@ -120,10 +154,13 @@ describe('001', () => {
     child.bind(C).toSelf();
   });
 
-  test('child.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      child.get(A);
-    }).toThrowError(TokenNotFoundError);
+  test('child.get(A) should work correctly', async () => {
+    const a = child.get(A);
+    expect(a).toBeInstanceOf(A);
+    expect(a.id).toBe(1);
+    expect(a.b).toBeUndefined();
+    expect(a.c).toBeDefined();
+    expect(a.c.id).toBe(33);
   });
 
   test('child.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
@@ -138,10 +175,13 @@ describe('001', () => {
     }).toThrowError(TokenNotFoundError);
   });
 
-  test('parent.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      parent.get(A);
-    }).toThrowError(TokenNotFoundError);
+  test('parent.get(A) should work correctly', async () => {
+    const a = parent.get(A);
+    expect(a).toBeInstanceOf(A);
+    expect(a.id).toBe(1);
+    expect(a.b).toBeUndefined();
+    expect(a.c).toBeDefined();
+    expect(a.c.id).toBe(33);
   });
 
   test('parent.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
@@ -169,10 +209,13 @@ describe('010', () => {
     parent.bind(C).toSelf();
   });
 
-  test('child.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      child.get(A);
-    }).toThrowError(TokenNotFoundError);
+  test('child.get(A) should work correctly', async () => {
+    const a = child.get(A);
+    expect(a).toBeInstanceOf(A);
+    expect(a.id).toBe(1);
+    expect(a.b).toBeUndefined();
+    expect(a.c).toBeDefined();
+    expect(a.c.id).toBe(33);
   });
 
   test('child.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
@@ -187,10 +230,13 @@ describe('010', () => {
     }).toThrowError(TokenNotFoundError);
   });
 
-  test('parent.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      parent.get(A);
-    }).toThrowError(TokenNotFoundError);
+  test('parent.get(A) should work correctly', async () => {
+    const a = parent.get(A);
+    expect(a).toBeInstanceOf(A);
+    expect(a.id).toBe(1);
+    expect(a.b).toBeUndefined();
+    expect(a.c).toBeDefined();
+    expect(a.c.id).toBe(33);
   });
 
   test('parent.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
@@ -218,28 +264,42 @@ describe('011', () => {
     child.bind(C).toSelf();
   });
 
-  test('child.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      child.get(A);
-    }).toThrowError(TokenNotFoundError);
+  test('child.get(A) should work correctly', async () => {
+    const a = child.get(A);
+    expect(a).toBeInstanceOf(A);
+    expect(a.id).toBe(1);
+    expect(a.b).toBeUndefined();
+    expect(a.c).toBeDefined();
+    expect(a.c.id).toBe(33);
   });
 
-  test('child.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      child.get(B);
-    }).toThrowError(TokenNotFoundError);
+  test('child.get(B) should work correctly', async () => {
+    const b = child.get(B);
+    expect(b).toBeInstanceOf(B);
+    expect(b).toBe(b.c.b);
+    expect(b.a).toBe(b.c.a);
+    expect(b.id).toBe(2);
+    expect(b.a.id).toBe(1);
+    expect(b.c.id).toBe(3);
   });
 
-  test('child.get(C) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      child.get(C);
-    }).toThrowError(TokenNotFoundError);
+  test('child.get(C) should work correctly', async () => {
+    const c = child.get(C);
+    expect(c).toBeInstanceOf(C);
+    expect(c).toBe(c.b.c);
+    expect(c.a).toBe(c.b.a);
+    expect(c.id).toBe(3);
+    expect(c.a.id).toBe(1);
+    expect(c.b.id).toBe(2);
   });
 
-  test('parent.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      parent.get(A);
-    }).toThrowError(TokenNotFoundError);
+  test('parent.get(A) should work correctly', async () => {
+    const a = parent.get(A);
+    expect(a).toBeInstanceOf(A);
+    expect(a.id).toBe(1);
+    expect(a.b).toBeUndefined();
+    expect(a.c).toBeDefined();
+    expect(a.c.id).toBe(33);
   });
 
   test('parent.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
@@ -414,22 +474,33 @@ describe('111', () => {
     child.bind(C).toSelf();
   });
 
-  test('child.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      child.get(A);
-    }).toThrowError(TokenNotFoundError);
+  test('child.get(A) should work correctly', async () => {
+    const a = child.get(A);
+    expect(a).toBeInstanceOf(A);
+    expect(a.id).toBe(1);
+    expect(a.b).toBeUndefined();
+    expect(a.c).toBeDefined();
+    expect(a.c.id).toBe(33);
   });
 
-  test('child.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      child.get(B);
-    }).toThrowError(TokenNotFoundError);
+  test('child.get(B) should work correctly', async () => {
+    const b = child.get(B);
+    expect(b).toBeInstanceOf(B);
+    expect(b).toBe(b.c.b);
+    expect(b.a).toBe(b.c.a);
+    expect(b.id).toBe(2);
+    expect(b.a.id).toBe(1);
+    expect(b.c.id).toBe(3);
   });
 
-  test('child.get(C) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      child.get(C);
-    }).toThrowError(TokenNotFoundError);
+  test('child.get(C) should work correctly', async () => {
+    const c = child.get(C);
+    expect(c).toBeInstanceOf(C);
+    expect(c).toBe(c.b.c);
+    expect(c.a).toBe(c.b.a);
+    expect(c.id).toBe(3);
+    expect(c.a.id).toBe(1);
+    expect(c.b.id).toBe(2);
   });
 
   test('parent.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {

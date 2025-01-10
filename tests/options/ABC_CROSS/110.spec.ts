@@ -1,4 +1,4 @@
-import { SkipSelf, Inject, Container, LazyToken } from '@/index';
+import { SkipSelf, Self, Inject, Container, LazyToken } from '@/index';
 import { TokenNotFoundError } from '@/errors';
 
 interface IA {
@@ -26,6 +26,7 @@ class A {
 
   @Inject(new LazyToken(() => B))
   @SkipSelf()
+  @Self()
   public b!: IB;
 
   @Inject(new LazyToken(() => C))

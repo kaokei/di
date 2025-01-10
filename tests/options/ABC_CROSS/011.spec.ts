@@ -1,11 +1,4 @@
-import {
-  SkipSelf,
-  Self,
-  Optional,
-  Inject,
-  Container,
-  LazyToken,
-} from '@/index';
+import { Self, Optional, Inject, Container, LazyToken } from '@/index';
 import { TokenNotFoundError } from '@/errors';
 
 interface IA {
