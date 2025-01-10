@@ -41,7 +41,7 @@ describe('options -> AB_CONTAIN -> C -> 111: A parent injector B parent injector
     parent.bind(B).toSelf();
   });
 
-  test('injector.get(A) should work correctly', async () => {
+  test('child.get(A) should work correctly', async () => {
     const a = child.get(A);
 
     expect(a).toBeInstanceOf(A);
@@ -56,7 +56,7 @@ describe('options -> AB_CONTAIN -> C -> 111: A parent injector B parent injector
     expect(hasOwn(parent, B, a.b)).toBe(false);
   });
 
-  test('injector.get(B) should work correctly', async () => {
+  test('child.get(B) should work correctly', async () => {
     const b = child.get(B);
 
     expect(b).toBeInstanceOf(B);
@@ -79,7 +79,7 @@ describe('options -> AB_CONTAIN -> C -> 111: A child injector B child injector',
     child.bind(B).toSelf();
   });
 
-  test('injector.get(A) should work correctly', async () => {
+  test('child.get(A) should work correctly', async () => {
     const a = child.get(A);
 
     expect(a).toBeInstanceOf(A);
@@ -94,7 +94,7 @@ describe('options -> AB_CONTAIN -> C -> 111: A child injector B child injector',
     expect(hasOwn(parent, B, a.b)).toBe(false);
   });
 
-  test('injector.get(B) should work correctly', async () => {
+  test('child.get(B) should work correctly', async () => {
     const b = child.get(B);
 
     expect(b).toBeInstanceOf(B);
@@ -117,7 +117,7 @@ describe('options -> AB_CONTAIN -> C -> 111: A parent injector B child injector'
     child.bind(B).toSelf();
   });
 
-  test('injector.get(A) should work correctly', async () => {
+  test('child.get(A) should work correctly', async () => {
     const a = child.get(A);
 
     expect(a).toBeInstanceOf(A);
@@ -132,7 +132,7 @@ describe('options -> AB_CONTAIN -> C -> 111: A parent injector B child injector'
     expect(hasOwn(parent, B, a.b)).toBe(false);
   });
 
-  test('injector.get(B) should work correctly', async () => {
+  test('child.get(B) should work correctly', async () => {
     const b = child.get(B);
 
     expect(b).toBeInstanceOf(B);
@@ -155,7 +155,7 @@ describe('options -> AB_CONTAIN -> C -> 111: A child injector B parent injector'
     child.bind(A).toSelf();
   });
 
-  test('injector.get(A) should work correctly', async () => {
+  test('child.get(A) should work correctly', async () => {
     const a = child.get(A);
 
     expect(a).toBeInstanceOf(A);
@@ -172,7 +172,7 @@ describe('options -> AB_CONTAIN -> C -> 111: A child injector B parent injector'
     expect(hasOwn(parent, B, a.b)).toBe(true);
   });
 
-  test('injector.get(B) should work correctly', async () => {
+  test('child.get(B) should work correctly', async () => {
     const b = child.get(B);
 
     expect(b).toBeInstanceOf(B);
