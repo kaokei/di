@@ -44,7 +44,7 @@ describe('options -> AB_CONTAIN -> C -> 000: A parent injector B parent injector
   });
 
   test('injector.get(A) should work correctly', async () => {
-    const a = child.get(A) as A;
+    const a = child.get(A);
 
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
@@ -61,7 +61,7 @@ describe('options -> AB_CONTAIN -> C -> 000: A parent injector B parent injector
   });
 
   test('injector.get(B) should work correctly', async () => {
-    const b = child.get(B) as B;
+    const b = child.get(B);
 
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);
@@ -85,7 +85,7 @@ describe('options -> AB_CONTAIN -> C -> 000: A child injector B child injector',
   });
 
   test('injector.get(A) should work correctly', async () => {
-    const a = child.get(A) as A;
+    const a = child.get(A);
 
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
@@ -102,7 +102,7 @@ describe('options -> AB_CONTAIN -> C -> 000: A child injector B child injector',
   });
 
   test('injector.get(B) should work correctly', async () => {
-    const b = child.get(B) as B;
+    const b = child.get(B);
 
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);
@@ -131,7 +131,7 @@ describe('options -> AB_CONTAIN -> C -> 000: A parent injector B child injector'
   });
 
   test('injector.get(B) should work correctly', async () => {
-    const b = child.get(B) as B;
+    const b = child.get(B);
 
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);
@@ -154,7 +154,7 @@ describe('options -> AB_CONTAIN -> C -> 000: A child injector B parent injector'
   });
 
   test('injector.get(A) should work correctly', async () => {
-    const a = child.get(A) as A;
+    const a = child.get(A);
 
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
@@ -171,7 +171,7 @@ describe('options -> AB_CONTAIN -> C -> 000: A child injector B parent injector'
   });
 
   test('injector.get(B) should work correctly', async () => {
-    const b = child.get(B) as B;
+    const b = child.get(B);
 
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);
