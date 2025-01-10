@@ -36,7 +36,6 @@ describe('options -> AB_CONTAIN -> C -> 000: A parent injector B parent injector
   let child: Container;
 
   beforeEach(() => {
-    console.log('before each 001001001');
     parent = new Container();
     child = parent.createChild();
     parent.bind(A).toSelf();
@@ -79,7 +78,6 @@ describe('options -> AB_CONTAIN -> C -> 000: A child injector B child injector',
   beforeEach(() => {
     parent = new Container();
     child = parent.createChild();
-
     child.bind(A).toSelf();
     child.bind(B).toSelf();
   });
