@@ -1,13 +1,4 @@
-import {
-  Skip,
-  Self,
-  Optional,
-  Inject,
-  Injector,
-  Injectable,
-  forwardRef,
-} from '@/index';
-
+import { SkipSelf, Self, Optional, Inject, Container } from '@/index';
 import { hasOwn } from '@tests/utils';
 
 interface IA {
@@ -21,35 +12,35 @@ interface IB {
   id: number;
 }
 
-@Injectable()
-export class A {
+class B {
+  public name = 'B';
+  public id = 2;
+}
+
+class A {
   public name = 'A';
   public id = 1;
 
-  @Inject(forwardRef(() => B))
-  @Skip(false)
+  @Inject(B)
+  @SkipSelf(false)
   @Self(false)
   @Optional(true)
   public b!: IB;
 }
 
-@Injectable()
-export class B {
-  public name = 'B';
-  public id = 2;
-}
-
 describe('options -> AB_CONTAIN -> P -> 001: A parent injector B parent injector', () => {
-  let parentInjector: Injector;
-  let injector: Injector;
+  let parent: Container;
+  let child: Container;
 
   beforeEach(() => {
-    parentInjector = new Injector([A, B]);
-    injector = new Injector([], parentInjector);
+    parent = new Container();
+    child = parent.createChild();
+    parent.bind(A).toSelf();
+    parent.bind(B).toSelf();
   });
 
-  test('injector.get(A) should work correctly', async () => {
-    const a = injector.get(A);
+  test('child.get(A) should work correctly', async () => {
+    const a = child.get(A);
 
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
@@ -58,36 +49,38 @@ describe('options -> AB_CONTAIN -> P -> 001: A parent injector B parent injector
     expect(a.b.id).toBe(2);
     expect(a.b.name).toBe('B');
 
-    expect(hasOwn(injector, A, a)).toBe(false);
-    expect(hasOwn(parentInjector, A, a)).toBe(true);
+    expect(hasOwn(child, A, a)).toBe(false);
+    expect(hasOwn(parent, A, a)).toBe(true);
 
-    expect(hasOwn(injector, B, a.b)).toBe(false);
-    expect(hasOwn(parentInjector, B, a.b)).toBe(true);
+    expect(hasOwn(child, B, a.b)).toBe(false);
+    expect(hasOwn(parent, B, a.b)).toBe(true);
   });
 
-  test('injector.get(B) should work correctly', async () => {
-    const b = injector.get(B);
+  test('child.get(B) should work correctly', async () => {
+    const b = child.get(B);
 
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);
     expect(b.name).toBe('B');
 
-    expect(hasOwn(injector, B, b)).toBe(false);
-    expect(hasOwn(parentInjector, B, b)).toBe(true);
+    expect(hasOwn(child, B, b)).toBe(false);
+    expect(hasOwn(parent, B, b)).toBe(true);
   });
 });
 
 describe('options -> AB_CONTAIN -> P -> 001: A child injector B child injector', () => {
-  let parentInjector: Injector;
-  let injector: Injector;
+  let parent: Container;
+  let child: Container;
 
   beforeEach(() => {
-    parentInjector = new Injector([]);
-    injector = new Injector([A, B], parentInjector);
+    parent = new Container();
+    child = parent.createChild();
+    child.bind(A).toSelf();
+    child.bind(B).toSelf();
   });
 
-  test('injector.get(A) should work correctly', async () => {
-    const a = injector.get(A);
+  test('child.get(A) should work correctly', async () => {
+    const a = child.get(A);
 
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
@@ -96,74 +89,76 @@ describe('options -> AB_CONTAIN -> P -> 001: A child injector B child injector',
     expect(a.b.id).toBe(2);
     expect(a.b.name).toBe('B');
 
-    expect(hasOwn(injector, A, a)).toBe(true);
-    expect(hasOwn(parentInjector, A, a)).toBe(false);
+    expect(hasOwn(child, A, a)).toBe(true);
+    expect(hasOwn(parent, A, a)).toBe(false);
 
-    expect(hasOwn(injector, B, a.b)).toBe(true);
-    expect(hasOwn(parentInjector, B, a.b)).toBe(false);
+    expect(hasOwn(child, B, a.b)).toBe(true);
+    expect(hasOwn(parent, B, a.b)).toBe(false);
   });
 
-  test('injector.get(B) should work correctly', async () => {
-    const b = injector.get(B);
+  test('child.get(B) should work correctly', async () => {
+    const b = child.get(B);
 
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);
     expect(b.name).toBe('B');
 
-    expect(hasOwn(injector, B, b)).toBe(true);
-    expect(hasOwn(parentInjector, B, b)).toBe(false);
+    expect(hasOwn(child, B, b)).toBe(true);
+    expect(hasOwn(parent, B, b)).toBe(false);
   });
 });
 
 describe('options -> AB_CONTAIN -> P -> 001: A parent injector B child injector', () => {
-  let parentInjector: Injector;
-  let injector: Injector;
+  let parent: Container;
+  let child: Container;
 
   beforeEach(() => {
-    parentInjector = new Injector([A]);
-    injector = new Injector([B], parentInjector);
+    parent = new Container();
+    child = parent.createChild();
+    parent.bind(A).toSelf();
+    child.bind(B).toSelf();
   });
 
-  test('injector.get(A) should work correctly', async () => {
-    const a = injector.get(A);
+  test('child.get(A) should work correctly', async () => {
+    const a = child.get(A);
 
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
     expect(a.name).toBe('A');
-    expect(a.b).toBeInstanceOf(B);
-    expect(a.b.id).toBe(2);
-    expect(a.b.name).toBe('B');
+    expect(a.b).toBeUndefined();
 
-    expect(hasOwn(injector, A, a)).toBe(false);
-    expect(hasOwn(parentInjector, A, a)).toBe(true);
+    expect(hasOwn(child, A, a)).toBe(false);
+    expect(hasOwn(parent, A, a)).toBe(true);
 
-    expect(hasOwn(injector, B, a.b)).toBe(false);
-    expect(hasOwn(parentInjector, B, a.b)).toBe(true);
+    expect(hasOwn(child, B, a.b)).toBe(false);
+    expect(hasOwn(parent, B, a.b)).toBe(false);
   });
 
-  test('injector.get(B) should work correctly', async () => {
-    const b = injector.get(B);
+  test('child.get(B) should work correctly', async () => {
+    const b = child.get(B);
 
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);
     expect(b.name).toBe('B');
 
-    expect(hasOwn(injector, B, b)).toBe(true);
-    expect(hasOwn(parentInjector, B, b)).toBe(false);
+    expect(hasOwn(child, B, b)).toBe(true);
+    expect(hasOwn(parent, B, b)).toBe(false);
   });
 });
 
 describe('options -> AB_CONTAIN -> P -> 001: A child injector B parent injector', () => {
-  let parentInjector: Injector;
-  let injector: Injector;
+  let parent: Container;
+  let child: Container;
 
   beforeEach(() => {
-    parentInjector = new Injector([B]);
-    injector = new Injector([A], parentInjector);
+    parent = new Container();
+    child = parent.createChild();
+    parent.bind(B).toSelf();
+    child.bind(A).toSelf();
   });
 
-  test('injector.get(A) should work correctly', async () => {
-    const a = injector.get(A);
+  test('child.get(A) should work correctly', async () => {
+    const a = child.get(A);
 
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
@@ -172,21 +167,21 @@ describe('options -> AB_CONTAIN -> P -> 001: A child injector B parent injector'
     expect(a.b.id).toBe(2);
     expect(a.b.name).toBe('B');
 
-    expect(hasOwn(injector, A, a)).toBe(true);
-    expect(hasOwn(parentInjector, A, a)).toBe(false);
+    expect(hasOwn(child, A, a)).toBe(true);
+    expect(hasOwn(parent, A, a)).toBe(false);
 
-    expect(hasOwn(injector, B, a.b)).toBe(false);
-    expect(hasOwn(parentInjector, B, a.b)).toBe(true);
+    expect(hasOwn(child, B, a.b)).toBe(false);
+    expect(hasOwn(parent, B, a.b)).toBe(true);
   });
 
-  test('injector.get(B) should work correctly', async () => {
-    const b = injector.get(B);
+  test('child.get(B) should work correctly', async () => {
+    const b = child.get(B);
 
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);
     expect(b.name).toBe('B');
 
-    expect(hasOwn(injector, B, b)).toBe(false);
-    expect(hasOwn(parentInjector, B, b)).toBe(true);
+    expect(hasOwn(child, B, b)).toBe(false);
+    expect(hasOwn(parent, B, b)).toBe(true);
   });
 });
