@@ -147,7 +147,7 @@ export class Binding {
   }
 
   private getContructorParameters(ClassName: any) {
-    const params = getOwnMetadata(KEYS.INJECTED_PARAMS, ClassName);
+    const params = getOwnMetadata(KEYS.INJECTED_PARAMS, ClassName) || [];
     const result = params.map((meta: any) => {
       const { inject, ...rest } = meta;
       const token = resolveToken(inject);

@@ -62,30 +62,29 @@ export class Container {
     // 关键在于new Constructor()可能需要提供参数，这些参数也需要从容器中获取，当然构造函数的参数需要通过@Inject来绑定对应的服务
     // 另外new Constructor()所在的类可能还有注入的实例属性，这些实例属性也需要从容器中获取
     // 需要把这些实例性通过赋值的方式合并到实例对象上。最终在返回实例对象之前，执行onActivationHandler
-    // const binding = this.getBinding(token) as Binding;
-    // if (options.skipSelf) {
-    //   if (this.parent) {
-    //     return this.parent.get(token, {
-    //       ...options,
-    //       skipSelf: false,
-    //     });
-    //   } else {
-    //     this.checkTokenNotFoundError(token, options);
-    //   }
-    // } else if (options.self) {
-    //   if (binding) {
-    //     return binding.get();
-    //   } else {
-    //     this.checkTokenNotFoundError(token, options);
-    //   }
-    // } else if (binding) {
-    //   return binding.get();
-    // } else if (this.parent) {
-    //   return this.parent.get(token, options);
-    // } else {
-    //   this.checkTokenNotFoundError(token, options);
-    // }
-    return 123 as T;
+    const binding = this.getBinding(token) as Binding;
+    if (options.skipSelf) {
+      if (this.parent) {
+        return this.parent.get(token, {
+          ...options,
+          skipSelf: false,
+        });
+      } else {
+        this.checkTokenNotFoundError(token, options);
+      }
+    } else if (options.self) {
+      if (binding) {
+        return binding.get();
+      } else {
+        this.checkTokenNotFoundError(token, options);
+      }
+    } else if (binding) {
+      return binding.get();
+    } else if (this.parent) {
+      return this.parent.get(token, options);
+    } else {
+      this.checkTokenNotFoundError(token, options);
+    }
   }
 
   public onActivation(handler: any) {

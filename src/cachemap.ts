@@ -13,6 +13,7 @@ export function defineMetadata(
 ) {
   const found = map.get(target) || {};
   found[metadataKey] = metadataValue;
+  map.set(target, found);
 }
 
 // 可能返回undefined
