@@ -1,5 +1,4 @@
 import { SkipSelf, Self, Optional, Inject, Container } from '@/index';
-
 import { hasOwn } from '@tests/utils';
 
 interface IA {
@@ -13,12 +12,12 @@ interface IB {
   id: number;
 }
 
-export class B {
+class B {
   public name = 'B';
   public id = 2;
 }
 
-export class A {
+class A {
   public name = 'A';
   public id = 1;
 

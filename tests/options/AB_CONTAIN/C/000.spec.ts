@@ -1,5 +1,5 @@
 import { SkipSelf, Self, Optional, Inject, Container } from '@/index';
-
+import { TokenNotFoundError } from '@/errors';
 import { hasOwn } from '@tests/utils';
 
 interface IA {
@@ -127,7 +127,7 @@ describe('options -> AB_CONTAIN -> C -> 000: A parent injector B child injector'
   test('injector.get(A) should work correctly', async () => {
     expect(() => {
       child.get(A);
-    }).toThrowError();
+    }).toThrowError(TokenNotFoundError);
   });
 
   test('injector.get(B) should work correctly', async () => {
