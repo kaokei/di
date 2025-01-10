@@ -1,11 +1,12 @@
 import {
+  SkipSelf,
+  Self,
+  Optional,
   Inject,
-  Injector,
-  Injectable,
-  forwardRef,
-  Skip,
-  TokenNotFoundError,
+  Container,
+  LazyToken,
 } from '@/index';
+import { TokenNotFoundError } from '@/errors';
 
 interface IA {
   name: string;
@@ -25,16 +26,16 @@ interface IC {
   a: IA;
   b: IB;
 }
-@Injectable()
-export class A {
+
+class A {
   public name = 'A';
   public id = 1;
 
-  @Inject(forwardRef(() => B))
-  @Skip()
+  @Inject(new LazyToken(() => B))
+  @SkipSelf()
   public b!: IB;
 
-  @Inject(forwardRef(() => C))
+  @Inject(new LazyToken(() => C))
   public c: IC = {
     name: 'default C',
     id: 33,
@@ -42,26 +43,26 @@ export class A {
     b: null as unknown as IB,
   };
 }
-@Injectable()
-export class B {
+
+class B {
   public name = 'B';
   public id = 2;
 
-  @Inject(forwardRef(() => A))
+  @Inject(new LazyToken(() => A))
   public a!: IA;
 
-  @Inject(forwardRef(() => C))
+  @Inject(new LazyToken(() => C))
   public c!: IC;
 }
-@Injectable()
-export class C {
+
+class C {
   public name = 'C';
   public id = 3;
 
-  @Inject(forwardRef(() => A))
+  @Inject(new LazyToken(() => A))
   public a!: IA;
 
-  @Inject(forwardRef(() => B))
+  @Inject(new LazyToken(() => B))
   public b!: IB;
 }
 

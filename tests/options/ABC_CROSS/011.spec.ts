@@ -1,10 +1,10 @@
 import {
-  Inject,
-  Injector,
-  Injectable,
-  forwardRef,
+  SkipSelf,
   Self,
-  TokenNotFoundError,
+  Optional,
+  Inject,
+  Container,
+  LazyToken,
 } from '@/index';
 
 interface IA {
@@ -25,16 +25,19 @@ interface IC {
   a: IA;
   b: IB;
 }
-@Injectable()
-export class A {
+
+class A {
   public name = 'A';
   public id = 1;
 
-  @Inject(forwardRef(() => B))
+  @Inject(new LazyToken(() => B))
   @Self()
+  @Optional()
   public b!: IB;
 
-  @Inject(forwardRef(() => C))
+  @Inject(new LazyToken(() => C))
+  @Self()
+  @Optional()
   public c: IC = {
     name: 'default C',
     id: 33,
@@ -42,30 +45,30 @@ export class A {
     b: null as unknown as IB,
   };
 }
-@Injectable()
-export class B {
+
+class B {
   public name = 'B';
   public id = 2;
 
-  @Inject(forwardRef(() => A))
+  @Inject(new LazyToken(() => A))
   public a!: IA;
 
-  @Inject(forwardRef(() => C))
+  @Inject(new LazyToken(() => C))
   public c!: IC;
 }
-@Injectable()
-export class C {
+
+class C {
   public name = 'C';
   public id = 3;
 
-  @Inject(forwardRef(() => A))
+  @Inject(new LazyToken(() => A))
   public a!: IA;
 
-  @Inject(forwardRef(() => B))
+  @Inject(new LazyToken(() => B))
   public b!: IB;
 }
 
-describe('Options Combination 2: self + optional', () => {
+describe('Options Combination 1: self + optional', () => {
   let injector: Injector;
   let parentInjector: Injector;
 
@@ -82,15 +85,22 @@ describe('Options Combination 2: self + optional', () => {
     );
   });
 
-  test('injector.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('injector.get(A) should work correctly', async () => {
     // A在injector中
-    // 但是在injector中找不到B，所以抛出异常
-    expect(() => {
-      injector.get(A);
-    }).toThrowError(TokenNotFoundError);
+    // 但是B和C在injector中都找不到
+    const a = injector.get(A);
+
+    expect(a).toBeInstanceOf(A);
+    expect(a.id).toBe(1);
+
+    expect(a.b).toBeUndefined();
+    expect(a.c).toBeDefined();
+    expect(a.c.id).toBe(33);
   });
 
   test('injector.get(B) should work correctly', async () => {
+    // B 在parentInjector中
+    // 意味着A和C也都在parentInjector中
     const b = injector.get(B);
 
     expect(b).toBeInstanceOf(B);
@@ -101,11 +111,14 @@ describe('Options Combination 2: self + optional', () => {
     expect(b.a).toBe(b.c.a);
     expect(b.c).toBe(b.a.c);
 
+    expect(b.id).toBe(2);
     expect(b.a.c.id).toBe(3);
     expect(b.a.b.id).toBe(2);
   });
 
   test('injector.get(C) should work correctly', async () => {
+    // C 在parentInjector中
+    // 意味着A和B也都在parentInjector中
     const c = injector.get(C);
 
     expect(c).toBeInstanceOf(C);
