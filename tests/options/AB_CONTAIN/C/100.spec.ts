@@ -1,6 +1,5 @@
 import { SkipSelf, Self, Optional, Inject, Container } from '@/index';
 import { TokenNotFoundError } from '@/errors';
-
 import { hasOwn } from '@tests/utils';
 
 interface IA {
