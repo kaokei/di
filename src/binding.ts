@@ -164,7 +164,7 @@ export class Binding {
       const { inject, ...rest } = meta;
       const token = resolveToken(inject);
       const property = this.container.get(token, rest);
-      if (!(property === void 0 && meta.value?.optional)) {
+      if (!(property === void 0 && meta.optional)) {
         acc[prop] = property;
       }
       return acc;
