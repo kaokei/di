@@ -31,7 +31,7 @@ class A {
   ) {}
 }
 
-describe('options -> AB_CONTAIN -> C -> 100: A parent injector B parent injector', () => {
+describe('00', () => {
   let parent: Container;
   let child: Container;
 
@@ -42,7 +42,7 @@ describe('options -> AB_CONTAIN -> C -> 100: A parent injector B parent injector
     parent.bind(B).toSelf();
   });
 
-  test('child.get(A) should work correctly', async () => {
+  test('child.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       child.get(A);
     }).toThrowError(TokenNotFoundError);
@@ -50,46 +50,15 @@ describe('options -> AB_CONTAIN -> C -> 100: A parent injector B parent injector
 
   test('child.get(B) should work correctly', async () => {
     const b = child.get(B);
-
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);
     expect(b.name).toBe('B');
-
     expect(hasOwn(child, B, b)).toBe(false);
     expect(hasOwn(parent, B, b)).toBe(true);
   });
 });
 
-describe('options -> AB_CONTAIN -> C -> 100: A child injector B child injector', () => {
-  let parent: Container;
-  let child: Container;
-
-  beforeEach(() => {
-    parent = new Container();
-    child = parent.createChild();
-    child.bind(A).toSelf();
-    child.bind(B).toSelf();
-  });
-
-  test('child.get(A) should work correctly', async () => {
-    expect(() => {
-      child.get(A);
-    }).toThrowError(TokenNotFoundError);
-  });
-
-  test('child.get(B) should work correctly', async () => {
-    const b = child.get(B);
-
-    expect(b).toBeInstanceOf(B);
-    expect(b.id).toBe(2);
-    expect(b.name).toBe('B');
-
-    expect(hasOwn(child, B, b)).toBe(true);
-    expect(hasOwn(parent, B, b)).toBe(false);
-  });
-});
-
-describe('options -> AB_CONTAIN -> C -> 100: A parent injector B child injector', () => {
+describe('01', () => {
   let parent: Container;
   let child: Container;
 
@@ -100,7 +69,7 @@ describe('options -> AB_CONTAIN -> C -> 100: A parent injector B child injector'
     child.bind(B).toSelf();
   });
 
-  test('child.get(A) should work correctly', async () => {
+  test('child.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       child.get(A);
     }).toThrowError(TokenNotFoundError);
@@ -108,52 +77,72 @@ describe('options -> AB_CONTAIN -> C -> 100: A parent injector B child injector'
 
   test('child.get(B) should work correctly', async () => {
     const b = child.get(B);
-
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);
     expect(b.name).toBe('B');
-
     expect(hasOwn(child, B, b)).toBe(true);
     expect(hasOwn(parent, B, b)).toBe(false);
   });
 });
 
-describe('options -> AB_CONTAIN -> C -> 100: A child injector B parent injector', () => {
+describe('10', () => {
   let parent: Container;
   let child: Container;
 
   beforeEach(() => {
     parent = new Container();
     child = parent.createChild();
-    parent.bind(B).toSelf();
     child.bind(A).toSelf();
+    parent.bind(B).toSelf();
   });
 
   test('child.get(A) should work correctly', async () => {
     const a = child.get(A);
-
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
     expect(a.name).toBe('A');
     expect(a.b).toBeInstanceOf(B);
     expect(a.b.id).toBe(2);
     expect(a.b.name).toBe('B');
-
     expect(hasOwn(child, A, a)).toBe(true);
     expect(hasOwn(parent, A, a)).toBe(false);
-
     expect(hasOwn(child, B, a.b)).toBe(false);
     expect(hasOwn(parent, B, a.b)).toBe(true);
   });
 
   test('child.get(B) should work correctly', async () => {
     const b = child.get(B);
-
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);
     expect(b.name).toBe('B');
-
     expect(hasOwn(child, B, b)).toBe(false);
     expect(hasOwn(parent, B, b)).toBe(true);
+  });
+});
+
+describe('11', () => {
+  let parent: Container;
+  let child: Container;
+
+  beforeEach(() => {
+    parent = new Container();
+    child = parent.createChild();
+    child.bind(A).toSelf();
+    child.bind(B).toSelf();
+  });
+
+  test('child.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+    expect(() => {
+      child.get(A);
+    }).toThrowError(TokenNotFoundError);
+  });
+
+  test('child.get(B) should work correctly', async () => {
+    const b = child.get(B);
+    expect(b).toBeInstanceOf(B);
+    expect(b.id).toBe(2);
+    expect(b.name).toBe('B');
+    expect(hasOwn(child, B, b)).toBe(true);
+    expect(hasOwn(parent, B, b)).toBe(false);
   });
 });
