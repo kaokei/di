@@ -54,6 +54,21 @@ describe('00', () => {
     expect(hasOwn(child, B, b)).toBe(false);
     expect(hasOwn(parent, B, b)).toBe(true);
   });
+
+  test('parent.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+    expect(() => {
+      parent.get(A);
+    }).toThrowError(TokenNotFoundError);
+  });
+
+  test('parent.get(B) should work correctly', async () => {
+    const b = parent.get(B);
+    expect(b).toBeInstanceOf(B);
+    expect(b.id).toBe(2);
+    expect(b.name).toBe('B');
+    expect(hasOwn(child, B, b)).toBe(false);
+    expect(hasOwn(parent, B, b)).toBe(true);
+  });
 });
 
 describe('01', () => {
@@ -80,6 +95,18 @@ describe('01', () => {
     expect(b.name).toBe('B');
     expect(hasOwn(child, B, b)).toBe(true);
     expect(hasOwn(parent, B, b)).toBe(false);
+  });
+
+  test('parent.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+    expect(() => {
+      parent.get(A);
+    }).toThrowError(TokenNotFoundError);
+  });
+
+  test('parent.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+    expect(() => {
+      parent.get(B);
+    }).toThrowError(TokenNotFoundError);
   });
 });
 
@@ -116,6 +143,21 @@ describe('10', () => {
     expect(hasOwn(child, B, b)).toBe(false);
     expect(hasOwn(parent, B, b)).toBe(true);
   });
+
+  test('parent.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+    expect(() => {
+      parent.get(A);
+    }).toThrowError(TokenNotFoundError);
+  });
+
+  test('parent.get(B) should work correctly', async () => {
+    const b = parent.get(B);
+    expect(b).toBeInstanceOf(B);
+    expect(b.id).toBe(2);
+    expect(b.name).toBe('B');
+    expect(hasOwn(child, B, b)).toBe(false);
+    expect(hasOwn(parent, B, b)).toBe(true);
+  });
 });
 
 describe('11', () => {
@@ -142,5 +184,17 @@ describe('11', () => {
     expect(b.name).toBe('B');
     expect(hasOwn(child, B, b)).toBe(true);
     expect(hasOwn(parent, B, b)).toBe(false);
+  });
+
+  test('parent.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+    expect(() => {
+      parent.get(A);
+    }).toThrowError(TokenNotFoundError);
+  });
+
+  test('parent.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+    expect(() => {
+      parent.get(B);
+    }).toThrowError(TokenNotFoundError);
   });
 });
