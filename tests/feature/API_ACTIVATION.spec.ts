@@ -45,7 +45,7 @@ class B {
   }
 }
 
-describe('injector useValue', () => {
+describe('container activation', () => {
   let container: Container;
 
   beforeEach(() => {
