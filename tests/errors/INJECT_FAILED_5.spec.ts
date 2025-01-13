@@ -1,4 +1,4 @@
-import { Container, Self } from '@/index';
+import { Inject, Container } from '@/index';
 import { TokenNotFoundError } from '@/errors';
 
 interface IA {
@@ -16,8 +16,7 @@ export class A {
   public name = 'A';
   public id = 1;
 
-  @Self()
-  public b!: IB;
+  public constructor(@Inject(Object) public b: IB) {}
 }
 
 export class B {
@@ -25,7 +24,7 @@ export class B {
   public id = 2;
 }
 
-describe('errors -> INJECT_FAILED: Property miss @Inject and use interface', () => {
+describe('errors -> INJECT_FAILED: Constructor @Inject use Object', () => {
   let container: Container;
 
   beforeEach(() => {

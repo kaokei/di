@@ -1,11 +1,5 @@
-import {
-  Inject,
-  Injector,
-  Injectable,
-  forwardRef,
-  ProviderNotValidError,
-  TokenNotFoundError,
-} from '@/index';
+import { Inject, Container } from '@/index';
+import { TokenNotFoundError } from '@/errors';
 
 interface IA {
   name: string;
@@ -18,8 +12,7 @@ interface IB {
   id: number;
 }
 
-@Injectable()
-export class A {
+class A {
   public name = 'A';
   public id = 1;
 
@@ -27,41 +20,41 @@ export class A {
   public b!: IB;
 }
 
-@Injectable()
-export class B {
+class B {
   public name = 'B';
   public id = 2;
 }
 
-export class C {
+class C {
   public name = 'C';
   public id = 3;
 }
 
-describe('errors -> TOKEN_NOT_FOUND', () => {
-  let injector: Injector;
+describe('TOKEN_NOT_FOUND', () => {
+  let container: Container;
 
   beforeEach(() => {
-    injector = new Injector([A, B]);
+    container = new Container();
+    container.bind(A).toSelf();
+    container.bind(B).toSelf();
   });
 
-  test('injector.get(A) should throw TokenNotFoundError', async () => {
+  test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
-      injector.get(A);
+      container.get(A);
     }).toThrowError(TokenNotFoundError);
   });
 
-  test('injector.get(B) should work correctly', async () => {
-    const b = injector.get(B);
-
+  test('container.get(B) should work correctly', async () => {
+    const b = container.get(B);
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);
     expect(b.name).toBe('B');
   });
 
-  test('injector.get(C) should throw TokenNotFoundError', async () => {
+  test('container.get(C) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
-      injector.get(C);
+      container.get(C);
     }).toThrowError(TokenNotFoundError);
   });
 });
