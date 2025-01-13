@@ -6,12 +6,15 @@
     2. rebind<T>(serviceIdentifier: interfaces.ServiceIdentifier<T>): interfaces.BindingToSyntax<T>;
     3. unbind(serviceIdentifier: interfaces.ServiceIdentifier): void;
     4. unbindAll(): void;
+    
     5. onActivation<T>(serviceIdentifier: interfaces.ServiceIdentifier<T>, onActivation: interfaces.BindingActivation<T>): void;
     6. onDeactivation<T>(serviceIdentifier: interfaces.ServiceIdentifier<T>, onDeactivation: interfaces.BindingDeactivation<T>): void;
+
     7. isBound(serviceIdentifier: interfaces.ServiceIdentifier<unknown>): boolean;
     8. isCurrentBound<T>(serviceIdentifier: interfaces.ServiceIdentifier<T>): boolean;
     9. createChild(containerOptions?: interfaces.ContainerOptions): Container;
     10. get<T>(serviceIdentifier: interfaces.ServiceIdentifier<T>): T;
+
     11. #applyMiddleware(...middlewares: interfaces.Middleware[]): void;
     12. #resolve<T>(constructorFunction: interfaces.Newable<T>): T;
 2. Token

@@ -1,5 +1,5 @@
-import { Inject, Container, LazyToken, Token } from '@/index';
-import { CircularDependencyError, TokenNotFoundError } from '@/errors';
+import { Inject, Container, Token } from '@/index';
+import { TokenNotFoundError } from '@/errors';
 
 class UserClass {
   private classNo = 302;
@@ -17,7 +17,7 @@ class User {
   private name = 'zhangsan';
   private age = 12;
 
-  constructor(private userClass: UserClass) {}
+  constructor(@Inject(UserClass) private userClass: UserClass) {}
 
   public getName() {
     return this.name;
@@ -40,41 +40,23 @@ class User {
   }
 }
 
-describe('User depends on UserClass (no providers)', () => {
+describe('User depends on UserClass (no bindings)', () => {
   let container: Container;
 
   beforeEach(() => {
     container = new Container();
-    container.bind(User).toSelf();
-    container.bind(UserClass).toSelf();
   });
 
-  test('instanceOf works right', async () => {
-    const user = container.get(User);
-    const userClass = container.get(UserClass);
-
-    expect(user).toBeInstanceOf(User);
-    expect(userClass).toBeInstanceOf(UserClass);
-    expect(userClass).toBe(user.getUserClass());
+  test('container.get(User) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+    expect(() => {
+      container.get(User);
+    }).toThrowError(TokenNotFoundError);
   });
 
-  test('modify user name and age', async () => {
-    const user = container.get(User);
-    user.setName('lisi');
-    user.setAge(123);
-
-    expect(user.getName()).toBe('lisi');
-    expect(user.getAge()).toBe(123);
-  });
-
-  test('modify userClass.classNo', async () => {
-    const user = container.get(User);
-    const userClass = container.get(UserClass);
-
-    userClass.setClassNo(777);
-
-    expect(userClass.getClassNo()).toBe(777);
-    expect(user.getUserClass().getClassNo()).toBe(777);
+  test('container.get(UserClass) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+    expect(() => {
+      container.get(UserClass);
+    }).toThrowError(TokenNotFoundError);
   });
 });
 
@@ -127,36 +109,17 @@ describe('User depends on UserClass (User inside parent container)', () => {
     child.bind(UserClass).toSelf();
   });
 
-  test('instanceOf works right', async () => {
-    const user = child.get(User);
-    const userClass = child.get(UserClass);
-    const parentUserClass = parent.get(UserClass);
-
-    expect(user).toBeInstanceOf(User);
-    expect(userClass).toBeInstanceOf(UserClass);
-    expect(userClass).not.toBe(user.getUserClass());
-    expect(parentUserClass).toBe(user.getUserClass());
-  });
-
-  test('modify user name and age', async () => {
-    const user = child.get(User);
-    user.setName('lisi');
-    user.setAge(123);
-
-    expect(user.getName()).toBe('lisi');
-    expect(user.getAge()).toBe(123);
+  test('child.get(User) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+    expect(() => {
+      child.get(User);
+    }).toThrowError(TokenNotFoundError);
   });
 
   test('modify userClass.classNo', async () => {
-    const user = child.get(User);
     const userClass = child.get(UserClass);
-    const parentUserClass = parent.get(UserClass);
-
+    expect(userClass.getClassNo()).toBe(302);
     userClass.setClassNo(777);
-
     expect(userClass.getClassNo()).toBe(777);
-    expect(user.getUserClass().getClassNo()).not.toBe(777);
-    expect(user.getUserClass().getClassNo()).toBe(parentUserClass.getClassNo());
   });
 });
 
@@ -200,7 +163,7 @@ describe('User depends on UserClass (UserClass inside parent container)', () => 
   });
 });
 
-describe('User depends on UserClass (use InjectionKey)', () => {
+describe('User depends on UserClass (use Token)', () => {
   let container: Container;
   const userKey = new Token<User>('userKey');
   const userClassKey = new Token<UserClass>('userClassKey');
@@ -213,12 +176,18 @@ describe('User depends on UserClass (use InjectionKey)', () => {
     container.bind(userClassKey).toService(UserClass);
   });
 
-  test('InjectionKey should work', async () => {
+  test('Token should work', async () => {
     const user1 = container.get(User);
     const userClass1 = container.get(UserClass);
-
     const user2 = container.get(userKey);
     const userClass2 = container.get(userClassKey);
+
+    expect(user1.getName()).toBe('zhangsan');
+    expect(user1.getAge()).toBe(12);
+    expect(userClass1.getClassNo()).toBe(302);
+    expect(user2.getName()).toBe('zhangsan');
+    expect(user2.getAge()).toBe(12);
+    expect(userClass2.getClassNo()).toBe(302);
 
     expect(user1).not.toBe(user2);
     expect(userClass1).toBe(userClass2);

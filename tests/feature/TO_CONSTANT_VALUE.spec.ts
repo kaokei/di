@@ -25,13 +25,17 @@ class B {
   public id = 2;
 }
 
-describe('container useValue', () => {
+describe('toConstantValue', () => {
   let container: Container;
+
+  function factoryB() {
+    return new B();
+  }
 
   beforeEach(() => {
     container = new Container();
     container.bind(A).toConstantValue('A_Value');
-    container.bind(B).toSelf();
+    container.bind(B).toConstantValue(factoryB);
   });
 
   test('container.get(A) should work correctly', async () => {
@@ -40,9 +44,12 @@ describe('container useValue', () => {
   });
 
   test('container.get(B) should work correctly', async () => {
-    const b = container.get(B);
-    expect(b).toBeInstanceOf(B);
-    expect(b.id).toBe(2);
-    expect(b.name).toBe('B');
+    const b: any = container.get(B);
+    expect(b).not.toBeInstanceOf(B);
+    expect(b).toBe(factoryB);
+
+    const bInst = b();
+    expect(bInst.id).toBe(2);
+    expect(bInst.name).toBe('B');
   });
 });
