@@ -5,6 +5,6 @@ export class TokenNotFoundError extends Error {
   constructor(token: any) {
     super();
 
-    this.message = `TOKEN IS NOT A INJECTABLE CLASS OR SKIP OUT OF ROOT INJECTOR. YOU CAN USE @Optional DECORATOR TO IGNORE THIS ERROR IF THIS SERVICE IS OPTIONAL. ${token}`;
+    this.message = `TOKEN IS NOT BOUND TO CONTAINER. YOU CAN USE @Optional DECORATOR TO IGNORE THIS ERROR IF THIS SERVICE IS OPTIONAL. ${token}`;
   }
 }

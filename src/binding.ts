@@ -8,7 +8,7 @@ import {
 import { Container } from './container';
 import { getMetadata, getOwnMetadata } from './cachemap';
 import { resolveToken } from './token';
-import { CircularDependencyError } from './errors';
+import { CircularDependencyError, BindingNotValidError } from './errors';
 
 export class Binding {
   public container!: Container;
@@ -108,7 +108,7 @@ export class Binding {
     } else if (BindingTypeEnum.DynamicValue === this.type) {
       return this.resolveDynamicValue();
     } else {
-      //  throw error
+      throw new BindingNotValidError(this);
     }
   }
 

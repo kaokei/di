@@ -1,5 +1,5 @@
 import { Binding } from './binding';
-import { TokenNotFoundError } from './errors/TokenNotFoundError';
+import { TokenNotFoundError, DuplicateBindingError } from './errors';
 import { IDENTITY, NOOP } from './constants';
 import { GenericToken } from './interfaces';
 
@@ -11,7 +11,7 @@ export class Container {
 
   public bind(serviceIdentifier: any) {
     if (this.bindings.has(serviceIdentifier)) {
-      // todo: throw new Error('Already bound');
+      throw new DuplicateBindingError(serviceIdentifier);
     }
     const binding = this.buildBinding(serviceIdentifier);
     this.bindings.set(serviceIdentifier, binding);

@@ -13,7 +13,7 @@ import dts from 'vite-plugin-dts';
 export default defineConfig({
   plugins: [
     dts({
-      rollupTypes: true,
+      // rollupTypes: true,
       include: ["./src"],
       tsconfigPath: './tsconfig.app.json',
       beforeWriteFile: (filePath, content) => {
