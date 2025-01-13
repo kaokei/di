@@ -1,4 +1,4 @@
-import { Inject, Injector, Injectable, forwardRef } from '@/index';
+import { Inject, Container, LazyToken } from '@/index';
 
 interface IA {
   name: string;
@@ -12,42 +12,35 @@ interface IB {
   a: IA;
 }
 
-@Injectable()
-export class A {
+class A {
   public name = 'A';
   public id = 1;
 
-  @Inject(forwardRef(() => B))
+  @Inject(new LazyToken(() => B))
   public b!: IB;
 }
 
-@Injectable()
-export class B {
+class B {
   public name = 'B';
   public id = 2;
 }
 
-describe('injector useValue', () => {
-  let injector: Injector;
+describe('container useValue', () => {
+  let container: Container;
 
   beforeEach(() => {
-    injector = new Injector([
-      {
-        provide: A,
-        useValue: 'A_Value',
-      },
-    ]);
+    container = new Container();
+    container.bind(A).toConstantValue('A_Value');
+    container.bind(B).toSelf();
   });
 
-  test('injector.get(A) should work correctly', async () => {
-    const a = injector.get(A);
-
+  test('container.get(A) should work correctly', async () => {
+    const a = container.get(A);
     expect(a).toBe('A_Value');
   });
 
-  test('injector.get(B) should work correctly', async () => {
-    const b = injector.get(B);
-
+  test('container.get(B) should work correctly', async () => {
+    const b = container.get(B);
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);
     expect(b.name).toBe('B');

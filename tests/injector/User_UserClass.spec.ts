@@ -1,7 +1,7 @@
-import { Injector, Injectable, InjectionKey } from '@/index';
+import { Inject, Container, LazyToken, Token } from '@/index';
+import { CircularDependencyError, TokenNotFoundError } from '@/errors';
 
-@Injectable()
-export class UserClass {
+class UserClass {
   private classNo = 302;
 
   public getClassNo() {
@@ -13,8 +13,7 @@ export class UserClass {
   }
 }
 
-@Injectable()
-export class User {
+class User {
   private name = 'zhangsan';
   private age = 12;
 
@@ -42,15 +41,17 @@ export class User {
 }
 
 describe('User depends on UserClass (no providers)', () => {
-  let injector: Injector;
+  let container: Container;
 
   beforeEach(() => {
-    injector = new Injector([]);
+    container = new Container();
+    container.bind(User).toSelf();
+    container.bind(UserClass).toSelf();
   });
 
   test('instanceOf works right', async () => {
-    const user = injector.get(User);
-    const userClass = injector.get(UserClass);
+    const user = container.get(User);
+    const userClass = container.get(UserClass);
 
     expect(user).toBeInstanceOf(User);
     expect(userClass).toBeInstanceOf(UserClass);
@@ -58,7 +59,7 @@ describe('User depends on UserClass (no providers)', () => {
   });
 
   test('modify user name and age', async () => {
-    const user = injector.get(User);
+    const user = container.get(User);
     user.setName('lisi');
     user.setAge(123);
 
@@ -67,8 +68,8 @@ describe('User depends on UserClass (no providers)', () => {
   });
 
   test('modify userClass.classNo', async () => {
-    const user = injector.get(User);
-    const userClass = injector.get(UserClass);
+    const user = container.get(User);
+    const userClass = container.get(UserClass);
 
     userClass.setClassNo(777);
 
@@ -77,16 +78,18 @@ describe('User depends on UserClass (no providers)', () => {
   });
 });
 
-describe('User depends on UserClass (same Injector)', () => {
-  let injector: Injector;
+describe('User depends on UserClass (same container)', () => {
+  let container: Container;
 
   beforeEach(() => {
-    injector = new Injector([User, UserClass]);
+    container = new Container();
+    container.bind(User).toSelf();
+    container.bind(UserClass).toSelf();
   });
 
   test('instanceOf works right', async () => {
-    const user = injector.get(User);
-    const userClass = injector.get(UserClass);
+    const user = container.get(User);
+    const userClass = container.get(UserClass);
 
     expect(user).toBeInstanceOf(User);
     expect(userClass).toBeInstanceOf(UserClass);
@@ -94,7 +97,7 @@ describe('User depends on UserClass (same Injector)', () => {
   });
 
   test('modify user name and age', async () => {
-    const user = injector.get(User);
+    const user = container.get(User);
     user.setName('lisi');
     user.setAge(123);
 
@@ -103,8 +106,8 @@ describe('User depends on UserClass (same Injector)', () => {
   });
 
   test('modify userClass.classNo', async () => {
-    const user = injector.get(User);
-    const userClass = injector.get(UserClass);
+    const user = container.get(User);
+    const userClass = container.get(UserClass);
 
     userClass.setClassNo(777);
 
@@ -113,18 +116,20 @@ describe('User depends on UserClass (same Injector)', () => {
   });
 });
 
-describe('User depends on UserClass (User inside parent Injector)', () => {
-  let parent: Injector;
-  let injector: Injector;
+describe('User depends on UserClass (User inside parent container)', () => {
+  let parent: Container;
+  let child: Container;
 
   beforeEach(() => {
-    parent = new Injector([User]);
-    injector = new Injector([UserClass], parent);
+    parent = new Container();
+    child = parent.createChild();
+    parent.bind(User).toSelf();
+    child.bind(UserClass).toSelf();
   });
 
   test('instanceOf works right', async () => {
-    const user = injector.get(User);
-    const userClass = injector.get(UserClass);
+    const user = child.get(User);
+    const userClass = child.get(UserClass);
     const parentUserClass = parent.get(UserClass);
 
     expect(user).toBeInstanceOf(User);
@@ -134,7 +139,7 @@ describe('User depends on UserClass (User inside parent Injector)', () => {
   });
 
   test('modify user name and age', async () => {
-    const user = injector.get(User);
+    const user = child.get(User);
     user.setName('lisi');
     user.setAge(123);
 
@@ -143,8 +148,8 @@ describe('User depends on UserClass (User inside parent Injector)', () => {
   });
 
   test('modify userClass.classNo', async () => {
-    const user = injector.get(User);
-    const userClass = injector.get(UserClass);
+    const user = child.get(User);
+    const userClass = child.get(UserClass);
     const parentUserClass = parent.get(UserClass);
 
     userClass.setClassNo(777);
@@ -155,18 +160,20 @@ describe('User depends on UserClass (User inside parent Injector)', () => {
   });
 });
 
-describe('User depends on UserClass (UserClass inside parent Injector)', () => {
-  let parent: Injector;
-  let injector: Injector;
+describe('User depends on UserClass (UserClass inside parent container)', () => {
+  let parent: Container;
+  let child: Container;
 
   beforeEach(() => {
-    parent = new Injector([UserClass]);
-    injector = new Injector([User], parent);
+    parent = new Container();
+    child = parent.createChild();
+    child.bind(User).toSelf();
+    parent.bind(UserClass).toSelf();
   });
 
   test('instanceOf works right', async () => {
-    const user = injector.get(User);
-    const userClass = injector.get(UserClass);
+    const user = child.get(User);
+    const userClass = child.get(UserClass);
 
     expect(user).toBeInstanceOf(User);
     expect(userClass).toBeInstanceOf(UserClass);
@@ -174,7 +181,7 @@ describe('User depends on UserClass (UserClass inside parent Injector)', () => {
   });
 
   test('modify user name and age', async () => {
-    const user = injector.get(User);
+    const user = child.get(User);
     user.setName('lisi');
     user.setAge(123);
 
@@ -183,8 +190,8 @@ describe('User depends on UserClass (UserClass inside parent Injector)', () => {
   });
 
   test('modify userClass.classNo', async () => {
-    const user = injector.get(User);
-    const userClass = injector.get(UserClass);
+    const user = child.get(User);
+    const userClass = child.get(UserClass);
 
     userClass.setClassNo(777);
 
@@ -194,33 +201,24 @@ describe('User depends on UserClass (UserClass inside parent Injector)', () => {
 });
 
 describe('User depends on UserClass (use InjectionKey)', () => {
-  let injector: Injector;
-
-  type UserKey = InjectionKey<User>;
-  const userKey: UserKey = Symbol();
-
-  type UserClassKey = InjectionKey<UserClass>;
-  const userClassKey: UserClassKey = Symbol();
+  let container: Container;
+  const userKey = new Token<User>('userKey');
+  const userClassKey = new Token<UserClass>('userClassKey');
 
   beforeEach(() => {
-    injector = new Injector([
-      {
-        provide: userKey,
-        useClass: User,
-      },
-      {
-        provide: userClassKey,
-        useExisting: UserClass,
-      },
-    ]);
+    container = new Container();
+    container.bind(User).toSelf();
+    container.bind(UserClass).toSelf();
+    container.bind(userKey).to(User);
+    container.bind(userClassKey).toService(UserClass);
   });
 
   test('InjectionKey should work', async () => {
-    const user1 = injector.get(User);
-    const userClass1 = injector.get(UserClass);
+    const user1 = container.get(User);
+    const userClass1 = container.get(UserClass);
 
-    const user2 = injector.get(userKey);
-    const userClass2 = injector.get(userClassKey);
+    const user2 = container.get(userKey);
+    const userClass2 = container.get(userClassKey);
 
     expect(user1).not.toBe(user2);
     expect(userClass1).toBe(userClass2);

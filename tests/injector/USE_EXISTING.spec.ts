@@ -1,10 +1,5 @@
-import {
-  InjectionKey,
-  Inject,
-  Injector,
-  Injectable,
-  forwardRef,
-} from '@/index';
+import { Inject, Container, LazyToken, Token } from '@/index';
+import { CircularDependencyError, TokenNotFoundError } from '@/errors';
 
 interface IA {
   name: string;
@@ -17,50 +12,40 @@ interface IB {
   id: number;
 }
 
-const KEY_B1: InjectionKey<IB> = Symbol();
-const KEY_B2: InjectionKey<IB> = Symbol();
-const KEY_B3: InjectionKey<IB> = Symbol();
+const KEY_B1 = new Token<IB>('KEY_B1');
+const KEY_B2 = new Token<IB>('KEY_B2');
+const KEY_B3 = new Token<IB>('KEY_B3');
 
-@Injectable()
-export class A {
+class A {
   public name = 'A';
   public id = 1;
 
-  @Inject(forwardRef(() => KEY_B1))
+  @Inject(new LazyToken(() => KEY_B1))
   public b!: IB;
 }
 
-@Injectable()
-export class B {
+class B {
   public name = 'B';
   public id = 2;
 }
 
 describe('injector useExisting', () => {
-  let injector: Injector;
+  let container: Container;
 
   beforeEach(() => {
-    injector = new Injector([
-      {
-        provide: KEY_B1,
-        useExisting: B,
-      },
-      {
-        provide: KEY_B2,
-        useExisting: B,
-      },
-      {
-        provide: KEY_B3,
-        useExisting: B,
-      },
-    ]);
+    container = new Container();
+    container.bind(A).toSelf();
+    container.bind(B).toSelf();
+    container.bind(KEY_B1).toService(B);
+    container.bind(KEY_B2).toService(B);
+    container.bind(KEY_B3).toService(B);
   });
 
-  test('injector.get(A) should work correctly', async () => {
-    const a = injector.get(A);
-    const b1 = injector.get(KEY_B1);
-    const b2 = injector.get(KEY_B2);
-    const b3 = injector.get(KEY_B3);
+  test('container.get(A) should work correctly', async () => {
+    const a = container.get(A);
+    const b1 = container.get(KEY_B1);
+    const b2 = container.get(KEY_B2);
+    const b3 = container.get(KEY_B3);
 
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
@@ -75,8 +60,8 @@ describe('injector useExisting', () => {
     expect(b2).toBe(b3);
   });
 
-  test('injector.get(B) should work correctly', async () => {
-    const b = injector.get(B);
+  test('container.get(B) should work correctly', async () => {
+    const b = container.get(B);
 
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);

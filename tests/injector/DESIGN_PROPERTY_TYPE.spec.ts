@@ -1,4 +1,5 @@
-import { Inject, Injector, Injectable } from '@/index';
+import { Inject, Container } from '@/index';
+import { TokenNotFoundError } from '@/errors';
 
 interface IA {
   name: string;
@@ -11,14 +12,12 @@ interface IB {
   id: number;
 }
 
-@Injectable()
-export class B {
+class B {
   public name = 'B';
   public id = 2;
 }
 
-@Injectable()
-export class A {
+class A {
   public name = 'A';
   public id = 1;
 
@@ -26,27 +25,25 @@ export class A {
   public b!: B;
 }
 
-describe('injector -> DESIGN_PROPERTY_TYPE', () => {
-  let injector: Injector;
+describe('DESIGN_PROPERTY_TYPE', () => {
+  let container: Container;
 
   beforeEach(() => {
-    injector = new Injector([A, B]);
+    container = new Container();
+    container.bind(A).toSelf();
+    container.bind(B).toSelf();
   });
 
-  test('injector.get(A) should work correctly', async () => {
-    const a = injector.get(A);
-
-    expect(a).toBeInstanceOf(A);
-    expect(a.id).toBe(1);
-    expect(a.name).toBe('A');
-    expect(a.b).toBeInstanceOf(B);
-    expect(a.b.id).toBe(2);
-    expect(a.b.name).toBe('B');
+  test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+    expect(() => {
+      // @Inject()必须明确指定参数
+      // 本库不再自动读取b的类型信息为类B，从而自动注入B的实例对象
+      container.get(A);
+    }).toThrowError(TokenNotFoundError);
   });
 
-  test('injector.get(B) should work correctly', async () => {
-    const b = injector.get(B);
-
+  test('container.get(B) should work correctly', async () => {
+    const b = container.get(B);
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);
     expect(b.name).toBe('B');

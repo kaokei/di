@@ -1,10 +1,4 @@
-import {
-  InjectionKey,
-  Inject,
-  Injector,
-  Injectable,
-  forwardRef,
-} from '@/index';
+import { Inject, Container, LazyToken, Token } from '@/index';
 
 interface IA {
   name: string;
@@ -17,42 +11,40 @@ interface IB {
   id: number;
 }
 
-@Injectable()
-export class A {
+class A {
   public name = 'A';
   public id = 1;
 
   public constructor(
-    @Inject(forwardRef(() => B))
+    @Inject(new LazyToken(() => B))
     public b: IB
   ) {}
 }
 
-@Injectable()
-export class B {
+class B {
   public name = 'B';
   public id = 2;
 }
 
-const ANOTHER_A_CLASS_KEY: InjectionKey<IA> = Symbol();
+const ANOTHER_A_CLASS_KEY = new Token<IA>('ANOTHER_A_CLASS_KEY');
 
 describe('injector useFactory with deps', () => {
-  let injector: Injector;
+  let container: Container;
 
   beforeEach(() => {
-    injector = new Injector([
-      {
-        provide: ANOTHER_A_CLASS_KEY,
-        useFactory: (b: IB) => {
-          return new A(b);
-        },
-        deps: [B],
-      },
-    ]);
+    container = new Container();
+    container.bind(A).toSelf();
+    container.bind(B).toSelf();
+    container
+      .bind(ANOTHER_A_CLASS_KEY)
+      .toDynamicValue(({ container }: { container: Container }) => {
+        const b = container.get(B);
+        return new A(b);
+      });
   });
 
-  test('injector.get(A) should work correctly', async () => {
-    const a = injector.get(A);
+  test('container.get(A) should work correctly', async () => {
+    const a = container.get(A);
 
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
@@ -62,8 +54,8 @@ describe('injector useFactory with deps', () => {
     expect(a.b.name).toBe('B');
   });
 
-  test('injector.get(ANOTHER_A_CLASS_KEY) should work correctly', async () => {
-    const a = injector.get(ANOTHER_A_CLASS_KEY);
+  test('container.get(ANOTHER_A_CLASS_KEY) should work correctly', async () => {
+    const a = container.get(ANOTHER_A_CLASS_KEY);
 
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
@@ -73,8 +65,8 @@ describe('injector useFactory with deps', () => {
     expect(a.b.name).toBe('B');
   });
 
-  test('injector.get(B) should work correctly', async () => {
-    const b = injector.get(B);
+  test('container.get(B) should work correctly', async () => {
+    const b = container.get(B);
 
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);
@@ -82,22 +74,20 @@ describe('injector useFactory with deps', () => {
   });
 });
 
-describe('injector useFactory without deps', () => {
-  let injector: Injector;
+describe('container useFactory without deps', () => {
+  let container: Container;
 
   beforeEach(() => {
-    injector = new Injector([
-      {
-        provide: ANOTHER_A_CLASS_KEY,
-        useFactory: () => {
-          return new A({ id: 2, name: 'B' });
-        },
-      },
-    ]);
+    container = new Container();
+    container.bind(A).toSelf();
+    container.bind(B).toSelf();
+    container.bind(ANOTHER_A_CLASS_KEY).toDynamicValue(() => {
+      return new A({ id: 2, name: 'B' });
+    });
   });
 
-  test('injector.get(A) should work correctly', async () => {
-    const a = injector.get(A);
+  test('container.get(A) should work correctly', async () => {
+    const a = container.get(A);
 
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
@@ -107,8 +97,8 @@ describe('injector useFactory without deps', () => {
     expect(a.b.name).toBe('B');
   });
 
-  test('injector.get(ANOTHER_A_CLASS_KEY) should work correctly', async () => {
-    const a = injector.get(ANOTHER_A_CLASS_KEY);
+  test('container.get(ANOTHER_A_CLASS_KEY) should work correctly', async () => {
+    const a = container.get(ANOTHER_A_CLASS_KEY);
 
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
@@ -118,8 +108,8 @@ describe('injector useFactory without deps', () => {
     expect(a.b.name).toBe('B');
   });
 
-  test('injector.get(B) should work correctly', async () => {
-    const b = injector.get(B);
+  test('container.get(B) should work correctly', async () => {
+    const b = container.get(B);
 
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);

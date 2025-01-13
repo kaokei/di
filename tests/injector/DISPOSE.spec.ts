@@ -1,13 +1,12 @@
-import { Inject, Injector, Injectable, forwardRef } from '@/index';
-import exp from 'constants';
+import { Inject, Container, LazyToken } from '@/index';
+import { CircularDependencyError, TokenNotFoundError } from '@/errors';
 
 interface IA {
   name: string;
   id: number;
 }
 
-@Injectable()
-export class A {
+class A {
   public name = 'A';
   public id = 1;
 
@@ -25,8 +24,7 @@ export class A {
   }
 }
 
-@Injectable()
-export class B {
+class B {
   public name = 'B';
   public id = 2;
 
@@ -48,16 +46,17 @@ export class B {
 }
 
 describe('injector useValue', () => {
-  let injector: Injector;
+  let container: Container;
 
   beforeEach(() => {
-    // injector = new Injector([]);
-    injector = new Injector();
+    container = new Container();
+    container.bind(A).toSelf();
+    container.bind(B).toSelf();
   });
 
-  test('injector.get(A) should work correctly', async () => {
-    const a = injector.get(A);
-    const b = injector.get(B);
+  test('container.get(A) and container.get(B) should work correctly', async () => {
+    const a = container.get(A);
+    const b = container.get(B);
 
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
@@ -76,12 +75,12 @@ describe('injector useValue', () => {
     expect(a.timer).not.toBeUndefined();
     expect(b.timer).not.toBeUndefined();
 
-    injector.dispose();
+    container.unbindAll();
 
     expect(a.timer).toBe(null);
     expect(b.timer).toBe(null);
 
-    expect(injector.providerMap).toBe(null);
-    expect(injector.parent).toBe(null);
+    expect(container.providerMap).toBe(null);
+    expect(container.parent).toBe(null);
   });
 });

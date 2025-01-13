@@ -1,10 +1,5 @@
-import {
-  Inject,
-  Injector,
-  Injectable,
-  forwardRef,
-  CircularDependencyError,
-} from '@/index';
+import { Inject, Container, LazyToken } from '@/index';
+import { CircularDependencyError } from '@/errors';
 
 interface IA {
   name: string;
@@ -21,52 +16,54 @@ interface IC {
   id: number;
   a: IA;
 }
-@Injectable()
-export class A {
+
+class A {
   public name = 'A';
   public id = 1;
 
-  constructor(@Inject(forwardRef(() => B)) private b: IB) {}
+  constructor(@Inject(new LazyToken(() => B)) private b: IB) {}
 }
-@Injectable()
-export class B {
+
+class B {
   public name = 'B';
   public id = 2;
 
-  @Inject(forwardRef(() => C))
+  @Inject(new LazyToken(() => C))
   public c!: IC;
 }
-@Injectable()
-export class C {
+
+class C {
   public name = 'C';
   public id = 3;
 
-  constructor(@Inject(forwardRef(() => A)) private a: IA) {}
+  constructor(@Inject(new LazyToken(() => A)) private a: IA) {}
 }
 
-describe('cyclic dependency ABC_CYCLE_CPC', () => {
-  let injector: Injector;
+describe('CPC', () => {
+  let container: Container;
 
   beforeEach(() => {
-    injector = new Injector([]);
+    container = new Container();
+    container.bind(A).toSelf();
+    container.bind(B).toSelf();
+    container.bind(C).toSelf();
   });
 
-  test('injector.get(A) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
+  test('container.get(A) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
     expect(() => {
-      injector.get(A);
+      container.get(A);
     }).toThrowError(CircularDependencyError);
   });
 
-  test('injector.get(B) should work correctly', async () => {
-    const b = injector.get(B);
-
+  test('container.get(B) should work correctly', async () => {
+    const b = container.get(B);
     expect(b).toBeInstanceOf(B);
     expect(b).toBe(b.c.a.b);
   });
 
-  test('injector.get(C) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
+  test('container.get(C) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
     expect(() => {
-      injector.get(C);
+      container.get(C);
     }).toThrowError(CircularDependencyError);
   });
 });

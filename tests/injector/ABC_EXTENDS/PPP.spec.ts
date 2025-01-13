@@ -1,4 +1,4 @@
-import { Inject, Injector, Injectable, forwardRef } from '@/index';
+import { Inject, Container, LazyToken } from '@/index';
 
 interface IA {
   name: string;
@@ -20,41 +20,44 @@ interface IC {
   cId: number;
   b: IB;
 }
-@Injectable()
-export class C {
+
+class C {
   public name = 'C';
   public id = 3;
   public cName = 'C';
   public cId = 3;
 
-  @Inject(forwardRef(() => B))
+  @Inject(new LazyToken(() => B))
   public b!: IB;
 }
-@Injectable()
-export class B {
+
+class B {
   public name = 'B';
   public id = 2;
   public bName = 'B';
   public bId = 2;
 
-  @Inject(forwardRef(() => C))
+  @Inject(new LazyToken(() => C))
   public c!: IC;
 }
-@Injectable()
-export class A extends B {
+
+class A extends B {
   public name = 'A';
   public id = 1;
 }
 
-describe('test extends ABC_CONTAIN_1_PPP', () => {
-  let injector: Injector;
+describe('PPP', () => {
+  let container: Container;
 
   beforeEach(() => {
-    injector = new Injector([]);
+    container = new Container();
+    container.bind(A).toSelf();
+    container.bind(B).toSelf();
+    container.bind(C).toSelf();
   });
 
-  test('injector.get(A) should work correctly', async () => {
-    const a = injector.get(A);
+  test('container.get(A) should work correctly', async () => {
+    const a = container.get(A);
 
     // 这里说明了c属性并不是在B的原型上，而是直接属于a实例的属性
     // 关键在于Reflect.getMetadata(DECORATOR_KEYS.SERVICE_INJECTED_PROPS, ClassName)可以直接获取到父类的属性装饰器数据，类似于原型链的访问模式
@@ -74,17 +77,15 @@ describe('test extends ABC_CONTAIN_1_PPP', () => {
     expect(a.c.id).toBe(3);
   });
 
-  test('injector.get(B) should work correctly', async () => {
-    const b = injector.get(B);
-
+  test('container.get(B) should work correctly', async () => {
+    const b = container.get(B);
     expect(b).toBeInstanceOf(B);
     expect(b).toBe(b.c.b);
     expect(b.c).toBe(b.c.b.c);
   });
 
-  test('injector.get(C) should work correctly', async () => {
-    const c = injector.get(C);
-
+  test('container.get(C) should work correctly', async () => {
+    const c = container.get(C);
     expect(c).toBeInstanceOf(C);
     expect(c).toBe(c.b.c);
     expect(c.b).toBe(c.b.c.b);
