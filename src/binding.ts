@@ -8,6 +8,7 @@ import {
 import { Container } from './container';
 import { getMetadata, getOwnMetadata } from './cachemap';
 import { resolveToken } from './token';
+import { CircularDependencyError } from './errors';
 
 export class Binding {
   public container!: Container;
@@ -97,7 +98,7 @@ export class Binding {
 
   public get() {
     if (this.status === SERVICE_STATUS.INITING) {
-      // throw new CircularDependencyError();
+      throw new CircularDependencyError();
     }
 
     if (this.cache) {

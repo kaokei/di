@@ -1,4 +1,4 @@
-import { Inject, Injector, Injectable, forwardRef } from '@/index';
+import { Inject, Container, LazyToken } from '@/index';
 
 interface IA {
   name: string;
@@ -12,42 +12,40 @@ interface IB {
   a: IA;
 }
 
-@Injectable()
-export class A {
+class A {
   public name = 'A';
   public id = 1;
 
-  @Inject(forwardRef(() => B))
+  @Inject(new LazyToken(() => B))
   public b!: IB;
 }
 
-@Injectable()
-export class B {
+class B {
   public name = 'B';
   public id = 2;
 
-  @Inject(forwardRef(() => A))
+  @Inject(new LazyToken(() => A))
   public a!: IA;
 }
 
-describe('cyclic dependency AB_CYCLE_PP', () => {
-  let injector: Injector;
+describe('PP', () => {
+  let container: Container;
 
   beforeEach(() => {
-    injector = new Injector([]);
+    container = new Container();
+    container.bind(A).toSelf();
+    container.bind(B).toSelf();
   });
 
-  test('injector.get(A) should work correctly', async () => {
-    const a = injector.get(A);
-
+  test('container.get(A) should work correctly', async () => {
+    const a = container.get(A);
     expect(a).toBeInstanceOf(A);
     expect(a).toBe(a.b.a);
     expect(a.b).toBe(a.b.a.b);
   });
 
-  test('injector.get(B) should work correctly', async () => {
-    const b = injector.get(B);
-
+  test('container.get(B) should work correctly', async () => {
+    const b = container.get(B);
     expect(b).toBeInstanceOf(B);
     expect(b).toBe(b.a.b);
     expect(b.a).toBe(b.a.b.a);
