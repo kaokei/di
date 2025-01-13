@@ -1,10 +1,5 @@
-import {
-  Inject,
-  Injector,
-  Injectable,
-  forwardRef,
-  CircularDependencyError,
-} from '@/index';
+import { Inject, Container, LazyToken } from '@/index';
+import { CircularDependencyError } from '@/errors';
 
 interface IA {
   name: string;
@@ -22,42 +17,44 @@ interface IC {
   id: number;
   a: IA;
 }
-@Injectable()
-export class A {
+
+class A {
   public name = 'A';
   public id = 1;
 
-  @Inject(forwardRef(() => B))
+  @Inject(new LazyToken(() => B))
   public b!: IB;
 
-  @Inject(forwardRef(() => C))
+  @Inject(new LazyToken(() => C))
   public c!: IC;
 }
-@Injectable()
-export class B {
+
+class B {
   public name = 'B';
   public id = 2;
 
-  constructor(@Inject(forwardRef(() => A)) private a: IA) {}
+  constructor(@Inject(new LazyToken(() => A)) private a: IA) {}
 }
-@Injectable()
-export class C {
+
+class C {
   public name = 'C';
   public id = 3;
 
-  constructor(@Inject(forwardRef(() => A)) private a: IA) {}
+  constructor(@Inject(new LazyToken(() => A)) private a: IA) {}
 }
 
-describe('cyclic dependency ABC_CONTAIN_2_PCC', () => {
-  let injector: Injector;
+describe('PCC', () => {
+  let container: Container;
 
   beforeEach(() => {
-    injector = new Injector([]);
+    container = new Container();
+    container.bind(A).toSelf();
+    container.bind(B).toSelf();
+    container.bind(C).toSelf();
   });
 
-  test('injector.get(A) should work correctly', async () => {
-    const a = injector.get(A);
-
+  test('container.get(A) should work correctly', async () => {
+    const a = container.get(A);
     expect(a).toBeInstanceOf(A);
     expect(a).toBe(a.b.a);
     expect(a).toBe(a.c.a);
@@ -65,15 +62,15 @@ describe('cyclic dependency ABC_CONTAIN_2_PCC', () => {
     expect(a.c).toBe(a.b.a.c);
   });
 
-  test('injector.get(B) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
+  test('container.get(B) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
     expect(() => {
-      injector.get(B);
+      container.get(B);
     }).toThrowError(CircularDependencyError);
   });
 
-  test('injector.get(C) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
+  test('container.get(C) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
     expect(() => {
-      injector.get(C);
+      container.get(C);
     }).toThrowError(CircularDependencyError);
   });
 });
