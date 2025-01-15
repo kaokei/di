@@ -1,13 +1,12 @@
 import { Binding } from './binding';
 import { TokenNotFoundError, DuplicateBindingError } from './errors';
-import { IDENTITY, NOOP } from './constants';
 import { GenericToken } from './interfaces';
 
 export class Container {
   public parent?: Container;
   private bindings: Map<any, Binding> = new Map();
-  private onActivationHandler = IDENTITY;
-  private onDeactivationHandler = NOOP;
+  private onActivationHandler: any;
+  private onDeactivationHandler: any;
 
   public bind(serviceIdentifier: any) {
     if (this.bindings.has(serviceIdentifier)) {
@@ -34,7 +33,7 @@ export class Container {
 
   public unbindAll() {
     this.bindings.forEach(binding => {
-      this.unbind(binding.serviceIdentifier);
+      this.unbind(binding.token);
     });
   }
 
@@ -96,12 +95,17 @@ export class Container {
     this.onActivationHandler = handler;
   }
 
-  public activate(input: any) {
-    return this.onActivationHandler(input);
+  public activate(input: any, token: any) {
+    if (this.onActivationHandler) {
+      const ctx = { container: this };
+      return this.onActivationHandler(ctx, input, token);
+    } else {
+      return input;
+    }
   }
 
   public deactivate() {
-    this.onDeactivationHandler();
+    this.onDeactivationHandler && this.onDeactivationHandler();
   }
 
   private buildBinding(serviceIdentifier: any) {

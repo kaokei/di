@@ -2,14 +2,14 @@ import type { GenericToken } from './interfaces';
 
 // @ts-ignore
 export class Token<T> {
-  private __name: string;
+  private $: string;
 
   constructor(name: string) {
-    this.__name = name;
+    this.$ = name;
   }
 
-  public getName() {
-    return this.__name;
+  public toString() {
+    return this.$;
   }
 }
 

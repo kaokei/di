@@ -1,51 +1,37 @@
-import {
-  BindingTypeEnum,
-  KEYS,
-  SERVICE_STATUS,
-  IDENTITY,
-  NOOP,
-} from './constants';
+import { BINDING, KEYS, STATUS } from './constants';
 import { Container } from './container';
 import { getMetadata, getOwnMetadata } from './cachemap';
 import { resolveToken } from './token';
 import { CircularDependencyError, BindingNotValidError } from './errors';
+import { GenericToken } from './interfaces';
 
-export class Binding {
+export class Binding<T = unknown> {
   public container!: Container;
-  // Determines weather the bindings has been already activated
-  // The activation action takes place when an instance is resolved
-  // If the scope is singleton it only happens once
-  public status: string;
 
-  // A runtime identifier because at runtime we don't have interfaces
-  public serviceIdentifier: any;
+  public context!: any;
 
-  // constructor from binding to or toConstructor
-  public implementationType: any;
+  public token!: GenericToken<T>;
 
-  // Cache used to allow singleton scope and BindingType.ConstantValue bindings
-  public cache: any;
+  public type = BINDING.Invalid;
 
-  // Cache used to allow BindingType.DynamicValue bindings
-  public dynamicValue: any;
+  public status = STATUS.DEFAULT;
 
-  // The kind of binding
-  public type: any;
+  public classValue: any = null;
 
-  // On activation handler (invoked just before an instance is added to cache and injected)
-  public onActivationHandler = IDENTITY;
+  public constantValue: any = null;
 
-  // On deactivation handler (invoked just before an instance is unbinded and removed from container)
-  public onDeactivationHandler = NOOP;
+  public dynamicValue: any = null;
 
-  constructor(serviceIdentifier: any, container: Container) {
-    this.status = '';
-    this.serviceIdentifier = serviceIdentifier;
-    this.type = BindingTypeEnum.Invalid;
-    this.cache = null;
-    this.dynamicValue = null;
-    this.implementationType = null;
+  public cache: any = null;
+
+  public onActivationHandler: any;
+
+  public onDeactivationHandler: any;
+
+  constructor(token: any, container: Container) {
     this.container = container;
+    this.context = { container: this.container };
+    this.token = token;
   }
 
   public onActivation(handler: any) {
@@ -57,102 +43,106 @@ export class Binding {
   }
 
   public activate(input: any) {
-    return this.onActivationHandler(input);
+    if (this.onActivationHandler) {
+      const bindingActivation = this.onActivationHandler(this.context, input);
+      return this.container.activate(bindingActivation, this.token);
+    } else {
+      return input;
+    }
   }
 
   public deactivate() {
-    this.onDeactivationHandler();
+    this.onDeactivationHandler && this.onDeactivationHandler();
   }
 
   public to(constructor: any) {
-    this.type = BindingTypeEnum.Instance;
-    this.cache = null;
-    this.dynamicValue = null;
-    this.implementationType = constructor;
+    this.type = BINDING.Instance;
+    this.classValue = constructor;
     return this;
   }
 
   public toSelf() {
-    return this.to(this.serviceIdentifier);
+    return this.to(this.token);
   }
 
   public toConstantValue(value: any) {
-    this.type = BindingTypeEnum.ConstantValue;
-    this.cache = value;
-    this.dynamicValue = null;
-    this.implementationType = null;
+    this.type = BINDING.ConstantValue;
+    this.constantValue = value;
     return this;
   }
 
   public toDynamicValue(func: any) {
-    this.type = BindingTypeEnum.DynamicValue;
-    this.cache = null;
+    this.type = BINDING.DynamicValue;
     this.dynamicValue = func;
-    this.implementationType = null;
     return this;
   }
 
   public toService(service: any) {
-    this.toDynamicValue((context: any) => context.container.get(service));
+    return this.toDynamicValue((context: any) =>
+      context.container.get(service)
+    );
   }
 
   public get() {
-    if (this.status === SERVICE_STATUS.INITING) {
+    if (STATUS.INITING === this.status) {
       throw new CircularDependencyError();
-    }
-
-    if (this.cache) {
+    } else if (
+      STATUS.ACTIVATED === this.status ||
+      STATUS.CONSTRUCTED === this.status
+    ) {
       return this.cache;
-    } else if (BindingTypeEnum.Instance === this.type) {
+    } else if (BINDING.Instance === this.type) {
       return this.resolveValue();
-    } else if (BindingTypeEnum.DynamicValue === this.type) {
+    } else if (BINDING.ConstantValue === this.type) {
+      return this.resolveConstantValue();
+    } else if (BINDING.DynamicValue === this.type) {
       return this.resolveDynamicValue();
     } else {
       throw new BindingNotValidError(this);
     }
   }
 
+  /**
+   * activate逻辑有两种处理时机
+   * 第1种是在CONSTRUCTED之前，此方案的缺点是activate对象还不是完整的对象，缺少注入属性。
+   * 第2种是在ACTIVATED之前，此方案的优点是activate对象是完整的对象，
+   * 但缺点是CONSTRUCTED阶段的this.cache并不是最终的对象，有可能在ACTIVATED被修改和替换。
+   * 权衡之后还是选择方案1，相对来说方案1的缺点是稳定可控的，只要保证在activate方法中不依赖注入属性即可。
+   * 但是方案2可能导致系统表面上可以正常运行，但是隐藏了未知的异常风险。
+   */
   private resolveValue() {
-    this.status = SERVICE_STATUS.INITING;
-
-    const ClassName = this.implementationType;
+    this.status = STATUS.INITING;
+    const ClassName = this.classValue;
     const params = this.getContructorParameters(ClassName);
     const inst = new ClassName(...params);
-    const activation1 = this.activate(inst);
-    const activation2 = this.container.activate(activation1);
+    this.cache = this.activate(inst);
     // 实例化成功，此时不会再有死循环问题
-    this.cache = activation2;
-    this.status = SERVICE_STATUS.CONSTRUCTED;
-
+    this.status = STATUS.CONSTRUCTED;
     const properties = this.getInjectProperties(ClassName);
-    Object.assign(activation2, properties);
+    Object.assign(this.cache, properties);
+    this.status = STATUS.ACTIVATED;
+    return this.cache;
+  }
 
-    this.status = SERVICE_STATUS.MERGED;
-
-    return activation2;
+  private resolveConstantValue() {
+    this.cache = this.activate(this.constantValue);
+    this.status = STATUS.ACTIVATED;
+    return this.cache;
   }
 
   private resolveDynamicValue() {
-    this.status = SERVICE_STATUS.INITING;
-
-    const serviceValue = this.dynamicValue.call(this, {
-      container: this.container,
-    });
-    const activation1 = this.activate(serviceValue);
-    const activation2 = this.container.activate(activation1);
-    this.cache = activation2;
-
-    this.status = SERVICE_STATUS.CONSTRUCTED;
-
-    return activation2;
+    this.status = STATUS.INITING;
+    const dynamicValue = this.dynamicValue.call(this, this.context);
+    this.cache = this.activate(dynamicValue);
+    this.status = STATUS.ACTIVATED;
+    return this.cache;
   }
 
   private getContructorParameters(ClassName: any) {
     const params = getOwnMetadata(KEYS.INJECTED_PARAMS, ClassName) || [];
     const result = params.map((meta: any) => {
       const { inject, ...rest } = meta;
-      const token = resolveToken(inject);
-      return this.container.get(token, rest);
+      return this.container.get(resolveToken(inject), rest);
     });
     return result;
   }
@@ -163,8 +153,7 @@ export class Binding {
     return propKeys.reduce((acc: any, prop: any) => {
       const meta = props[prop];
       const { inject, ...rest } = meta;
-      const token = resolveToken(inject);
-      const property = this.container.get(token, rest);
+      const property = this.container.get(resolveToken(inject), rest);
       if (!(property === void 0 && meta.optional)) {
         acc[prop] = property;
       }

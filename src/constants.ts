@@ -13,30 +13,16 @@ export const KEYS = {
   OPTIONAL: 'optional',
 };
 
-export const SERVICE_STATUS = {
+export const STATUS = {
+  DEFAULT: 'default',
   INITING: 'initing',
   CONSTRUCTED: 'constructed',
-  MERGED: 'merged',
+  ACTIVATED: 'activated',
 };
 
-export const BindingScopeEnum = {
-  Request: 'Request',
-  Singleton: 'Singleton',
-  Transient: 'Transient',
-};
-
-export const BindingTypeEnum = {
+export const BINDING = {
+  Invalid: 'Invalid',
+  Instance: 'Instance',
   ConstantValue: 'ConstantValue',
   DynamicValue: 'DynamicValue',
-  Instance: 'Instance',
-  Invalid: 'Invalid',
-
-  Factory: 'Factory',
-  Provider: 'Provider',
-  Function: 'Function',
-  Constructor: 'Constructor',
 };
-
-export const NOOP = () => {};
-
-export const IDENTITY = (i: any) => i;

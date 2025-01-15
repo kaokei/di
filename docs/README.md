@@ -59,3 +59,5 @@ https://github.com/inversify/InversifyJS
 循环依赖检测，以及输出循环依赖链条
 生命周期以及handler处理器
 中间件和插件的处理
+父类和子类都有PostConstruct是否会有异常
+PostConstruct + dispose生命周期钩子

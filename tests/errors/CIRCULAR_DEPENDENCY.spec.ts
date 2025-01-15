@@ -124,6 +124,7 @@ describe('CircularDependencyError', () => {
       container.get(A);
     }).toThrowError(CircularDependencyError);
 
+    // todo
     // expect(() => {
     //   container.get(A);
     // }).toThrowError(
