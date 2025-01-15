@@ -4,6 +4,10 @@ class A {
   public name = 'A';
   public id = 1;
 }
+class B {
+  public name = 'B';
+  public id = 2;
+}
 
 describe('inversify activation', () => {
   let container: Container;
@@ -35,5 +39,18 @@ describe('inversify activation', () => {
     expect(mock).toHaveBeenCalledTimes(1);
     expect(a2).toBe('A_VALUE_NEW');
     expect(a2).toBe(a);
+  });
+
+  test(`container.get(B) should throw error`, async () => {
+    expect(() => {
+      container.get(B);
+    }).toThrowError('No matching bindings found for serviceIdentifier: B');
+  });
+
+  test(`container.get(B) should throw error`, async () => {
+    expect(() => {
+      container.bind(B);
+      container.get(B);
+    }).toThrowError('Invalid binding type: B');
   });
 });

@@ -1,4 +1,4 @@
-import type { GenericToken } from './interfaces';
+import type { GenericToken, LazyTokenCallback } from './interfaces';
 
 // @ts-ignore
 export class Token<T> {
@@ -14,9 +14,9 @@ export class Token<T> {
 }
 
 export class LazyToken<T> {
-  private callback: () => GenericToken<T>;
+  private callback: LazyTokenCallback<T>;
 
-  constructor(callback: () => GenericToken<T>) {
+  constructor(callback: LazyTokenCallback<T>) {
     this.callback = callback;
   }
 

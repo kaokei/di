@@ -55,9 +55,9 @@ https://github.com/inversify/InversifyJS
 ## todo
 
 目前还有 container 和 binding 需要完善，其他文件都基本已经实现。
-需要打通__DEV__和异常检测以及异常输出
+需要打通**DEV**和异常检测以及异常输出
 循环依赖检测，以及输出循环依赖链条
-生命周期以及handler处理器
+生命周期以及 handler 处理器
 中间件和插件的处理
-父类和子类都有PostConstruct是否会有异常
-PostConstruct + dispose生命周期钩子
+父类和子类都有 PostConstruct 是否会有异常
+PostConstruct + dispose 生命周期钩子

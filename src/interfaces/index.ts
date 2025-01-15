@@ -1,11 +1,15 @@
 import type { Token, LazyToken } from '../token';
 
-export type GenericToken<T = unknown> = Token<T> | LazyToken<T> | Newable<T>;
-
 export type Newable<
   TInstance = unknown,
   TArgs extends unknown[] = any[]
 > = new (...args: TArgs) => TInstance;
+
+export type CommonToken<T = unknown> = Token<T> | Newable<T>;
+
+export type GenericToken<T = unknown> = Token<T> | Newable<T> | LazyToken<T>;
+
+export type LazyTokenCallback<T = unknown> = () => CommonToken<T>;
 
 // export type CommonServiceIdentifier<TInstance = unknown> =
 //   | string
