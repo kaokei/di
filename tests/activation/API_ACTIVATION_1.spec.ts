@@ -1,9 +1,5 @@
+// binding activation
 import { Container } from '@/index';
-
-interface IA {
-  name: string;
-  id: number;
-}
 
 class A {
   public name = 'A';
@@ -30,56 +26,33 @@ describe('container activation', () => {
       return 'mock_activated_by_binding';
     });
 
-    const mockContainerActivation = vi
-      .fn()
-      .mockImplementation((_: any, inst: any, token: any) => {
-        if (token === A) {
-          inst.name += '_activated_by_container';
-          return inst;
-        } else {
-          return inst + '_activated_by_container';
-        }
-      });
-
     const container = new Container();
-    container.onActivation(mockContainerActivation);
+
     container.bind(A).toSelf().onActivation(mockBindingActivationA);
     container.bind(B).toSelf().onActivation(mockBindingActivationB);
-
-    expect(mockContainerActivation).toHaveBeenCalledTimes(0);
 
     expect(mockBindingActivationA).toHaveBeenCalledTimes(0);
     const a = container.get(A);
     expect(mockBindingActivationA).toHaveBeenCalledTimes(1);
 
-    expect(mockContainerActivation).toHaveBeenCalledTimes(1);
-
     expect(mockBindingActivationB).toHaveBeenCalledTimes(0);
     const b = container.get(B);
     expect(mockBindingActivationB).toHaveBeenCalledTimes(1);
 
-    expect(mockContainerActivation).toHaveBeenCalledTimes(2);
-
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(11);
-    expect(a.name).toBe('A_activated_by_binding_activated_by_container');
+    expect(a.name).toBe('A_activated_by_binding');
 
-    expect(b).toBe('mock_activated_by_binding_activated_by_container');
+    expect(b).toBe('mock_activated_by_binding');
 
     expect(container.parent).toBeUndefined();
-
-    expect(mockContainerActivation).toHaveBeenCalledTimes(2);
 
     expect(mockBindingActivationA).toHaveBeenCalledTimes(1);
     container.get(A);
     expect(mockBindingActivationA).toHaveBeenCalledTimes(1);
 
-    expect(mockContainerActivation).toHaveBeenCalledTimes(2);
-
     expect(mockBindingActivationB).toHaveBeenCalledTimes(1);
     container.get(B);
     expect(mockBindingActivationB).toHaveBeenCalledTimes(1);
-
-    expect(mockContainerActivation).toHaveBeenCalledTimes(2);
   });
 });

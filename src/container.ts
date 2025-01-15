@@ -25,8 +25,7 @@ export class Container {
   public unbind(serviceIdentifier: any) {
     if (this.bindings.has(serviceIdentifier)) {
       const binding = this.getBinding(serviceIdentifier) as Binding;
-      binding.deactivate();
-      this.deactivate();
+      this.deactivate(binding);
       this.bindings.delete(serviceIdentifier);
     }
   }
@@ -92,7 +91,7 @@ export class Container {
   }
 
   public onDeactivation(handler: any) {
-    this.onActivationHandler = handler;
+    this.onDeactivationHandler = handler;
   }
 
   public activate(input: any, token: any) {
@@ -104,8 +103,10 @@ export class Container {
     }
   }
 
-  public deactivate() {
-    this.onDeactivationHandler && this.onDeactivationHandler();
+  public deactivate(binding: Binding) {
+    binding.deactivate();
+    this.onDeactivationHandler &&
+      this.onDeactivationHandler(binding.cache, binding.token);
   }
 
   private buildBinding(serviceIdentifier: any) {

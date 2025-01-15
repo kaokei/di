@@ -1,3 +1,4 @@
+// binding + container activation
 import { Container } from '@/index';
 
 interface IA {

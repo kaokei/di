@@ -43,16 +43,14 @@ export class Binding<T = unknown> {
   }
 
   public activate(input: any) {
-    if (this.onActivationHandler) {
-      const bindingActivation = this.onActivationHandler(this.context, input);
-      return this.container.activate(bindingActivation, this.token);
-    } else {
-      return input;
-    }
+    const output = this.onActivationHandler
+      ? this.onActivationHandler(this.context, input)
+      : input;
+    return this.container.activate(output, this.token);
   }
 
   public deactivate() {
-    this.onDeactivationHandler && this.onDeactivationHandler();
+    this.onDeactivationHandler && this.onDeactivationHandler(this.cache);
   }
 
   public to(constructor: any) {
