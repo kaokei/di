@@ -48,7 +48,7 @@ class A extends B {
   public id = 1;
 
   @Inject(new LazyToken(() => C))
-  public c = void 0 as unknown as IC;
+  public declare c: IC;
 }
 
 describe('PPP', () => {
@@ -61,7 +61,7 @@ describe('PPP', () => {
     container.bind(C).toSelf();
   });
 
-  test.only('container.get(A) should work correctly', async () => {
+  test('container.get(A) should work correctly', async () => {
     const a = container.get(A);
 
     expect(Object.prototype.hasOwnProperty.call(a, 'c')).toBe(true);

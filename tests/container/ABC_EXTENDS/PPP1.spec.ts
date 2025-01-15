@@ -58,7 +58,7 @@ describe('PPP', () => {
     container.bind(C).toSelf();
   });
 
-  test.only('container.get(A) should work correctly', async () => {
+  test('container.get(A) should work correctly', async () => {
     const a = container.get(A);
 
     // 这里说明了c属性并不是在B的原型上，而是直接属于a实例的属性
