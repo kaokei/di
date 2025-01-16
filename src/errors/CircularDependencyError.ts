@@ -1,18 +1,23 @@
+import { Binding } from '../binding';
+
 export class CircularDependencyError extends Error {
   public name = 'CIRCULAR_DEPENDENCY_ERROR';
 
   public message = this.name;
 
-  constructor(provider?: any, options?: any) {
+  constructor(binding: Binding, options?: any) {
     super();
 
-    const tokenArr = [provider?.provide];
-    let currentProvider = options?.provider;
-    while (currentProvider && currentProvider.provide) {
-      tokenArr.push(currentProvider.provide);
-      currentProvider = currentProvider.parent;
+    const tokenArr = [binding.token];
+    let parent = options;
+    while (parent && parent.binding && parent.binding.token) {
+      tokenArr.push(parent.binding.token);
+      parent = parent.parent;
     }
-    const tokenListText = tokenArr.join(' <-- ');
+    const tokenListText = tokenArr
+      .reverse()
+      .map(item => item.name)
+      .join(' --> ');
 
     this.message = `CIRCULAR DEPENDENCY DETECTED. PLEASE FIX IT MANUALLY. \n ${tokenListText}`;
   }

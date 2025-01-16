@@ -1,6 +1,6 @@
 import { Binding } from './binding';
 import { TokenNotFoundError, DuplicateBindingError } from './errors';
-import { GenericToken } from './interfaces';
+import { CommonToken } from './interfaces';
 
 export class Container {
   public parent?: Container;
@@ -53,7 +53,7 @@ export class Container {
     return child;
   }
 
-  public get<T>(token: GenericToken<T>, options: any = {}): T {
+  public get<T>(token: CommonToken<T>, options: any = {}): T {
     // 优先从缓存中获取
     // 如果是DynamicValue类型的绑定，执行绑定的函数，缓存并返回函数结果
     // 如果是Instance类型的绑定，本质上是执行了new Constructor()，缓存并返回实例
@@ -72,12 +72,12 @@ export class Container {
       }
     } else if (options.self) {
       if (binding) {
-        return binding.get();
+        return binding.get(options);
       } else {
         this.checkTokenNotFoundError(token, options);
       }
     } else if (binding) {
-      return binding.get();
+      return binding.get(options);
     } else if (this.parent) {
       return this.parent.get(token, options);
     } else {

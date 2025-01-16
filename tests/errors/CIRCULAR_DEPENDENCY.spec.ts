@@ -122,13 +122,6 @@ describe('CircularDependencyError', () => {
   test('container.get(A) should throw ERROR_CIRCULAR_DEPENDENCY detail', async () => {
     expect(() => {
       container.get(A);
-    }).toThrowError(CircularDependencyError);
-
-    // todo
-    // expect(() => {
-    //   container.get(A);
-    // }).toThrowError(
-    //   /class C .+ <-- class H .+ <-- class G .+ <-- class F .+ <-- class E .+ <-- class D .+ <-- class C .+ <-- class B .+ <-- class A/s
-    // );
+    }).toThrowError(/A --> B --> C --> D --> E --> F --> G --> H --> C/);
   });
 });

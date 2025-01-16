@@ -2,14 +2,11 @@ import type { GenericToken, LazyTokenCallback } from './interfaces';
 
 // @ts-ignore
 export class Token<T> {
-  private $: string;
+  public _ = '';
+  public name: string;
 
   constructor(name: string) {
-    this.$ = name;
-  }
-
-  public toString() {
-    return this.$;
+    this.name = name;
   }
 }
 
