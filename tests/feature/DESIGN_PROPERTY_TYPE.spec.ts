@@ -1,5 +1,5 @@
 import { Inject, Container } from '@/index';
-import { TokenNotFoundError } from '@/errors';
+import { BindingNotFoundError } from '@/errors';
 
 interface IA {
   name: string;
@@ -42,7 +42,7 @@ describe('DESIGN_PROPERTY_TYPE', () => {
       // 注意container容器中其实是有A和B的注册信息的
       // 但是A的属性b并没有明确指定@Inject的参数，导致无法确定应该注入哪个服务
       container.get(A);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 
   test('container.get(B) should work correctly', async () => {

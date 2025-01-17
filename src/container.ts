@@ -1,5 +1,5 @@
 import { Binding } from './binding';
-import { TokenNotFoundError, DuplicateBindingError } from './errors';
+import { BindingNotFoundError, DuplicateBindingError } from './errors';
 import { CommonToken } from './interfaces';
 
 export class Container {
@@ -69,20 +69,20 @@ export class Container {
           skipSelf: false,
         });
       } else {
-        this.checkTokenNotFoundError(token, options);
+        this.checkBindingNotFoundError(token, options);
       }
     } else if (options.self) {
       if (binding) {
         return binding.get(options);
       } else {
-        this.checkTokenNotFoundError(token, options);
+        this.checkBindingNotFoundError(token, options);
       }
     } else if (binding) {
       return binding.get(options);
     } else if (this.parent) {
       return this.parent.get(token, options);
     } else {
-      this.checkTokenNotFoundError(token, options);
+      this.checkBindingNotFoundError(token, options);
     }
     return void 0 as T;
   }
@@ -118,9 +118,9 @@ export class Container {
     return this.bindings.get(serviceIdentifier);
   }
 
-  private checkTokenNotFoundError(token: any, options: any) {
+  private checkBindingNotFoundError(token: any, options: any) {
     if (!options.optional) {
-      throw new TokenNotFoundError(token);
+      throw new BindingNotFoundError(token);
     }
   }
 }

@@ -1,5 +1,5 @@
 import { Inject, Container, LazyToken, Token } from '@/index';
-import { TokenNotFoundError } from '@/errors';
+import { BindingNotFoundError } from '@/errors';
 import { hasOwn } from '@tests/utils';
 
 interface IA {
@@ -46,13 +46,13 @@ describe('No bindings', () => {
   test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       container.get(A);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 
   test('container.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       container.get(B);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 });
 
@@ -110,14 +110,14 @@ describe('Unbind', () => {
     container.unbind(B);
     expect(() => {
       container.get(A);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 
   test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     container.unbind(A);
     expect(() => {
       container.get(A);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 
   test('container.get(B) should work correctly', async () => {
@@ -129,7 +129,7 @@ describe('Unbind', () => {
     container.unbind(B);
     expect(() => {
       container.get(B);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 });
 
@@ -219,14 +219,14 @@ describe('Unbind all', () => {
     container.unbindAll();
     expect(() => {
       container.get(A);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 
   test('container.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     container.unbindAll();
     expect(() => {
       container.get(B);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 });
 
@@ -273,7 +273,7 @@ describe('Unbind all with hierarchical container', () => {
     parent.unbindAll();
     expect(() => {
       parent.get(A);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 });
 

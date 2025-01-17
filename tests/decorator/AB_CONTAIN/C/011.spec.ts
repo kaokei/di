@@ -1,5 +1,5 @@
 import { SkipSelf, Self, Optional, Inject, Container } from '@/index';
-import { TokenNotFoundError } from '@/errors';
+import { BindingNotFoundError } from '@/errors';
 import { hasOwn } from '@tests/utils';
 
 interface IA {
@@ -136,7 +136,7 @@ describe('01', () => {
   test('parent.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       parent.get(B);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 });
 
@@ -175,7 +175,7 @@ describe('10', () => {
   test('parent.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       parent.get(A);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 
   test('parent.get(B) should work correctly', async () => {
@@ -225,12 +225,12 @@ describe('11', () => {
   test('parent.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       parent.get(A);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 
   test('parent.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       parent.get(B);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 });

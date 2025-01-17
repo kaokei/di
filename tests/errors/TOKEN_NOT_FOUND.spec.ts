@@ -1,5 +1,5 @@
 import { Inject, Container } from '@/index';
-import { TokenNotFoundError } from '@/errors';
+import { BindingNotFoundError } from '@/errors';
 
 interface IA {
   name: string;
@@ -42,7 +42,7 @@ describe('TOKEN_NOT_FOUND', () => {
   test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       container.get(A);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 
   test('container.get(B) should work correctly', async () => {
@@ -55,6 +55,6 @@ describe('TOKEN_NOT_FOUND', () => {
   test('container.get(C) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       container.get(C);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 });

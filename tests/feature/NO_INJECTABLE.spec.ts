@@ -1,5 +1,5 @@
 import { Inject, Container, LazyToken } from '@/index';
-import { TokenNotFoundError } from '@/errors';
+import { BindingNotFoundError } from '@/errors';
 
 interface IA {
   name: string;
@@ -35,13 +35,13 @@ describe('No bindings', () => {
   test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       container.get(A);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 
   test('container.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       container.get(B);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 });
 

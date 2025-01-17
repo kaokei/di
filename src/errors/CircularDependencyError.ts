@@ -3,8 +3,6 @@ import { Binding } from '../binding';
 export class CircularDependencyError extends Error {
   public name = 'CIRCULAR_DEPENDENCY_ERROR';
 
-  public message = this.name;
-
   constructor(binding: Binding, options?: any) {
     super();
 

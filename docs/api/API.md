@@ -373,7 +373,7 @@ export class CountService {
 
 本库作为依赖注入工具，必须处理一个场景就是当本库找不到对应的服务的时候，应该怎么处理。
 
-目前的处理逻辑是，默认会抛出`TokenNotFoundError`异常。
+目前的处理逻辑是，默认会抛出`BindingNotFoundError`异常。
 
 但是如果我们认为某个服务是可选的，可以配置`@Optional`，这样当本库找不到对应的服务的时候，就会返回 `undefined`，而不是抛出异常了。
 

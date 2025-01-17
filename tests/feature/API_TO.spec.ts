@@ -1,5 +1,5 @@
 import { Inject, Container, Token } from '@/index';
-import { TokenNotFoundError } from '@/errors';
+import { BindingNotFoundError } from '@/errors';
 
 class UserClass {
   private classNo = 302;
@@ -50,13 +50,13 @@ describe('User depends on UserClass (no bindings)', () => {
   test('container.get(User) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       container.get(User);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 
   test('container.get(UserClass) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       container.get(UserClass);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 });
 
@@ -112,7 +112,7 @@ describe('User depends on UserClass (User inside parent container)', () => {
   test('child.get(User) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       child.get(User);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 
   test('modify userClass.classNo', async () => {

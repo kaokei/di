@@ -1,5 +1,5 @@
 import { Container, Self } from '@/index';
-import { TokenNotFoundError } from '@/errors';
+import { BindingNotFoundError } from '@/errors';
 
 interface IA {
   name: string;
@@ -37,7 +37,7 @@ describe('errors -> INJECT_FAILED: Property miss @Inject and use interface', () 
   test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       container.get(A);
-    }).toThrowError(TokenNotFoundError);
+    }).toThrowError(BindingNotFoundError);
   });
 
   test('container.get(B) should work correctly', async () => {
