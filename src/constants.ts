@@ -11,6 +11,10 @@ export const KEYS = {
   SKIP_SELF: 'skipSelf',
   // Optional装饰器的key
   OPTIONAL: 'optional',
+  // PostConstruct装饰器的key
+  POST_CONSTRUCT: 'postConstruct',
+  // PreDestroy装饰器的key
+  PRE_DESTROY: 'preDestroy',
 };
 
 export const STATUS = {
@@ -25,4 +29,11 @@ export const BINDING = {
   Instance: 'Instance',
   ConstantValue: 'ConstantValue',
   DynamicValue: 'DynamicValue',
+};
+
+export const ERRORS = {
+  POST_CONSTRUCT:
+    'Cannot apply @postConstruct decorator multiple times in the same class',
+  PRE_DESTROY:
+    'Cannot apply @preDestroy decorator multiple times in the same class',
 };

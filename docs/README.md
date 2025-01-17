@@ -60,4 +60,11 @@ https://github.com/inversify/InversifyJS
 生命周期以及 handler 处理器
 中间件和插件的处理
 父类和子类都有 PostConstruct 是否会有异常
-PostConstruct + dispose 生命周期钩子
+PostConstruct + PreDestroy 生命周期钩子
+
+1. 完善更多的单元测试
+  1. 更多场景
+  2. 和inversely的对比测试用例
+1. 完善中英文文档并部署
+1. 完成所有todo项目
+1. 完善代码中所有类型信息

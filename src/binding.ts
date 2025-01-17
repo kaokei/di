@@ -100,6 +100,22 @@ export class Binding<T = unknown> {
     }
   }
 
+  public postConstruct() {
+    const key = getMetadata(KEYS.POST_CONSTRUCT, this.token);
+    if (key && this.cache[key]) {
+      this.cache[key].call(this.cache);
+    }
+  }
+
+  public preDestroy() {
+    if (BINDING.Instance === this.type) {
+      const key = getMetadata(KEYS.PRE_DESTROY, this.token);
+      if (key && this.cache[key]) {
+        this.cache[key].call(this.cache);
+      }
+    }
+  }
+
   /**
    * activate逻辑有两种处理时机
    * 第1种是在CONSTRUCTED之前，此方案的缺点是activate对象还不是完整的对象，缺少注入属性。
@@ -119,6 +135,7 @@ export class Binding<T = unknown> {
     const properties = this.getInjectProperties(ClassName, options);
     Object.assign(this.cache, properties);
     this.status = STATUS.ACTIVATED;
+    this.postConstruct();
     return this.cache;
   }
 

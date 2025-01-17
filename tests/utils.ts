@@ -1,9 +1,9 @@
 import type { Container } from '@/container';
-import { GenericToken } from '@/interfaces';
+import type { CommonToken } from '@/interfaces';
 
 export function hasOwn<T>(
   container: Container,
-  token: GenericToken<T>,
+  token: CommonToken<T>,
   value: T
 ) {
   return container.isCurrentBound(token) && container.get(token) === value;

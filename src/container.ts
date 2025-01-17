@@ -26,6 +26,7 @@ export class Container {
     if (this.bindings.has(serviceIdentifier)) {
       const binding = this.getBinding(serviceIdentifier) as Binding;
       this.deactivate(binding);
+      binding.preDestroy();
       this.bindings.delete(serviceIdentifier);
     }
   }

@@ -2,7 +2,10 @@
 const map = new WeakMap<any, Record<string, any>>();
 
 function hasParentClass(cls: any) {
-  return Object.getPrototypeOf(cls) !== Function.prototype;
+  return (
+    typeof cls === 'function' &&
+    Object.getPrototypeOf(cls) !== Function.prototype
+  );
 }
 
 // 注意重复调用会覆盖之前的结果

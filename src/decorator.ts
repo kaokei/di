@@ -19,7 +19,7 @@
  */
 
 import { getMetadata, getOwnMetadata, defineMetadata } from './cachemap';
-import { KEYS } from './constants';
+import { KEYS, ERRORS } from './constants';
 
 /**
  * 创建装饰器的高阶函数
@@ -75,6 +75,17 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
   };
 }
 
+function createEventDecorator(eventKey: string, errorMessage: string) {
+  return () => {
+    return (target: any, propertyKey: string) => {
+      if (getOwnMetadata(eventKey, target.constructor)) {
+        throw new Error(errorMessage);
+      }
+      defineMetadata(eventKey, propertyKey, target.constructor);
+    };
+  };
+}
+
 // 可以使用在类构造函数的参数中和类的实例属性中
 export const Inject = createDecorator(KEYS.INJECT);
 
@@ -87,3 +98,15 @@ export const SkipSelf = createDecorator(KEYS.SKIP_SELF, true);
 // 指定服务是可选的，找不到服务时返回undefined，否则抛出异常
 // 其实应该说是默认情况下找不到服务时，会抛出异常，除非明确指定是optional的
 export const Optional = createDecorator(KEYS.OPTIONAL, true);
+
+// 一个类最多只有一个PostConstruct
+export const PostConstruct = createEventDecorator(
+  KEYS.POST_CONSTRUCT,
+  ERRORS.POST_CONSTRUCT
+);
+
+// 一个类最多只有一个PreDestroy
+export const PreDestroy = createEventDecorator(
+  KEYS.PRE_DESTROY,
+  ERRORS.PRE_DESTROY
+);
