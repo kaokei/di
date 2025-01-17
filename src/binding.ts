@@ -77,13 +77,13 @@ export class Binding<T = unknown> {
 
   public toService(service: any) {
     return this.toDynamicValue((context: any) =>
-      context.container.get(service, { binding: this })
+      context.container.get(service, { token: this.token })
     );
   }
 
   public get(options?: any) {
     if (STATUS.INITING === this.status) {
-      throw new CircularDependencyError(this, options);
+      throw new CircularDependencyError(this.token, options);
     } else if (
       STATUS.ACTIVATED === this.status ||
       STATUS.CONSTRUCTED === this.status
@@ -96,7 +96,7 @@ export class Binding<T = unknown> {
     } else if (BINDING.DynamicValue === this.type) {
       return this.resolveDynamicValue();
     } else {
-      throw new BindingNotValidError(this);
+      throw new BindingNotValidError(this.token);
     }
   }
 
@@ -160,7 +160,7 @@ export class Binding<T = unknown> {
       return this.container.get(resolveToken(inject), {
         ...rest,
         parent: options,
-        binding: this,
+        token: this.token,
       });
     });
     return result;
@@ -175,7 +175,7 @@ export class Binding<T = unknown> {
       const property = this.container.get(resolveToken(inject), {
         ...rest,
         parent: options,
-        binding: this,
+        token: this.token,
       });
       if (!(property === void 0 && meta.optional)) {
         acc[prop] = property;
