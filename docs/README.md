@@ -54,17 +54,13 @@ https://github.com/inversify/InversifyJS
 
 ## todo
 
-目前还有 container 和 binding 需要完善，其他文件都基本已经实现。
 需要打通**DEV**和异常检测以及异常输出
-循环依赖检测，以及输出循环依赖链条
-生命周期以及 handler 处理器
 中间件和插件的处理
-父类和子类都有 PostConstruct 是否会有异常
-PostConstruct + PreDestroy 生命周期钩子
+父类和子类都有 PostConstruct 是否会有异常，因为按照定义只能有一个 PostConstruct
 
 1. 完善更多的单元测试
-  1. 更多场景
-  2. 和inversely的对比测试用例
+1. 更多场景
+1. 和 inversely 的对比测试用例
 1. 完善中英文文档并部署
-1. 完成所有todo项目
+1. 完成所有 todo 项目
 1. 完善代码中所有类型信息

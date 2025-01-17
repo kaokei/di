@@ -1,33 +1,38 @@
 import { Binding } from './binding';
 import { BindingNotFoundError, DuplicateBindingError } from './errors';
-import { CommonToken } from './interfaces';
+import {
+  CommonToken,
+  ActivationHandler,
+  DeactivationHandler,
+  Options,
+} from './interfaces';
 
 export class Container {
   public parent?: Container;
-  private bindings: Map<any, Binding> = new Map();
-  private onActivationHandler: any;
-  private onDeactivationHandler: any;
+  private bindings: Map<CommonToken, Binding> = new Map();
+  private onActivationHandler?: ActivationHandler<unknown>;
+  private onDeactivationHandler?: DeactivationHandler<unknown>;
 
-  public bind(serviceIdentifier: any) {
-    if (this.bindings.has(serviceIdentifier)) {
-      throw new DuplicateBindingError(serviceIdentifier);
+  public bind<T>(token: CommonToken<T>) {
+    if (this.bindings.has(token)) {
+      throw new DuplicateBindingError(token);
     }
-    const binding = this.buildBinding(serviceIdentifier);
-    this.bindings.set(serviceIdentifier, binding);
+    const binding = this.buildBinding(token);
+    this.bindings.set(token, binding);
     return binding;
   }
 
-  public rebind(serviceIdentifier: any) {
-    this.unbind(serviceIdentifier);
-    return this.bind(serviceIdentifier);
+  public rebind<T>(token: CommonToken<T>) {
+    this.unbind(token);
+    return this.bind(token);
   }
 
-  public unbind(serviceIdentifier: any) {
-    if (this.bindings.has(serviceIdentifier)) {
-      const binding = this.getBinding(serviceIdentifier) as Binding;
+  public unbind<T>(token: CommonToken<T>) {
+    if (this.bindings.has(token)) {
+      const binding = this.getBinding(token);
       this.deactivate(binding);
       binding.preDestroy();
-      this.bindings.delete(serviceIdentifier);
+      this.bindings.delete(token);
     }
   }
 
@@ -37,14 +42,14 @@ export class Container {
     });
   }
 
-  public isCurrentBound(serviceIdentifier: any) {
-    return this.bindings.has(serviceIdentifier);
+  public isCurrentBound<T>(token: CommonToken<T>) {
+    return this.bindings.has(token);
   }
 
-  public isBound(serviceIdentifier: any): boolean {
+  public isBound<T>(token: CommonToken<T>): boolean {
     return (
-      this.isCurrentBound(serviceIdentifier) ||
-      (!!this.parent && this.parent.isBound(serviceIdentifier))
+      this.isCurrentBound(token) ||
+      (!!this.parent && this.parent.isBound(token))
     );
   }
 
@@ -54,14 +59,14 @@ export class Container {
     return child;
   }
 
-  public get<T>(token: CommonToken<T>, options: any = {}): T {
+  public get<T>(token: CommonToken<T>, options: Options<T> = {}): T {
     // 优先从缓存中获取
     // 如果是DynamicValue类型的绑定，执行绑定的函数，缓存并返回函数结果
     // 如果是Instance类型的绑定，本质上是执行了new Constructor()，缓存并返回实例
     // 关键在于new Constructor()可能需要提供参数，这些参数也需要从容器中获取，当然构造函数的参数需要通过@Inject来绑定对应的服务
     // 另外new Constructor()所在的类可能还有注入的实例属性，这些实例属性也需要从容器中获取
     // 需要把这些实例性通过赋值的方式合并到实例对象上。最终在返回实例对象之前，执行onActivationHandler
-    const binding = this.getBinding(token) as Binding;
+    const binding = this.getBinding(token);
     if (options.skipSelf) {
       if (this.parent) {
         return this.parent.get(token, {
@@ -87,15 +92,15 @@ export class Container {
     return void 0 as T;
   }
 
-  public onActivation(handler: any) {
+  public onActivation(handler: ActivationHandler<unknown>) {
     this.onActivationHandler = handler;
   }
 
-  public onDeactivation(handler: any) {
+  public onDeactivation(handler: DeactivationHandler<unknown>) {
     this.onDeactivationHandler = handler;
   }
 
-  public activate(input: any, token: any) {
+  public activate<T>(input: T, token: CommonToken<T>): T {
     if (this.onActivationHandler) {
       const ctx = { container: this };
       return this.onActivationHandler(ctx, input, token);
@@ -104,21 +109,21 @@ export class Container {
     }
   }
 
-  public deactivate(binding: Binding) {
+  public deactivate<T>(binding: Binding<T>) {
     binding.deactivate();
     this.onDeactivationHandler &&
       this.onDeactivationHandler(binding.cache, binding.token);
   }
 
-  private buildBinding(serviceIdentifier: any) {
-    return new Binding(serviceIdentifier, this);
+  private buildBinding<T>(token: CommonToken<T>) {
+    return new Binding<T>(token, this);
   }
 
-  private getBinding(serviceIdentifier: any) {
-    return this.bindings.get(serviceIdentifier);
+  private getBinding<T>(token: CommonToken<T>) {
+    return this.bindings.get(token) as Binding<T>;
   }
 
-  private checkBindingNotFoundError(token: any, options: any) {
+  private checkBindingNotFoundError(token: CommonToken, options: any) {
     if (!options.optional) {
       throw new BindingNotFoundError(token);
     }

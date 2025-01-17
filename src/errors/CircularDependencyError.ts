@@ -14,6 +14,6 @@ export class CircularDependencyError extends Error {
       .join(' --> ');
 
     this.name = 'CircularDependencyError';
-    this.message = `Circular dependency detected. Please fix it manually. \n ${tokenListText}`;
+    this.message = `Circular dependency found: ${tokenListText}`;
   }
 }

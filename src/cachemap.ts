@@ -1,7 +1,8 @@
 // key是token或者class
-const map = new WeakMap<any, Record<string, any>>();
+import type { CommonToken } from './interfaces';
+const map = new WeakMap<CommonToken, Record<string, any>>();
 
-function hasParentClass(cls: any) {
+function hasParentClass(cls: CommonToken) {
   return (
     typeof cls === 'function' &&
     Object.getPrototypeOf(cls) !== Function.prototype
@@ -10,9 +11,9 @@ function hasParentClass(cls: any) {
 
 // 注意重复调用会覆盖之前的结果
 export function defineMetadata(
-  metadataKey: any,
+  metadataKey: string,
   metadataValue: any,
-  target: any
+  target: CommonToken
 ) {
   const found = map.get(target) || {};
   found[metadataKey] = metadataValue;
@@ -22,7 +23,7 @@ export function defineMetadata(
 // 可能返回undefined
 // 可能返回object，因为是属性装饰器数据
 // 可能返回array，因为时构造函数参数装饰器数据
-export function getOwnMetadata(metadataKey: any, target: any) {
+export function getOwnMetadata(metadataKey: string, target: CommonToken) {
   const found = map.get(target) || {};
   return found[metadataKey];
 }
@@ -31,7 +32,7 @@ export function getOwnMetadata(metadataKey: any, target: any) {
 // 如果没有父类直接使用getOwnMetadata获取数据
 // 如果有父类，那么需要合并getOwnMetadata(target)和getMetadata(target的父类)
 // getMetadata只支持获取属性装饰器数据或者没有父类的构造函数参数装饰器数据
-export function getMetadata(metadataKey: any, target: any): any {
+export function getMetadata(metadataKey: string, target: CommonToken): any {
   const ownMetadata = getOwnMetadata(metadataKey, target);
 
   if (!hasParentClass(target)) {
