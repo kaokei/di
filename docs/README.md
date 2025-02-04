@@ -57,6 +57,7 @@ https://github.com/inversify/InversifyJS
 需要打通**DEV**和异常检测以及异常输出
 中间件和插件的处理
 父类和子类都有 PostConstruct 是否会有异常，因为按照定义只能有一个 PostConstruct
+Container.parent = null
 
 1. 完善更多的单元测试
 1. 更多场景
