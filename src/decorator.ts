@@ -37,13 +37,15 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
     // target可能是构造函数或者类的原型
     // 如果target是构造函数，targetKey是undefined，index是参数的位置下标
     // 如果target是原型，targetKey是属姓名，index是undefined
-    return function (target: any, targetKey: string, index?: number) {
+    return function (target: any, targetKey?: string, index?: number) {
       // 如果index是number，那么代表是构造函数的参数的装饰器
       const isParameterDecorator = typeof index === 'number';
       // 统一把装饰器数据绑定到构造函数上，后续获取数据比较方便
       const Ctor = isParameterDecorator ? target : target.constructor;
       // 如果是构造函数的参数装饰器，取参数位置下标，否则取实例属性的属性名
-      const key = isParameterDecorator ? index : targetKey;
+      const key: string | number = isParameterDecorator
+        ? (index as number)
+        : (targetKey as string);
       // 区分构造函数的参数装饰器和实例属性的装饰器
       // 分别记录到全局Map的不同位置，metadataKey不一样
       const metadataKey = isParameterDecorator

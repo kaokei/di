@@ -93,6 +93,10 @@ export class Container {
     return void 0 as T;
   }
 
+  public resolve<T>(token: CommonToken<T>, options: Options<T> = {}): T {
+    return this.get(token, { ...options, self: true });
+  }
+
   public onActivation(handler: ActivationHandler<unknown>) {
     this.onActivationHandler = handler;
   }

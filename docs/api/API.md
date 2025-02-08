@@ -15,8 +15,7 @@
     9. createChild(containerOptions?: interfaces.ContainerOptions): Container;
     10. get<T>(serviceIdentifier: interfaces.ServiceIdentifier<T>): T;
 
-    11. #applyMiddleware(...middlewares: interfaces.Middleware[]): void;
-    12. #resolve<T>(constructorFunction: interfaces.Newable<T>): T;
+    11. #resolve<T>(constructorFunction: interfaces.Newable<T>): T;
 2. Token
 3. LazyToken
 4. 装饰器
