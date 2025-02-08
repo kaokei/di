@@ -1,5 +1,5 @@
 import { Container, Self } from '@/index';
-import { BindingNotFoundError } from '@/errors';
+import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
 
 interface IA {
   name: string;

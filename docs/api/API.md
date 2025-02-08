@@ -24,6 +24,8 @@
   2. @Self
   3. @SkipSelf
   4. @Optional
+  4. @PostConstruct
+  4. @PreDestroy
 
 ## Injector
 

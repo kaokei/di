@@ -1,5 +1,6 @@
 import { Binding } from './binding';
-import { BindingNotFoundError, DuplicateBindingError } from './errors';
+import { BindingNotFoundError } from './errors/BindingNotFoundError';
+import { DuplicateBindingError } from './errors/DuplicateBindingError';
 import {
   CommonToken,
   ActivationHandler,
@@ -8,7 +9,7 @@ import {
 } from './interfaces';
 
 export class Container {
-  public parent?: Container;
+  public parent: Container | null = null;
   private bindings: Map<CommonToken, Binding> = new Map();
   private onActivationHandler?: ActivationHandler<unknown>;
   private onDeactivationHandler?: DeactivationHandler<unknown>;
@@ -103,7 +104,7 @@ export class Container {
   public activate<T>(input: T, token: CommonToken<T>): T {
     if (this.onActivationHandler) {
       const ctx = { container: this };
-      return this.onActivationHandler(ctx, input, token);
+      return this.onActivationHandler(ctx, input, token) as T;
     } else {
       return input;
     }

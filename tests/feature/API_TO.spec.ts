@@ -1,5 +1,5 @@
 import { Inject, Container, Token } from '@/index';
-import { BindingNotFoundError } from '@/errors';
+import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
 
 class UserClass {
   private classNo = 302;

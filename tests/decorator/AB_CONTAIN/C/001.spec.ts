@@ -1,5 +1,5 @@
 import { SkipSelf, Self, Optional, Inject, Container } from '@/index';
-import { BindingNotFoundError } from '@/errors';
+import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
 import { hasOwn } from '@tests/utils';
 
 interface IA {

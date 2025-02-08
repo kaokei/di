@@ -1,5 +1,5 @@
 import { Inject, Container, LazyToken } from '@/index';
-import { CircularDependencyError } from '@/errors';
+import { CircularDependencyError } from '@/errors/CircularDependencyError';
 interface IA {
   name: string;
   id: number;

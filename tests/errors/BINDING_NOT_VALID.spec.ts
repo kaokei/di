@@ -1,5 +1,5 @@
 import { Inject, Container, LazyToken } from '@/index';
-import { BindingNotValidError } from '@/errors';
+import { BindingNotValidError } from '@/errors/BindingNotValidError';
 
 interface IA {
   name: string;

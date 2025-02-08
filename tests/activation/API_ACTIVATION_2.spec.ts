@@ -39,7 +39,7 @@ describe('container activation', () => {
     expect(b.id).toBe(2);
     expect(b.name).toBe('B_activated_by_container');
 
-    expect(container.parent).toBeUndefined();
+    expect(container.parent).toBeNull();
 
     expect(mockContainerActivation).toHaveBeenCalledTimes(2);
     container.get(A);

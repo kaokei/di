@@ -2,7 +2,8 @@ import { BINDING, KEYS, STATUS } from './constants';
 import { Container } from './container';
 import { getMetadata, getOwnMetadata } from './cachemap';
 import { resolveToken } from './token';
-import { CircularDependencyError, BindingNotValidError } from './errors';
+import { CircularDependencyError } from './errors/CircularDependencyError';
+import { BindingNotValidError } from './errors/BindingNotValidError';
 import { CommonToken } from './interfaces';
 
 export class Binding<T = unknown> {

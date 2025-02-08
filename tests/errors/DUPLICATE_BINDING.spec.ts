@@ -1,5 +1,5 @@
 import { Inject, Container, LazyToken } from '@/index';
-import { DuplicateBindingError } from '@/errors';
+import { DuplicateBindingError } from '@/errors/DuplicateBindingError';
 
 interface IA {
   name: string;
