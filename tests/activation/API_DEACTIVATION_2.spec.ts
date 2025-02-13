@@ -1,4 +1,4 @@
-// container deactivation
+// 单独测试container的deactivation
 import { Container } from '@/index';
 
 class A {

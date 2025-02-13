@@ -1,5 +1,7 @@
+import { CommonToken } from '../interfaces';
+
 export class DuplicateBindingError extends Error {
-  constructor(token: any) {
+  constructor(token: CommonToken) {
     super();
     this.name = 'DuplicateBindingError';
     this.message = `Cannot bind token multiple times: ${token}`;

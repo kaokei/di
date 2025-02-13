@@ -1,4 +1,4 @@
-// binding deactivation
+// 单独测试binding的deactivation
 import { Container } from '@/index';
 
 class A {

@@ -4,12 +4,22 @@ import { getMetadata, getOwnMetadata } from './cachemap';
 import { resolveToken } from './token';
 import { CircularDependencyError } from './errors/CircularDependencyError';
 import { BindingNotValidError } from './errors/BindingNotValidError';
-import { CommonToken } from './interfaces';
+import {
+  ActivationHandler,
+  CommonToken,
+  DeactivationHandler,
+  Newable,
+  DynamicValue,
+  Context,
+  Options,
+  RecordObject,
+  GenericToken,
+} from './interfaces';
 
 export class Binding<T = unknown> {
   public container!: Container;
 
-  public context!: any;
+  public context!: Context;
 
   public token!: CommonToken<T>;
 
@@ -17,72 +27,72 @@ export class Binding<T = unknown> {
 
   public status = STATUS.DEFAULT;
 
-  public classValue: any = null;
+  public classValue: Newable<T> | null = null;
 
-  public constantValue: any = null;
+  public constantValue: T | null = null;
 
-  public dynamicValue: any = null;
+  public dynamicValue: DynamicValue<T> | null = null;
 
-  public cache: any = null;
+  public cache: T | null = null;
 
-  public onActivationHandler: any;
+  public onActivationHandler: ActivationHandler<T> | null = null;
 
-  public onDeactivationHandler: any;
+  public onDeactivationHandler: DeactivationHandler<T> | null = null;
 
-  constructor(token: any, container: Container) {
+  constructor(token: CommonToken<T>, container: Container) {
     this.container = container;
     this.context = { container: this.container };
     this.token = token;
   }
 
-  public onActivation(handler: any) {
+  public onActivation(handler: ActivationHandler<T>) {
     this.onActivationHandler = handler;
   }
 
-  public onDeactivation(handler: any) {
+  public onDeactivation(handler: DeactivationHandler<T>) {
     this.onDeactivationHandler = handler;
   }
 
-  public activate(input: any) {
+  public activate(input: T) {
     const output = this.onActivationHandler
-      ? this.onActivationHandler(this.context, input)
+      ? (this.onActivationHandler(this.context, input) as T)
       : input;
     return this.container.activate(output, this.token);
   }
 
   public deactivate() {
-    this.onDeactivationHandler && this.onDeactivationHandler(this.cache);
+    this.onDeactivationHandler && this.onDeactivationHandler(this.cache as T);
   }
 
-  public to(constructor: any) {
+  public to(constructor: Newable<T>) {
     this.type = BINDING.Instance;
     this.classValue = constructor;
     return this;
   }
 
   public toSelf() {
-    return this.to(this.token);
+    return this.to(this.token as Newable<T>);
   }
 
-  public toConstantValue(value: any) {
+  public toConstantValue(value: T) {
     this.type = BINDING.ConstantValue;
     this.constantValue = value;
     return this;
   }
 
-  public toDynamicValue(func: any) {
+  public toDynamicValue(func: DynamicValue<T>) {
     this.type = BINDING.DynamicValue;
     this.dynamicValue = func;
     return this;
   }
 
-  public toService(service: any) {
-    return this.toDynamicValue((context: any) =>
-      context.container.get(service, { token: this.token })
+  public toService(token: CommonToken<T>) {
+    return this.toDynamicValue((context: Context) =>
+      context.container.get(token, { token: this.token })
     );
   }
 
-  public get(options?: any) {
+  public get(options?: Options<T>) {
     if (STATUS.INITING === this.status) {
       throw new CircularDependencyError(this.token, options);
     } else if (
@@ -91,7 +101,7 @@ export class Binding<T = unknown> {
     ) {
       return this.cache;
     } else if (BINDING.Instance === this.type) {
-      return this.resolveValue(options);
+      return this.resolveInstanceValue(options);
     } else if (BINDING.ConstantValue === this.type) {
       return this.resolveConstantValue();
     } else if (BINDING.DynamicValue === this.type) {
@@ -103,16 +113,18 @@ export class Binding<T = unknown> {
 
   public postConstruct() {
     const key = getMetadata(KEYS.POST_CONSTRUCT, this.token);
-    if (key && this.cache[key]) {
-      this.cache[key].call(this.cache);
+    if (key) {
+      const value = (this.cache as any)[key];
+      value?.call(this.cache);
     }
   }
 
   public preDestroy() {
     if (BINDING.Instance === this.type) {
       const key = getMetadata(KEYS.PRE_DESTROY, this.token);
-      if (key && this.cache[key]) {
-        this.cache[key].call(this.cache);
+      if (key) {
+        const value = (this.cache as any)[key];
+        value?.call(this.cache);
       }
     }
   }
@@ -125,40 +137,40 @@ export class Binding<T = unknown> {
    * 权衡之后还是选择方案1，相对来说方案1的缺点是稳定可控的，只要保证在activate方法中不依赖注入属性即可。
    * 但是方案2可能导致系统表面上可以正常运行，但是隐藏了未知的异常风险。
    */
-  private resolveValue(options?: any) {
+  private resolveInstanceValue(options?: Options<T>) {
     this.status = STATUS.INITING;
-    const ClassName = this.classValue;
+    const ClassName = this.classValue as Newable<T>;
     const params = this.getContructorParameters(ClassName, options);
     const inst = new ClassName(...params);
     this.cache = this.activate(inst);
     // 实例化成功，此时不会再有死循环问题
     this.status = STATUS.CONSTRUCTED;
     const properties = this.getInjectProperties(ClassName, options);
-    Object.assign(this.cache, properties);
+    Object.assign(this.cache as T as RecordObject, properties);
     this.status = STATUS.ACTIVATED;
     this.postConstruct();
     return this.cache;
   }
 
   private resolveConstantValue() {
-    this.cache = this.activate(this.constantValue);
+    this.cache = this.activate(this.constantValue as T);
     this.status = STATUS.ACTIVATED;
     return this.cache;
   }
 
   private resolveDynamicValue() {
     this.status = STATUS.INITING;
-    const dynamicValue = this.dynamicValue.call(this, this.context);
+    const dynamicValue = this.dynamicValue!.call(this, this.context);
     this.cache = this.activate(dynamicValue);
     this.status = STATUS.ACTIVATED;
     return this.cache;
   }
 
-  private getContructorParameters(ClassName: any, options?: any) {
+  private getContructorParameters(ClassName: Newable<T>, options?: Options<T>) {
     const params = getOwnMetadata(KEYS.INJECTED_PARAMS, ClassName) || [];
-    const result = params.map((meta: any) => {
+    const result = params.map((meta: RecordObject) => {
       const { inject, ...rest } = meta;
-      return this.container.get(resolveToken(inject), {
+      return this.container.get(resolveToken(inject as GenericToken), {
         ...rest,
         parent: options,
         token: this.token,
@@ -167,21 +179,24 @@ export class Binding<T = unknown> {
     return result;
   }
 
-  private getInjectProperties(ClassName: any, options?: any) {
+  private getInjectProperties(ClassName: Newable<T>, options?: Options<T>) {
     const props = getMetadata(KEYS.INJECTED_PROPS, ClassName) || {};
     const propKeys = Object.keys(props);
-    return propKeys.reduce((acc: any, prop: any) => {
+    return propKeys.reduce((acc: RecordObject, prop: string) => {
       const meta = props[prop];
       const { inject, ...rest } = meta;
-      const property = this.container.get(resolveToken(inject), {
-        ...rest,
-        parent: options,
-        token: this.token,
-      });
+      const property = this.container.get(
+        resolveToken(inject as GenericToken),
+        {
+          ...rest,
+          parent: options,
+          token: this.token,
+        }
+      );
       if (!(property === void 0 && meta.optional)) {
         acc[prop] = property;
       }
       return acc;
-    }, Object.create(null) as any);
+    }, Object.create(null) as RecordObject);
   }
 }

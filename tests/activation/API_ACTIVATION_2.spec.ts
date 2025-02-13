@@ -1,4 +1,4 @@
-// container activation
+// 单独测试container的activation
 import { Container } from '@/index';
 
 class A {

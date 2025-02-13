@@ -1,4 +1,4 @@
-// binding activation
+// 单独测试binding的activation
 import { Container } from '@/index';
 
 class A {

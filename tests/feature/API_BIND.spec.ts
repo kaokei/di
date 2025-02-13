@@ -1,3 +1,4 @@
+// 测试bind，unbind，unbindAll，rebind
 import { Inject, Container, LazyToken, Token } from '@/index';
 import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
 import { hasOwn } from '@tests/utils';

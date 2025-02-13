@@ -16,19 +16,26 @@ export interface Context {
   container: Container;
 }
 
-export interface Options<T> {
+export type DynamicValue<T> = (ctx: Context) => T;
+
+export type RecordObject = Record<string, unknown>;
+
+export interface Options<T = unknown> {
   inject?: GenericToken<T>;
   optional?: boolean;
   self?: boolean;
   skipSelf?: boolean;
   token?: CommonToken<T>;
-  parent?: Options<unknown>;
+  parent?: Options;
 }
 
-export type ActivationHandler<T> = (
+export type ActivationHandler<T = unknown> = (
   ctx: Context,
   input: T,
-  token: CommonToken<T>
+  token?: CommonToken<T>
 ) => T;
 
-export type DeactivationHandler<T> = (input: T, token: CommonToken<T>) => void;
+export type DeactivationHandler<T = unknown> = (
+  input: T,
+  token?: CommonToken<T>
+) => void;

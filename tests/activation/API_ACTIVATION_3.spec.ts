@@ -1,4 +1,4 @@
-// binding + container activation
+// 同时测试binding和container的activation
 import { Container } from '@/index';
 
 interface IA {

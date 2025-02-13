@@ -11,8 +11,8 @@ import {
 export class Container {
   public parent: Container | null = null;
   private bindings: Map<CommonToken, Binding> = new Map();
-  private onActivationHandler?: ActivationHandler<unknown>;
-  private onDeactivationHandler?: DeactivationHandler<unknown>;
+  private onActivationHandler?: ActivationHandler;
+  private onDeactivationHandler?: DeactivationHandler;
 
   public bind<T>(token: CommonToken<T>) {
     if (this.bindings.has(token)) {
@@ -97,11 +97,11 @@ export class Container {
     return this.get(token, { ...options, self: true });
   }
 
-  public onActivation(handler: ActivationHandler<unknown>) {
+  public onActivation(handler: ActivationHandler) {
     this.onActivationHandler = handler;
   }
 
-  public onDeactivation(handler: DeactivationHandler<unknown>) {
+  public onDeactivation(handler: DeactivationHandler) {
     this.onDeactivationHandler = handler;
   }
 
@@ -128,7 +128,7 @@ export class Container {
     return this.bindings.get(token) as Binding<T>;
   }
 
-  private checkBindingNotFoundError(token: CommonToken, options: any) {
+  private checkBindingNotFoundError(token: CommonToken, options: Options) {
     if (!options.optional) {
       throw new BindingNotFoundError(token);
     }
