@@ -10,7 +10,7 @@ import {
 
 export class Container {
   public parent: Container | null = null;
-  private bindings: Map<CommonToken, Binding> = new Map();
+  private bindings: Map<CommonToken, Binding<any>> = new Map();
   private onActivationHandler?: ActivationHandler;
   private onDeactivationHandler?: DeactivationHandler;
 
@@ -79,12 +79,12 @@ export class Container {
       }
     } else if (options.self) {
       if (binding) {
-        return binding.get(options);
+        return binding.get(options) as T;
       } else {
         this.checkBindingNotFoundError(token, options);
       }
     } else if (binding) {
-      return binding.get(options);
+      return binding.get(options) as T;
     } else if (this.parent) {
       return this.parent.get(token, options);
     } else {
