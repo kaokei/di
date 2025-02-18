@@ -115,9 +115,9 @@ export class Container {
   }
 
   public deactivate<T>(binding: Binding<T>) {
-    binding.deactivate();
     this.onDeactivationHandler &&
       this.onDeactivationHandler(binding.cache, binding.token);
+    binding.deactivate();
   }
 
   private buildBinding<T>(token: CommonToken<T>) {

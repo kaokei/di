@@ -91,6 +91,9 @@ describe('container activation', () => {
     container.unbind(A);
     expect(mockBindingDeactivationA).toHaveBeenCalledTimes(1);
     expect(mockContainerDeactivation).toHaveBeenCalledTimes(1);
+    expect(mockContainerDeactivation).toHaveBeenCalledBefore(
+      mockBindingDeactivationA
+    );
 
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(-2);
@@ -99,6 +102,9 @@ describe('container activation', () => {
     container.unbind(B);
     expect(mockBindingDeactivationB).toHaveBeenCalledTimes(1);
     expect(mockContainerDeactivation).toHaveBeenCalledTimes(2);
+    expect(mockContainerDeactivation).toHaveBeenCalledBefore(
+      mockBindingDeactivationB
+    );
 
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(-1);

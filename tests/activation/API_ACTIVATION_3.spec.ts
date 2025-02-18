@@ -28,7 +28,7 @@ describe('container activation', () => {
       });
 
     const mockBindingActivationB = vi.fn().mockImplementation((_: any) => {
-      return 'mock_activated_by_binding';
+      return 'B_activated_by_binding';
     });
 
     const mockContainerActivation = vi
@@ -55,17 +55,25 @@ describe('container activation', () => {
 
     expect(mockContainerActivation).toHaveBeenCalledTimes(1);
 
+    expect(mockBindingActivationA).toHaveBeenCalledBefore(
+      mockContainerActivation
+    );
+
     expect(mockBindingActivationB).toHaveBeenCalledTimes(0);
     const b = container.get(B);
     expect(mockBindingActivationB).toHaveBeenCalledTimes(1);
 
     expect(mockContainerActivation).toHaveBeenCalledTimes(2);
 
+    expect(mockBindingActivationB).toHaveBeenCalledBefore(
+      mockContainerActivation
+    );
+
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(11);
     expect(a.name).toBe('A_activated_by_binding_activated_by_container');
 
-    expect(b).toBe('mock_activated_by_binding_activated_by_container');
+    expect(b).toBe('B_activated_by_binding_activated_by_container');
 
     expect(container.parent).toBeNull();
 
