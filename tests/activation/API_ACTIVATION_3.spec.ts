@@ -65,8 +65,11 @@ describe('container activation', () => {
 
     expect(mockContainerActivation).toHaveBeenCalledTimes(2);
 
-    expect(mockBindingActivationB).toHaveBeenCalledBefore(
-      mockContainerActivation
+    expect(mockContainerActivation).toHaveLastReturnedWith(
+      'B_activated_by_binding_activated_by_container'
+    );
+    expect(mockBindingActivationB).toHaveLastReturnedWith(
+      'B_activated_by_binding'
     );
 
     expect(a).toBeInstanceOf(A);
