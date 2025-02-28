@@ -1,5 +1,5 @@
-import { Inject, Container, LazyToken } from '@/index';
-import { CircularDependencyError } from '@/errors/CircularDependencyError';
+import { inject, Container, LazyServiceIdentifier } from 'inversify';
+import { CIRCULAR_DEPENDENCY_ERROR } from '@tests/inversify/constant.ts';
 
 interface IA {
   name: string;
@@ -17,7 +17,7 @@ class A {
   public name = 'A';
   public id = 1;
 
-  @Inject(new LazyToken(() => B))
+  @inject(new LazyServiceIdentifier(() => B))
   public b!: IB;
 }
 
@@ -25,7 +25,7 @@ class B {
   public name = 'B';
   public id = 2;
 
-  constructor(@Inject(new LazyToken(() => A)) private a: IA) {}
+  constructor(@inject(new LazyServiceIdentifier(() => A)) private a: IA) {}
 }
 
 describe('PC', () => {
@@ -38,15 +38,14 @@ describe('PC', () => {
   });
 
   test('container.get(A) should work correctly', async () => {
-    const a = container.get(A);
-    expect(a).toBeInstanceOf(A);
-    expect(a).toBe(a.b.a);
-    expect(a.b).toBe(a.b.a.b);
+    expect(() => {
+      container.get(A);
+    }).toThrowError(CIRCULAR_DEPENDENCY_ERROR);
   });
 
   test('container.get(B) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
     expect(() => {
       container.get(B);
-    }).toThrowError(CircularDependencyError);
+    }).toThrowError(CIRCULAR_DEPENDENCY_ERROR);
   });
 });

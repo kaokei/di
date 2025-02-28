@@ -65,3 +65,22 @@ Container.parent = null
 1. 完善中英文文档并部署
 1. 完成所有 todo 项目
 1. 完善代码中所有类型信息
+
+特殊依赖案例
+https://github.com/inversify/InversifyJS/issues/543
+
+inversify 默认是不支持循环依赖的，必须通过第三方的 lazyInject 才能实现循环依赖。
+其中 LazyServiceIdentifier 只能解决 import 时的依赖问题，并不能解决 container.get()在实例化对象时的循环依赖问题。
+
+https://github.com/inversify/inversify-inject-decorators
+
+
+## 对比inversify的不同
+
+1. container只支持inSingletonScope这一种模式
+1. container缺少异步方法和tag相关方法
+1. container缺少applyMiddleware等其他方法
+1. container.onActivation定义不同
+1. container.onDeactivation定义不同
+1. 在继承父类时，父类支持依赖注入的方式不一致
+1. inversify默认不支持循环依赖，本库支持属性注入的循环依赖
