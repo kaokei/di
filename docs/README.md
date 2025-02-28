@@ -84,3 +84,5 @@ https://github.com/inversify/inversify-inject-decorators
 1. container.onDeactivation定义不同
 1. 在继承父类时，父类支持依赖注入的方式不一致
 1. inversify默认不支持循环依赖，本库支持属性注入的循环依赖
+1. 没有@injectable装饰器，也就是所有Class不支持默认注入，所有Class必须明确声明container的绑定关系
+1. 构造函数中的依赖也必须通过@inject明确声明依赖的token，并不会自动分析参数类型来自动注入
