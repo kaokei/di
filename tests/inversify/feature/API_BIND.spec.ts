@@ -139,7 +139,7 @@ describe('Unbind', () => {
   });
 });
 
-describe.only('Unbind with hierarchical container', () => {
+describe('Unbind with hierarchical container', () => {
   let parent: Container;
   let child: Container;
 
@@ -249,10 +249,10 @@ describe('Unbind all with hierarchical container', () => {
   beforeEach(() => {
     parent = new Container();
     child = parent.createChild();
-    parent.bind(A).toSelf();
-    parent.bind(B).toSelf();
-    child.bind(A).toSelf();
-    child.bind(B).toSelf();
+    parent.bind(A).toSelf().inSingletonScope();
+    parent.bind(B).toSelf().inSingletonScope();
+    child.bind(A).toSelf().inSingletonScope();
+    child.bind(B).toSelf().inSingletonScope();
   });
 
   test('container.get(A) should work correctly', async () => {
