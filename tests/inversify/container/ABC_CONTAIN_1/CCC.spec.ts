@@ -1,5 +1,9 @@
-import { inject, Container, LazyServiceIdentifier } from 'inversify';
-import { CIRCULAR_DEPENDENCY_ERROR } from '@tests/inversify/constant.ts';
+import {
+  Container,
+  inject as Inject,
+  LazyServiceIdentifier as LazyToken,
+} from 'inversify';
+import { CircularDependencyError } from '@tests/inversify/constant.ts';
 
 interface IA {
   name: string;
@@ -23,8 +27,8 @@ class A {
   public id = 1;
 
   constructor(
-    @inject(new LazyServiceIdentifier(() => B)) private b: IB,
-    @inject(new LazyServiceIdentifier(() => C)) private c: IC
+    @Inject(new LazyToken(() => B)) private b: IB,
+    @Inject(new LazyToken(() => C)) private c: IC
   ) {}
 }
 
@@ -32,14 +36,14 @@ class B {
   public name = 'B';
   public id = 2;
 
-  constructor(@inject(new LazyServiceIdentifier(() => C)) private c: IC) {}
+  constructor(@Inject(new LazyToken(() => C)) private c: IC) {}
 }
 
 class C {
   public name = 'C';
   public id = 3;
 
-  constructor(@inject(new LazyServiceIdentifier(() => B)) private b: IB) {}
+  constructor(@Inject(new LazyToken(() => B)) private b: IB) {}
 }
 
 describe('CCC', () => {
@@ -55,18 +59,18 @@ describe('CCC', () => {
   test('container.get(A) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
     expect(() => {
       container.get(A);
-    }).toThrowError(CIRCULAR_DEPENDENCY_ERROR);
+    }).toThrowError(CircularDependencyError);
   });
 
   test('container.get(B) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
     expect(() => {
       container.get(B);
-    }).toThrowError(CIRCULAR_DEPENDENCY_ERROR);
+    }).toThrowError(CircularDependencyError);
   });
 
   test('container.get(C) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
     expect(() => {
       container.get(C);
-    }).toThrowError(CIRCULAR_DEPENDENCY_ERROR);
+    }).toThrowError(CircularDependencyError);
   });
 });
