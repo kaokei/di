@@ -1,5 +1,9 @@
-import { Inject, Container, LazyToken } from '@/index';
-import { CircularDependencyError } from '@/errors/CircularDependencyError';
+import {
+  Container,
+  inject as Inject,
+  LazyServiceIdentifier as LazyToken,
+} from 'inversify';
+import { CircularDependencyError } from '@tests/inversify/constant.ts';
 
 interface IA {
   name: string;
@@ -63,25 +67,15 @@ describe('PPC', () => {
   });
 
   test('container.get(A) should work correctly', async () => {
-    const a = container.get(A);
-    expect(a).toBeInstanceOf(A);
-    expect(a).toBe(a.b.a);
-    expect(a).toBe(a.c.a);
-    expect(a).toBe(a.b.c.a);
-    expect(a).toBe(a.c.b.a);
-    expect(a.b).toBe(a.c.b);
-    expect(a.c).toBe(a.b.c);
+    expect(() => {
+      container.get(A);
+    }).toThrowError(CircularDependencyError);
   });
 
   test('container.get(B) should work correctly', async () => {
-    const b = container.get(B);
-    expect(b).toBeInstanceOf(B);
-    expect(b).toBe(b.a.b);
-    expect(b).toBe(b.c.b);
-    expect(b).toBe(b.a.c.b);
-    expect(b).toBe(b.c.a.b);
-    expect(b.a).toBe(b.c.a);
-    expect(b.c).toBe(b.a.c);
+    expect(() => {
+      container.get(B);
+    }).toThrowError(CircularDependencyError);
   });
 
   test('container.get(C) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
