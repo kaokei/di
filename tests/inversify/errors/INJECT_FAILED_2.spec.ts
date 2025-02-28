@@ -1,5 +1,5 @@
-import { Inject, Container } from '@/index';
-import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
+import { Container, inject as Inject } from 'inversify';
+import { BindingNotFoundError } from '@tests/inversify/constant.ts';
 
 interface IA {
   name: string;

@@ -1,5 +1,6 @@
-import { Inject, Container, Token } from '@/index';
-import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
+import { Token } from '@/index';
+import { Container, inject as Inject } from 'inversify';
+import { BindingNotFoundError } from '@tests/inversify/constant.ts';
 
 class UserClass {
   private classNo = 302;
@@ -65,8 +66,8 @@ describe('User depends on UserClass (same container)', () => {
 
   beforeEach(() => {
     container = new Container();
-    container.bind(User).toSelf();
-    container.bind(UserClass).toSelf();
+    container.bind(User).toSelf().inSingletonScope();
+    container.bind(UserClass).toSelf().inSingletonScope();
   });
 
   test('instanceOf works right', async () => {
@@ -105,14 +106,16 @@ describe('User depends on UserClass (User inside parent container)', () => {
   beforeEach(() => {
     parent = new Container();
     child = parent.createChild();
-    parent.bind(User).toSelf();
-    child.bind(UserClass).toSelf();
+    parent.bind(User).toSelf().inSingletonScope();
+    child.bind(UserClass).toSelf().inSingletonScope();
   });
 
   test('child.get(User) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    expect(() => {
-      child.get(User);
-    }).toThrowError(BindingNotFoundError);
+    // 还是同样的问题，就是User依赖UserClass，child找不到User，只能从parent中找到User
+    // 但是parent中并没有注册UserClass，最终导致User实例化失败
+    // 但是inversify并没有报错，这是因为inversify强制UserClass也从child中获取，此时child是有绑定UserClass的，所以没有报错
+    const user = child.get(User);
+    expect(user).toBeInstanceOf(User);
   });
 
   test('modify userClass.classNo', async () => {
@@ -130,8 +133,8 @@ describe('User depends on UserClass (UserClass inside parent container)', () => 
   beforeEach(() => {
     parent = new Container();
     child = parent.createChild();
-    child.bind(User).toSelf();
-    parent.bind(UserClass).toSelf();
+    child.bind(User).toSelf().inSingletonScope();
+    parent.bind(UserClass).toSelf().inSingletonScope();
   });
 
   test('instanceOf works right', async () => {
@@ -165,22 +168,22 @@ describe('User depends on UserClass (UserClass inside parent container)', () => 
 
 describe('User depends on UserClass (use Token)', () => {
   let container: Container;
-  const userKey = new Token<User>('userKey');
-  const userClassKey = new Token<UserClass>('userClassKey');
+  const userKey: any = new Token<User>('userKey');
+  const userClassKey: any = new Token<UserClass>('userClassKey');
 
   beforeEach(() => {
     container = new Container();
-    container.bind(User).toSelf();
-    container.bind(UserClass).toSelf();
-    container.bind(userKey).to(User);
+    container.bind(User).toSelf().inSingletonScope();
+    container.bind(UserClass).toSelf().inSingletonScope();
+    container.bind(userKey).to(User).inSingletonScope();
     container.bind(userClassKey).toService(UserClass);
   });
 
   test('Token should work', async () => {
     const user1 = container.get(User);
     const userClass1 = container.get(UserClass);
-    const user2 = container.get(userKey);
-    const userClass2 = container.get(userClassKey);
+    const user2: any = container.get(userKey);
+    const userClass2: any = container.get(userClassKey);
 
     expect(user1.getName()).toBe('zhangsan');
     expect(user1.getAge()).toBe(12);

@@ -86,3 +86,10 @@ https://github.com/inversify/inversify-inject-decorators
 1. inversify默认不支持循环依赖，本库支持属性注入的循环依赖
 1. 没有@injectable装饰器，也就是所有Class不支持默认注入，所有Class必须明确声明container的绑定关系
 1. 构造函数中的依赖也必须通过@inject明确声明依赖的token，并不会自动分析参数类型来自动注入
+1. 本库因为不支持container.getTagged 、 container.getNamed 、 container.getAll这些方法，所以也不支持重复绑定同一个token。
+1. 这里的逻辑需要重新梳理一下，理论上child虽然有B的绑定，但是没有A的绑定，此时A的实例化过程是在parent中发生的
+  inversify还是会强制将B的绑定也放到child中，但是本库认为B的绑定应该是在parent中的
+1. 问题同上
+    // 还是同样的问题，就是User依赖UserClass，child找不到User，只能从parent中找到User
+    // 但是parent中并没有注册UserClass，最终导致User实例化失败
+    // 但是inversify并没有报错，这是因为inversify强制UserClass也从child中获取，此时child是有绑定UserClass的，所以没有报错

@@ -1,5 +1,9 @@
-import { Inject, Container, LazyToken } from '@/index';
-import { BindingNotValidError } from '@/errors/BindingNotValidError';
+import {
+  Container,
+  inject as Inject,
+  LazyServiceIdentifier as LazyToken,
+} from 'inversify';
+import { BindingNotValidError } from '@tests/inversify/constant.ts';
 
 interface IA {
   name: string;

@@ -1,5 +1,8 @@
-import { Inject, Container, LazyToken } from '@/index';
-import { DuplicateBindingError } from '@/errors/DuplicateBindingError';
+import {
+  Container,
+  inject as Inject,
+  LazyServiceIdentifier as LazyToken,
+} from 'inversify';
 
 interface IA {
   name: string;
@@ -24,6 +27,10 @@ export class B {
   public name = 'B';
   public id = 2;
 }
+export class B2 extends B {
+  public name = 'B2';
+  public id = 22;
+}
 
 describe('DUPLICATE_BINDING', () => {
   let container: Container;
@@ -35,14 +42,24 @@ describe('DUPLICATE_BINDING', () => {
   });
 
   test('container.bind(A) should throw DuplicateBindingError', async () => {
-    expect(() => {
-      container.bind(A).toSelf();
-    }).toThrowError(DuplicateBindingError);
+    container.bind(A).toSelf();
+    const a = container.getAll(A);
+    expect(Array.isArray(a)).toBe(true);
+    expect(a.length).toBe(2);
+    expect(a[0]).toBeInstanceOf(A);
+    expect(a[0].id).toBe(1);
+    expect(a[1]).toBeInstanceOf(A);
+    expect(a[1].id).toBe(1);
   });
 
   test('container.bind(B) should throw DuplicateBindingError', async () => {
-    expect(() => {
-      container.bind(B).toSelf();
-    }).toThrowError(DuplicateBindingError);
+    container.bind(B).to(B2);
+    const b = container.getAll(B);
+    expect(Array.isArray(b)).toBe(true);
+    expect(b.length).toBe(2);
+    expect(b[0]).toBeInstanceOf(B);
+    expect(b[0].id).toBe(2);
+    expect(b[1]).toBeInstanceOf(B2);
+    expect(b[1].id).toBe(22);
   });
 });

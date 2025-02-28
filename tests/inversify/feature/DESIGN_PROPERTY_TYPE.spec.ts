@@ -1,5 +1,5 @@
-import { Inject, Container } from '@/index';
-import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
+import { Container, inject as Inject } from 'inversify';
+import { BindingNotFoundError } from '@tests/inversify/constant.ts';
 
 interface IA {
   name: string;
@@ -21,7 +21,7 @@ class A {
   public name = 'A';
   public id = 1;
 
-  @Inject()
+  @Inject('') // 未指定参数
   public b!: B;
 }
 

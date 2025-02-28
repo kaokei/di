@@ -1,6 +1,11 @@
 // A extends B
-// A has property di of c
-import { Inject, Container, LazyToken } from '@/index';
+// A has property di of C
+// C has property di of B
+import {
+  Container,
+  inject as Inject,
+  LazyServiceIdentifier as LazyToken,
+} from 'inversify';
 
 interface IA {
   name: string;

@@ -1,6 +1,13 @@
 // A extends B
-// A has property di of c
-import { Inject, Container, LazyToken } from '@/index';
+// A has property di of C
+// B has property di of C
+// C has property di of B
+import {
+  Container,
+  inject as Inject,
+  LazyServiceIdentifier as LazyToken,
+} from 'inversify';
+import { CircularDependencyError } from '@tests/inversify/constant.ts';
 
 interface IA {
   name: string;
@@ -62,38 +69,20 @@ describe('PPP', () => {
   });
 
   test('container.get(A) should work correctly', async () => {
-    const a = container.get(A);
-
-    expect(Object.prototype.hasOwnProperty.call(a, 'c')).toBe(true);
-
-    expect(a).toBeInstanceOf(A);
-    expect(a.name).toBe('A');
-    expect(a.id).toBe(1);
-    expect(a.bName).toBe('B');
-    expect(a.bId).toBe(2);
-    expect(a.c).toBeInstanceOf(C);
-    expect(a.c.cName).toBe('C');
-    expect(a.c.cId).toBe(3);
-    expect(a.c.name).toBe('C');
-    expect(a.c.id).toBe(3);
+    expect(() => {
+      container.get(A);
+    }).toThrowError(CircularDependencyError);
   });
 
   test('container.get(B) should work correctly', async () => {
-    const b = container.get(B);
-    expect(b).toBeInstanceOf(B);
-    expect(b.name).toBe('B');
-    expect(b.id).toBe(2);
-    expect(b.bName).toBe('B');
-    expect(b.bId).toBe(2);
+    expect(() => {
+      container.get(B);
+    }).toThrowError(CircularDependencyError);
   });
 
   test('container.get(C) should work correctly', async () => {
-    const c = container.get(C);
-    expect(c).toBeInstanceOf(C);
-    expect(c.b).toBeInstanceOf(B);
-    expect(c.id).toBe(3);
-    expect(c.name).toBe('C');
-    expect(c.cId).toBe(3);
-    expect(c.cName).toBe('C');
+    expect(() => {
+      container.get(C);
+    }).toThrowError(CircularDependencyError);
   });
 });

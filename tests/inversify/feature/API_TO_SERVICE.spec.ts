@@ -1,4 +1,10 @@
-import { Inject, Container, LazyToken, Token } from '@/index';
+import { Token } from '@/index';
+
+import {
+  Container,
+  inject as Inject,
+  LazyServiceIdentifier as LazyToken,
+} from 'inversify';
 
 interface IA {
   name: string;
@@ -11,9 +17,9 @@ interface IB {
   id: number;
 }
 
-const KEY_B1 = new Token<IB>('KEY_B1');
-const KEY_B2 = new Token<IB>('KEY_B2');
-const KEY_B3 = new Token<IB>('KEY_B3');
+const KEY_B1: any = new Token<IB>('KEY_B1');
+const KEY_B2: any = new Token<IB>('KEY_B2');
+const KEY_B3: any = new Token<IB>('KEY_B3');
 
 class A {
   public name = 'A';
@@ -33,8 +39,8 @@ describe('toService', () => {
 
   beforeEach(() => {
     container = new Container();
-    container.bind(A).toSelf();
-    container.bind(B).toSelf();
+    container.bind(A).toSelf().inSingletonScope();
+    container.bind(B).toSelf().inSingletonScope();
     container.bind(KEY_B1).toService(B);
     container.bind(KEY_B2).toService(B);
     container.bind(KEY_B3).toService(B);

@@ -1,4 +1,8 @@
-import { Inject, Container, LazyToken } from '@/index';
+import {
+  Container,
+  inject as Inject,
+  LazyServiceIdentifier as LazyToken,
+} from 'inversify';
 
 interface IA {
   name: string;

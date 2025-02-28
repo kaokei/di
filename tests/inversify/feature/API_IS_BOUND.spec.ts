@@ -1,4 +1,8 @@
-import { Inject, Container, LazyToken } from '@/index';
+import {
+  Container,
+  inject as Inject,
+  LazyServiceIdentifier as LazyToken,
+} from 'inversify';
 
 interface IA {
   name: string;
@@ -46,9 +50,9 @@ describe('isBound', () => {
     containerC = new Container();
     containerB = containerC.createChild();
     containerA = containerB.createChild();
-    containerC.bind(C).toSelf();
-    containerB.bind(B).toSelf();
-    containerA.bind(A).toSelf();
+    containerC.bind(C).toSelf().inSingletonScope();
+    containerB.bind(B).toSelf().inSingletonScope();
+    containerA.bind(A).toSelf().inSingletonScope();
   });
 
   test('container.get(A) should work correctly', async () => {

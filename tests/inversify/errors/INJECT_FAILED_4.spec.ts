@@ -1,4 +1,4 @@
-import { Container } from '@/index';
+import { Container } from 'inversify';
 
 interface IA {
   name: string;

@@ -1,4 +1,10 @@
-import { Inject, Container, LazyToken, Token } from '@/index';
+import { Token } from '@/index';
+
+import {
+  Container,
+  inject as Inject,
+  LazyServiceIdentifier as LazyToken,
+} from 'inversify';
 
 interface IA {
   name: string;
@@ -29,15 +35,18 @@ class B {
 describe('toDynamicValue without context', () => {
   let container: Container;
 
-  const ANOTHER_A_CLASS_KEY = new Token<IA>('ANOTHER_A_CLASS_KEY');
+  const ANOTHER_A_CLASS_KEY: any = new Token<IA>('ANOTHER_A_CLASS_KEY');
 
   beforeEach(() => {
     container = new Container();
-    container.bind(A).toSelf();
-    container.bind(B).toSelf();
-    container.bind(ANOTHER_A_CLASS_KEY).toDynamicValue(() => {
-      return new A({ id: 22, name: 'BB' });
-    });
+    container.bind(A).toSelf().inSingletonScope();
+    container.bind(B).toSelf().inSingletonScope();
+    container
+      .bind(ANOTHER_A_CLASS_KEY)
+      .toDynamicValue(() => {
+        return new A({ id: 22, name: 'BB' });
+      })
+      .inSingletonScope();
   });
 
   test('container.get(A) should work correctly', async () => {
@@ -58,7 +67,7 @@ describe('toDynamicValue without context', () => {
   });
 
   test('container.get(ANOTHER_A_CLASS_KEY) should work correctly', async () => {
-    const a = container.get(ANOTHER_A_CLASS_KEY);
+    const a: any = container.get(ANOTHER_A_CLASS_KEY);
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
     expect(a.name).toBe('A');
@@ -71,18 +80,19 @@ describe('toDynamicValue without context', () => {
 describe('toDynamicValue with context', () => {
   let container: Container;
 
-  const ANOTHER_A_CLASS_KEY = new Token<IA>('ANOTHER_A_CLASS_KEY');
+  const ANOTHER_A_CLASS_KEY: any = new Token<IA>('ANOTHER_A_CLASS_KEY');
 
   beforeEach(() => {
     container = new Container();
-    container.bind(A).toSelf();
-    container.bind(B).toSelf();
+    container.bind(A).toSelf().inSingletonScope();
+    container.bind(B).toSelf().inSingletonScope();
     container
       .bind(ANOTHER_A_CLASS_KEY)
-      .toDynamicValue(({ container }: { container: Container }) => {
+      .toDynamicValue(({ container }) => {
         const b = container.get(B);
         return new A(b);
-      });
+      })
+      .inSingletonScope();
   });
 
   test('container.get(A) should work correctly', async () => {
@@ -103,7 +113,7 @@ describe('toDynamicValue with context', () => {
   });
 
   test('container.get(ANOTHER_A_CLASS_KEY) should work correctly', async () => {
-    const a = container.get(ANOTHER_A_CLASS_KEY);
+    const a: any = container.get(ANOTHER_A_CLASS_KEY);
     const b = container.get(B);
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
@@ -122,30 +132,31 @@ describe('toDynamicValue with context', () => {
 describe('toDynamicValue with context, return function', () => {
   let container: Container;
 
-  const ANOTHER_A_CLASS_KEY = new Token<(id: number) => IA>(
+  const ANOTHER_A_CLASS_KEY: any = new Token<(id: number) => IA>(
     'ANOTHER_A_CLASS_KEY'
   );
 
   beforeEach(() => {
     container = new Container();
-    container.bind(A).toSelf();
-    container.bind(B).toSelf();
+    container.bind(A).toSelf().inSingletonScope();
+    container.bind(B).toSelf().inSingletonScope();
     container
       .bind(ANOTHER_A_CLASS_KEY)
-      .toDynamicValue(({ container }: { container: Container }) => {
+      .toDynamicValue(({ container }) => {
         return (id: number) => {
           const b = container.get(B);
           b.id = id;
           return new A(b);
         };
-      });
+      })
+      .inSingletonScope();
   });
 
   test('container.get(ANOTHER_A_CLASS_KEY) should work correctly', async () => {
     const b = container.get(B);
     expect(b.id).toBe(2);
 
-    const aFunc = container.get(ANOTHER_A_CLASS_KEY);
+    const aFunc: any = container.get(ANOTHER_A_CLASS_KEY);
     const a = aFunc(33);
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);

@@ -1,6 +1,11 @@
 // 测试bind，unbind，unbindAll，rebind
-import { Inject, Container, LazyToken, Token } from '@/index';
-import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
+import { Token } from '@/index';
+import {
+  Container,
+  inject as Inject,
+  LazyServiceIdentifier as LazyToken,
+} from 'inversify';
+import { BindingNotFoundError } from '@tests/inversify/constant.ts';
 import { hasOwn } from '@tests/utils';
 
 interface IA {
@@ -9,7 +14,7 @@ interface IA {
   b: IB;
 }
 
-const atoken = new Token<IA>('atoken');
+const atoken: any = new Token<IA>('atoken');
 
 interface IB {
   name: string;
@@ -89,7 +94,7 @@ describe('Unbind', () => {
 
   beforeEach(() => {
     container = new Container();
-    container.bind(A).toSelf();
+    container.bind(A).toSelf().inSingletonScope();
     container.bind(B).toSelf();
   });
 
@@ -134,17 +139,17 @@ describe('Unbind', () => {
   });
 });
 
-describe('Unbind with hierarchical container', () => {
+describe.only('Unbind with hierarchical container', () => {
   let parent: Container;
   let child: Container;
 
   beforeEach(() => {
     parent = new Container();
     child = parent.createChild();
-    parent.bind(A).toSelf();
-    parent.bind(B).toSelf();
-    child.bind(A).toSelf();
-    child.bind(B).toSelf();
+    parent.bind(A).toSelf().inSingletonScope();
+    parent.bind(B).toSelf().inSingletonScope();
+    child.bind(A).toSelf().inSingletonScope();
+    child.bind(B).toSelf().inSingletonScope();
   });
 
   test('container.get(A) should work correctly', async () => {
@@ -186,7 +191,13 @@ describe('Unbind with hierarchical container', () => {
     expect(a.b.name).toBe('B');
 
     expect(hasOwn(parent, A, a)).toBe(true);
-    expect(hasOwn(parent, B, a.b)).toBe(true);
+    // todo: 这里应该是false
+    expect(hasOwn(parent, B, a.b)).toBe(false);
+
+    expect(hasOwn(child, A, a)).toBe(false);
+    // 这里的逻辑需要重新梳理一下，理论上child虽然有B的绑定，但是没有A的绑定，此时A的实例化过程是在parent中发生的
+    // inversify还是会强制将B的绑定也放到child中，但是本库认为B的绑定应该是在parent中的
+    expect(hasOwn(child, B, a.b)).toBe(true);
   });
 
   test('container.get(B) should work correctly', async () => {
@@ -289,7 +300,7 @@ describe('Rebind atoken', () => {
   });
 
   test('container.get(A) should work correctly', async () => {
-    const a = container.get(atoken);
+    const a: any = container.get(atoken);
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
     expect(a.name).toBe('A');
@@ -298,7 +309,7 @@ describe('Rebind atoken', () => {
     expect(a.b.name).toBe('B');
 
     container.rebind(atoken).to(ABackup);
-    const a2 = container.get(atoken);
+    const a2: any = container.get(atoken);
     expect(a).not.toBe(a2);
 
     expect(a2).toBeInstanceOf(ABackup);

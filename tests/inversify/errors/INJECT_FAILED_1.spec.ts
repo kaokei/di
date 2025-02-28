@@ -1,5 +1,5 @@
-import { Container, Self } from '@/index';
-import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
+import { Container, optional as Optional } from 'inversify';
+import { missInjectError } from '@tests/inversify/constant.ts';
 
 interface IA {
   name: string;
@@ -16,7 +16,7 @@ export class A {
   public name = 'A';
   public id = 1;
 
-  @Self()
+  @Optional()
   public b!: IB;
 }
 
@@ -37,7 +37,7 @@ describe('errors -> INJECT_FAILED: Property miss @Inject and use interface', () 
   test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
     expect(() => {
       container.get(A);
-    }).toThrowError(BindingNotFoundError);
+    }).toThrowError(missInjectError);
   });
 
   test('container.get(B) should work correctly', async () => {
