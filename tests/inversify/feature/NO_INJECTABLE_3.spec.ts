@@ -2,7 +2,6 @@ import {
   Container,
   inject as Inject,
   LazyServiceIdentifier as LazyToken,
-  injectable,
 } from 'inversify';
 import { BindingNotFoundError } from '@tests/inversify/constant.ts';
 
@@ -17,7 +16,6 @@ interface IB {
   id: number;
 }
 
-@injectable()
 class A {
   public name = 'A';
   public id = 1;
@@ -26,7 +24,6 @@ class A {
   public b!: IB;
 }
 
-@injectable()
 class B {
   public name = 'B';
   public id = 2;

@@ -1,35 +1,16 @@
-import {
-  Container,
-  inject as Inject,
-  LazyServiceIdentifier as LazyToken,
-  injectable,
-} from 'inversify';
+import { Container } from 'inversify';
 import { BindingNotFoundError } from '@tests/inversify/constant.ts';
 
-interface IA {
-  name: string;
-  id: number;
-  b: IB;
+class B {
+  public name = 'B';
+  public id = 2;
 }
 
-interface IB {
-  name: string;
-  id: number;
-}
-
-@injectable()
 class A {
   public name = 'A';
   public id = 1;
 
-  @Inject(new LazyToken(() => B))
-  public b!: IB;
-}
-
-@injectable()
-class B {
-  public name = 'B';
-  public id = 2;
+  public constructor(public b: B) {}
 }
 
 describe('No bindings - with autoBindInjectable:true', () => {
@@ -44,9 +25,8 @@ describe('No bindings - with autoBindInjectable:true', () => {
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
     expect(a.name).toBe('A');
-    expect(a.b).toBeInstanceOf(B);
-    expect(a.b.id).toBe(2);
-    expect(a.b.name).toBe('B');
+    // @notice
+    expect(a.b).toBeUndefined();
   });
 
   test('container.get(B) should work correctly', async () => {
@@ -77,7 +57,33 @@ describe('No bindings - without autoBindInjectable:true', () => {
   });
 });
 
-describe('Has bindings', () => {
+describe('Has bindings - with autoBindInjectable:true', () => {
+  let container: Container;
+
+  beforeEach(() => {
+    container = new Container({ autoBindInjectable: true });
+    container.bind(A).toSelf();
+    container.bind(B).toSelf();
+  });
+
+  test('container.get(A) should work correctly', async () => {
+    const a = container.get(A);
+    expect(a).toBeInstanceOf(A);
+    expect(a.id).toBe(1);
+    expect(a.name).toBe('A');
+    // @notice
+    expect(a.b).toBeUndefined();
+  });
+
+  test('container.get(B) should work correctly', async () => {
+    const b = container.get(B);
+    expect(b).toBeInstanceOf(B);
+    expect(b.id).toBe(2);
+    expect(b.name).toBe('B');
+  });
+});
+
+describe('Has bindings - without autoBindInjectable:true', () => {
   let container: Container;
 
   beforeEach(() => {
@@ -91,9 +97,8 @@ describe('Has bindings', () => {
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
     expect(a.name).toBe('A');
-    expect(a.b).toBeInstanceOf(B);
-    expect(a.b.id).toBe(2);
-    expect(a.b.name).toBe('B');
+    // @notice
+    expect(a.b).toBeUndefined();
   });
 
   test('container.get(B) should work correctly', async () => {

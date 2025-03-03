@@ -20,8 +20,7 @@ class A {
   public name = 'A';
   public id = 1;
 
-  @Inject(new LazyToken(() => B))
-  public b!: IB;
+  public constructor(@Inject(new LazyToken(() => B)) public b: IB) {}
 }
 
 class B {
@@ -29,7 +28,32 @@ class B {
   public id = 2;
 }
 
-describe('No bindings', () => {
+describe('No bindings - with autoBindInjectable:true', () => {
+  let container: Container;
+
+  beforeEach(() => {
+    container = new Container({ autoBindInjectable: true });
+  });
+
+  test('container.get(A) should work correctly', async () => {
+    const a = container.get(A);
+    expect(a).toBeInstanceOf(A);
+    expect(a.id).toBe(1);
+    expect(a.name).toBe('A');
+    expect(a.b).toBeInstanceOf(B);
+    expect(a.b.id).toBe(2);
+    expect(a.b.name).toBe('B');
+  });
+
+  test('container.get(B) should work correctly', async () => {
+    const b = container.get(B);
+    expect(b).toBeInstanceOf(B);
+    expect(b.id).toBe(2);
+    expect(b.name).toBe('B');
+  });
+});
+
+describe('No bindings - without autoBindInjectable:true', () => {
   let container: Container;
 
   beforeEach(() => {

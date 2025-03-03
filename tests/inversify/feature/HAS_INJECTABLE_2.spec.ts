@@ -15,7 +15,31 @@ class A {
   public constructor(public b: B) {}
 }
 
-describe('No bindings', () => {
+describe('No bindings - with autoBindInjectable:true', () => {
+  let container: Container;
+
+  beforeEach(() => {
+    container = new Container({ autoBindInjectable: true });
+  });
+
+  test('container.get(A) should work correctly', async () => {
+    const a = container.get(A);
+    expect(a).toBeInstanceOf(A);
+    expect(a.id).toBe(1);
+    expect(a.name).toBe('A');
+    // @notice
+    expect(a.b).toBeUndefined();
+  });
+
+  test('container.get(B) should work correctly', async () => {
+    const b = container.get(B);
+    expect(b).toBeInstanceOf(B);
+    expect(b.id).toBe(2);
+    expect(b.name).toBe('B');
+  });
+});
+
+describe('No bindings - without autoBindInjectable:true', () => {
   let container: Container;
 
   beforeEach(() => {
@@ -33,23 +57,35 @@ describe('No bindings', () => {
       container.get(B);
     }).toThrowError(BindingNotFoundError);
   });
+});
+
+describe('Has bindings - with autoBindInjectable:true', () => {
+  let container: Container;
+
+  beforeEach(() => {
+    container = new Container({ autoBindInjectable: true });
+    container.bind(A).toSelf();
+    container.bind(B).toSelf();
+  });
 
   test('container.get(A) should work correctly', async () => {
-    const a = container.get(A, { autobind: true });
+    const a = container.get(A);
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
     expect(a.name).toBe('A');
+    // @notice
+    expect(a.b).toBeUndefined();
   });
 
   test('container.get(B) should work correctly', async () => {
-    const b = container.get(B, { autobind: true });
+    const b = container.get(B);
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);
     expect(b.name).toBe('B');
   });
 });
 
-describe('Has bindings', () => {
+describe('Has bindings - without autoBindInjectable:true', () => {
   let container: Container;
 
   beforeEach(() => {
@@ -63,9 +99,8 @@ describe('Has bindings', () => {
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
     expect(a.name).toBe('A');
-    expect(a.b).toBeInstanceOf(B);
-    expect(a.b.id).toBe(2);
-    expect(a.b.name).toBe('B');
+    // @notice
+    expect(a.b).toBeUndefined();
   });
 
   test('container.get(B) should work correctly', async () => {
