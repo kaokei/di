@@ -41,7 +41,7 @@ class C {
   public id = 3;
 }
 
-describe('isBound', () => {
+describe('API_IS_BOUND', () => {
   let containerA: Container;
   let containerB: Container;
   let containerC: Container;

@@ -29,7 +29,7 @@ describe('container activation', () => {
     expect(a.id).toBe(1);
     expect(a.name).toBe('A');
 
-    expect(container.parent).toBeNull();
+    expect(container.parent).toBeUndefined();
 
     expect(mockBindingDeactivationA).toHaveBeenCalledTimes(0);
     container.get(A);

@@ -64,19 +64,33 @@ describe('PPP', () => {
     container.bind(C).toSelf();
   });
 
-  test('container.get(A) should work correctly', async () => {
+  test('container.get(A) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
+    // inversify的v6版本和v7版本不一致
+    // v6版本结果
     expect(() => {
       container.get(A);
     }).toThrowError(CircularDependencyError);
+
+    // v7版本结果
+    // 虽然v7版本不再有循环依赖，但是依然不能注入c属性
+    // const a = container.get(A);
+    // expect(Object.prototype.hasOwnProperty.call(a, 'c')).toBe(true);
+    // expect(a).toBeInstanceOf(A);
+    // expect(a.name).toBe('A');
+    // expect(a.id).toBe(1);
+    // expect(a.bName).toBe('B');
+    // expect(a.bId).toBe(2);
+    // // todo 为啥没有继承c这个属性呢？
+    // expect(a.c).toBeUndefined();
   });
 
-  test('container.get(B) should work correctly', async () => {
+  test('container.get(B) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
     expect(() => {
       container.get(B);
     }).toThrowError(CircularDependencyError);
   });
 
-  test('container.get(C) should work correctly', async () => {
+  test('container.get(C) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
     expect(() => {
       container.get(C);
     }).toThrowError(CircularDependencyError);

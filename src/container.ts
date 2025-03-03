@@ -9,7 +9,7 @@ import {
 } from './interfaces';
 
 export class Container {
-  public parent: Container | null = null;
+  public parent?: Container;
   private bindings: Map<CommonToken, Binding<any>> = new Map();
   private onActivationHandler?: ActivationHandler;
   private onDeactivationHandler?: DeactivationHandler;

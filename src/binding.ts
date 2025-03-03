@@ -27,17 +27,17 @@ export class Binding<T = unknown> {
 
   public status = STATUS.DEFAULT;
 
-  public classValue: Newable<T> | null = null;
+  public classValue?: Newable<T>;
 
-  public constantValue: T | null = null;
+  public constantValue?: T;
 
-  public dynamicValue: DynamicValue<T> | null = null;
+  public dynamicValue?: DynamicValue<T>;
 
-  public cache: T | null = null;
+  public cache?: T;
 
-  public onActivationHandler: ActivationHandler<T> | null = null;
+  public onActivationHandler?: ActivationHandler<T>;
 
-  public onDeactivationHandler: DeactivationHandler<T> | null = null;
+  public onDeactivationHandler?: DeactivationHandler<T>;
 
   constructor(token: CommonToken<T>, container: Container) {
     this.container = container;
@@ -148,6 +148,7 @@ export class Binding<T = unknown> {
     const properties = this.getInjectProperties(ClassName, options);
     Object.assign(this.cache as T as RecordObject, properties);
     this.status = STATUS.ACTIVATED;
+    // todo postConstruct 应该在active之前
     this.postConstruct();
     return this.cache;
   }

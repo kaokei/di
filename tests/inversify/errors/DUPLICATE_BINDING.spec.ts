@@ -41,7 +41,7 @@ describe('DUPLICATE_BINDING', () => {
     container.bind(B).toSelf();
   });
 
-  test('container.bind(A) should throw DuplicateBindingError', async () => {
+  test('container.bind(A) should support multi binding', async () => {
     container.bind(A).toSelf();
     const a = container.getAll(A);
     expect(Array.isArray(a)).toBe(true);
@@ -52,7 +52,7 @@ describe('DUPLICATE_BINDING', () => {
     expect(a[1].id).toBe(1);
   });
 
-  test('container.bind(B) should throw DuplicateBindingError', async () => {
+  test('container.bind(B) should support multi binding', async () => {
     container.bind(B).to(B2);
     const b = container.getAll(B);
     expect(Array.isArray(b)).toBe(true);

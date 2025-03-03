@@ -78,7 +78,7 @@ describe('container activation', () => {
 
     expect(b).toBe('B_activated_by_binding_activated_by_container');
 
-    expect(container.parent).toBeNull();
+    expect(container.parent).toBeUndefined();
 
     expect(mockContainerActivation).toHaveBeenCalledTimes(2);
 

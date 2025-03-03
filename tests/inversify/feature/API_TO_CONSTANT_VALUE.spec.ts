@@ -29,7 +29,7 @@ class B {
   public id = 2;
 }
 
-describe('toConstantValue', () => {
+describe('API_TO_CONSTANT_VALUE', () => {
   let container: Container;
 
   function factoryB() {

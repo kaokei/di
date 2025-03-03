@@ -111,6 +111,7 @@ describe('User depends on UserClass (User inside parent container)', () => {
   });
 
   test('child.get(User) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+    // todo
     // 还是同样的问题，就是User依赖UserClass，child找不到User，只能从parent中找到User
     // 但是parent中并没有注册UserClass，最终导致User实例化失败
     // 但是inversify并没有报错，这是因为inversify强制UserClass也从child中获取，此时child是有绑定UserClass的，所以没有报错

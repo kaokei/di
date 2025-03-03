@@ -25,7 +25,7 @@ export class B {
   public id = 2;
 }
 
-describe('errors -> INJECT_FAILED: Property @Inject use Object', () => {
+describe('errors -> INJECT_FAILED: Property @Inject use empty string', () => {
   let container: Container;
 
   beforeEach(() => {

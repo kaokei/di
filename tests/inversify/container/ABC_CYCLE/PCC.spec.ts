@@ -53,7 +53,7 @@ describe('PCC', () => {
     container.bind(C).toSelf();
   });
 
-  test('container.get(A) should work correctly', async () => {
+  test('container.get(A) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
     expect(() => {
       container.get(A);
     }).toThrowError(CircularDependencyError);

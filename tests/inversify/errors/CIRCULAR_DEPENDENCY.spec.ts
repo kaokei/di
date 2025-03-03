@@ -102,7 +102,7 @@ class H {
   constructor(@Inject(new LazyToken(() => C)) private c: IC) {}
 }
 
-describe('CircularDependencyError', () => {
+describe('CIRCULAR_DEPENDENCY', () => {
   let container: Container;
 
   beforeEach(() => {

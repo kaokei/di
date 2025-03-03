@@ -14,7 +14,9 @@ inversify 没有提供@Self 这个装饰器，所以使用@Optional 这个装饰
 
 本库如果使用@Self 或者@Optional 装饰器，也会触发注入逻辑，但是不会提示缺少@Inject 装饰器，而是会导致注入异常。
 
-### @Inject('')
+### @Inject('') 代替 @Inject()
+
+主要是直接写 @Inject() 会导致编译失败
 
 INJECT_FAILED_3.spec 和 INJECT_FAILED_6.spec
 
