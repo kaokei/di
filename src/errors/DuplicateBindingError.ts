@@ -1,4 +1,4 @@
-import { CommonToken } from '../interfaces';
+import type { CommonToken } from '../interfaces';
 
 export class DuplicateBindingError extends Error {
   constructor(token: CommonToken) {

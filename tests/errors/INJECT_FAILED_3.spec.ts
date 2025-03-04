@@ -16,7 +16,7 @@ export class A {
   public name = 'A';
   public id = 1;
 
-  @Inject()
+  @Inject('')
   public b!: IB;
 }
 

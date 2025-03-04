@@ -20,6 +20,7 @@
 
 import { getMetadata, getOwnMetadata, defineMetadata } from './cachemap';
 import { KEYS, ERRORS } from './constants';
+import type { RequiredParameters } from './interfaces';
 
 /**
  * 创建装饰器的高阶函数
@@ -89,7 +90,8 @@ function createEventDecorator(eventKey: string, errorMessage: string) {
 }
 
 // 可以使用在类构造函数的参数中和类的实例属性中
-export const Inject = createDecorator(KEYS.INJECT);
+export const Inject: RequiredParameters<ReturnType<typeof createDecorator>> =
+  createDecorator(KEYS.INJECT);
 
 // 指定只在当前container中寻找服务
 export const Self = createDecorator(KEYS.SELF, true);

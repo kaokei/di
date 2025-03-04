@@ -16,7 +16,7 @@ export class A {
   public name = 'A';
   public id = 1;
 
-  public constructor(@Inject() public b: IB) {}
+  public constructor(@Inject('') public b: IB) {}
 }
 
 export class B {

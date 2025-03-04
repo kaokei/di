@@ -13,13 +13,3 @@ inversify 支持同一个 token 绑定多个服务，只不过不允许 containe
 inversify 没有提供@Self 这个装饰器，所以使用@Optional 这个装饰器，此时也触发了注入的逻辑，但是会提示没有使用@Inject 等必须的注入器。
 
 本库如果使用@Self 或者@Optional 装饰器，也会触发注入逻辑，但是不会提示缺少@Inject 装饰器，而是会导致注入异常。
-
-### @Inject('') 代替 @Inject()
-
-主要是直接写 @Inject() 会导致编译失败
-
-INJECT_FAILED_3.spec 和 INJECT_FAILED_6.spec
-
-inversify 的@Inject 装饰器必须传入参数，这里使用空字符串代替
-
-本库也有类似的逻辑，@Inject 如果没有参数，也会导致注入失败，只是没有强制校验@Inject 的参数类型是必填的。

@@ -1,4 +1,4 @@
-import { CommonToken, Options } from '../interfaces';
+import type { CommonToken, Options } from '../interfaces';
 
 export class CircularDependencyError extends Error {
   constructor(token: CommonToken, options?: Options) {

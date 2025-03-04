@@ -6,6 +6,10 @@ export type Newable<
   TArgs extends unknown[] = any[]
 > = new (...args: TArgs) => TInstance;
 
+export type RequiredParameters<T extends (...args: any) => any> = (
+  ...args: Required<Parameters<T>>
+) => ReturnType<T>;
+
 export type CommonToken<T = unknown> = Token<T> | Newable<T>;
 
 export type GenericToken<T = unknown> = Token<T> | Newable<T> | LazyToken<T>;

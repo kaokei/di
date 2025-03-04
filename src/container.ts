@@ -1,7 +1,7 @@
 import { Binding } from './binding';
 import { BindingNotFoundError } from './errors/BindingNotFoundError';
 import { DuplicateBindingError } from './errors/DuplicateBindingError';
-import {
+import type {
   CommonToken,
   ActivationHandler,
   DeactivationHandler,
@@ -91,10 +91,6 @@ export class Container {
       this.checkBindingNotFoundError(token, options);
     }
     return void 0 as T;
-  }
-
-  public resolve<T>(token: CommonToken<T>, options: Options<T> = {}): T {
-    return this.get(token, { ...options, self: true });
   }
 
   public onActivation(handler: ActivationHandler) {

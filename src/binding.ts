@@ -4,7 +4,7 @@ import { getMetadata, getOwnMetadata } from './cachemap';
 import { resolveToken } from './token';
 import { CircularDependencyError } from './errors/CircularDependencyError';
 import { BindingNotValidError } from './errors/BindingNotValidError';
-import {
+import type {
   ActivationHandler,
   CommonToken,
   DeactivationHandler,
