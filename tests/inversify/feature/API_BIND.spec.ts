@@ -191,12 +191,9 @@ describe('Unbind with hierarchical container', () => {
     expect(a.b.name).toBe('B');
 
     expect(hasOwn(parent, A, a)).toBe(true);
-    // todo: 这里应该是false
     expect(hasOwn(parent, B, a.b)).toBe(false);
-
     expect(hasOwn(child, A, a)).toBe(false);
-    // 这里的逻辑需要重新梳理一下，理论上child虽然有B的绑定，但是没有A的绑定，此时A的实例化过程是在parent中发生的
-    // inversify还是会强制将B的绑定也放到child中，但是本库认为B的绑定应该是在parent中的
+    // @notice inversify寻找B是从child容器开始的
     expect(hasOwn(child, B, a.b)).toBe(true);
   });
 

@@ -23,9 +23,25 @@
 
 ## 继承父类的依赖注入
 
-@todo
+不同库在实现继承时相关的文档
 
-在继承父类时，父类支持依赖注入的方式不一致
+- https://inversify.io/docs/fundamentals/inheritance/
+- https://inversify.io/docs/api/decorator/#injectfrombase
+- https://github.com/inversify/InversifyJS/blob/develop/v6/wiki/inheritance.md
+- https://docs.typestack.community/typedi/develop/02-basic-usage-guide/07-inheritance
+
+inversify 在 v6 版本升级到 v7 版本时，关于继承的处理逻辑有了较大的变化。
+inversify 比较强大，可以同时支持构造函数参数注入和属性注入。
+
+本库则是参考 inversify@6 和 typedi，只实现了继承父类的属性注入。
+
+属性注入是比较简单的，因为天然就有类似原型链的结构，子类的属性可以继承/覆盖父类的属性。
+
+但是子类在继承父类时，构造函数的参数是没有继承/覆盖的逻辑的，因为可以在子类中手动调用 super 方法自定义父类的初始化逻辑，这样就没有办法统一处理。
+
+就算是 inversify 中可以支持继承构造函数参数注入，也是有很多前提约束条件的，必须满足前提条件才能继承父类构造函数参数。
+
+本库认为一般业务代码中直接使用属性依赖注入就能满足业务需求了。
 
 ## 循环依赖注入
 

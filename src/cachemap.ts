@@ -33,6 +33,7 @@ export function getOwnMetadata(metadataKey: string, target: CommonToken) {
 // 如果有父类，那么需要合并getOwnMetadata(target)和getMetadata(target的父类)
 // getMetadata只支持获取属性装饰器数据或者没有父类的构造函数参数装饰器数据
 // 因为getMetadata默认写死返回对象而不是数组，这只能满足属性装饰器数据合并，不满足构造函数参数装饰数据合并
+// 所以本库只支持继承父类的属性注入，不支持父类的构造函数参数注入
 export function getMetadata(metadataKey: string, target: CommonToken): any {
   const ownMetadata = getOwnMetadata(metadataKey, target);
 

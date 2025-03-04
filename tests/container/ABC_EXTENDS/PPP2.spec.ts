@@ -1,5 +1,6 @@
 // A extends B
-// A has property di of c
+// A has property di of C
+// C has property di of B
 import { Inject, Container, LazyToken } from '@/index';
 
 interface IA {

@@ -93,3 +93,10 @@ https://github.com/inversify/inversify-inject-decorators
     // 还是同样的问题，就是User依赖UserClass，child找不到User，只能从parent中找到User
     // 但是parent中并没有注册UserClass，最终导致User实例化失败
     // 但是inversify并没有报错，这是因为inversify强制UserClass也从child中获取，此时child是有绑定UserClass的，所以没有报错
+1. https://inversify.io/docs/guides/migrating-from-v6/#use-of-bindingconstraints-instead-of-interfacesrequest
+
+1. 继承
+https://inversify.io/docs/fundamentals/inheritance/
+https://inversify.io/docs/api/decorator/#injectfrombase
+https://github.com/inversify/InversifyJS/blob/develop/v6/wiki/inheritance.md
+https://docs.typestack.community/typedi/develop/02-basic-usage-guide/07-inheritance

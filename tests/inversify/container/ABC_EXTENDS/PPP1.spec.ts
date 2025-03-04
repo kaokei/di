@@ -80,7 +80,7 @@ describe('PPP', () => {
     // expect(a.id).toBe(1);
     // expect(a.bName).toBe('B');
     // expect(a.bId).toBe(2);
-    // // todo 为啥没有继承c这个属性呢？
+    // @notice 为啥没有继承c这个属性呢？
     // expect(a.c).toBeUndefined();
   });
 

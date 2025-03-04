@@ -100,11 +100,11 @@ describe('container deactivation', () => {
     container.unbind(A);
     expect(mockBindingDeactivationA).toHaveBeenCalledTimes(1);
     expect(mockContainerDeactivation).toHaveBeenCalledTimes(1);
-    // todo inversify的v6版本和v7版本的顺序居然不一致
+    // @notice inversify的v6版本和v7版本的顺序居然不一致
     // v6的顺序
-    // expect(mockContainerDeactivation).toHaveBeenCalledBefore(
-    //   mockBindingDeactivationA
-    // );
+    expect(mockContainerDeactivation).toHaveBeenCalledBefore(
+      mockBindingDeactivationA
+    );
     // v7的顺序
     // expect(mockBindingDeactivationA).toHaveBeenCalledBefore(
     //   mockContainerDeactivation

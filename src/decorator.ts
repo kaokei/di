@@ -24,7 +24,7 @@ import type { RequiredParameters } from './interfaces';
 
 /**
  * 创建装饰器的高阶函数
- * 装饰器的通用逻辑就是通过Reflect记录到全局的Map中
+ * 装饰器的通用逻辑就是通过cachemap记录到全局的Map中
  * 所以可以抽象出一个通用逻辑，这里需要注意对Inject装饰器有特殊判断
  *
  * @param {(string )} decoratorKey 代表某个装饰器的名称

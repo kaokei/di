@@ -1,5 +1,6 @@
 // A extends B
-// B has property di of c
+// B has property di of C
+// C has property di of B
 import { Inject, Container, LazyToken } from '@/index';
 
 interface IA {
@@ -61,9 +62,10 @@ describe('PPP', () => {
   test('container.get(A) should work correctly', async () => {
     const a = container.get(A);
 
-    // 这里说明了c属性并不是在B的原型上，而是直接属于a实例的属性
-    // 关键在于Reflect.getMetadata(DECORATOR_KEYS.SERVICE_INJECTED_PROPS, ClassName)可以直接获取到父类的属性装饰器数据，类似于原型链的访问模式
-    // 如果是Reflect.getOwnMetadata则不会访问原型链数据了
+    // 这里说明A确实继承了B中的c属性，并且依赖注入自动生效了
+    // 而且说明了c属性并不是在B的原型上，而是直接属于a实例的属性
+    // 关键在于getMetadata(KEYS.INJECTED_PROPS, ClassName)可以直接获取到父类的属性装饰器数据，类似于原型链的访问模式
+    // 如果是getOwnMetadata则不会访问原型链数据了
     expect(Object.prototype.hasOwnProperty.call(a, 'c')).toBe(true);
 
     expect(a).toBeInstanceOf(A);
