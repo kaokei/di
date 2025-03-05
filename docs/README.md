@@ -74,29 +74,52 @@ inversify 默认是不支持循环依赖的，必须通过第三方的 lazyInjec
 
 https://github.com/inversify/inversify-inject-decorators
 
+## 对比 inversify 的不同
 
-## 对比inversify的不同
-
-1. container只支持inSingletonScope这一种模式
-1. container缺少异步方法和tag相关方法
-1. container缺少applyMiddleware等其他方法
-1. container.onActivation定义不同
-1. container.onDeactivation定义不同
+1. container 只支持 inSingletonScope 这一种模式
+1. container 缺少异步方法和 tag 相关方法
+1. container 缺少 applyMiddleware 等其他方法
+1. container.onActivation 定义不同
+1. container.onDeactivation 定义不同
 1. 在继承父类时，父类支持依赖注入的方式不一致
-1. inversify默认不支持循环依赖，本库支持属性注入的循环依赖
-1. 没有@injectable装饰器，也就是所有Class不支持默认注入，所有Class必须明确声明container的绑定关系
-1. 构造函数中的依赖也必须通过@inject明确声明依赖的token，并不会自动分析参数类型来自动注入
-1. 本库因为不支持container.getTagged 、 container.getNamed 、 container.getAll这些方法，所以也不支持重复绑定同一个token。
-1. 这里的逻辑需要重新梳理一下，理论上child虽然有B的绑定，但是没有A的绑定，此时A的实例化过程是在parent中发生的
-  inversify还是会强制将B的绑定也放到child中，但是本库认为B的绑定应该是在parent中的
+1. inversify 默认不支持循环依赖，本库支持属性注入的循环依赖
+1. 没有@injectable 装饰器，也就是所有 Class 不支持默认注入，所有 Class 必须明确声明 container 的绑定关系
+1. 构造函数中的依赖也必须通过@inject 明确声明依赖的 token，并不会自动分析参数类型来自动注入
+1. 本库因为不支持 container.getTagged 、 container.getNamed 、 container.getAll 这些方法，所以也不支持重复绑定同一个 token。
+1. 这里的逻辑需要重新梳理一下，理论上 child 虽然有 B 的绑定，但是没有 A 的绑定，此时 A 的实例化过程是在 parent 中发生的
+   inversify 还是会强制将 B 的绑定也放到 child 中，但是本库认为 B 的绑定应该是在 parent 中的
 1. 问题同上
-    // 还是同样的问题，就是User依赖UserClass，child找不到User，只能从parent中找到User
-    // 但是parent中并没有注册UserClass，最终导致User实例化失败
-    // 但是inversify并没有报错，这是因为inversify强制UserClass也从child中获取，此时child是有绑定UserClass的，所以没有报错
+   // 还是同样的问题，就是 User 依赖 UserClass，child 找不到 User，只能从 parent 中找到 User
+   // 但是 parent 中并没有注册 UserClass，最终导致 User 实例化失败
+   // 但是 inversify 并没有报错，这是因为 inversify 强制 UserClass 也从 child 中获取，此时 child 是有绑定 UserClass 的，所以没有报错
 1. https://inversify.io/docs/guides/migrating-from-v6/#use-of-bindingconstraints-instead-of-interfacesrequest
 
 1. 继承
-https://inversify.io/docs/fundamentals/inheritance/
-https://inversify.io/docs/api/decorator/#injectfrombase
-https://github.com/inversify/InversifyJS/blob/develop/v6/wiki/inheritance.md
-https://docs.typestack.community/typedi/develop/02-basic-usage-guide/07-inheritance
+   https://inversify.io/docs/fundamentals/inheritance/
+   https://inversify.io/docs/api/decorator/#injectfrombase
+   https://github.com/inversify/InversifyJS/blob/develop/v6/wiki/inheritance.md
+   https://docs.typestack.community/typedi/develop/02-basic-usage-guide/07-inheritance
+
+1. postConstruct 和 predestroy 单元测试
+
+1. 了解更多的 di 库有没有其他好用的 API
+
+https://angular.dev/api?type=decorator
+大部分装饰器都是组件相关的装饰器
+再加上：@Injectable @Inject @Optional @Self @SkipSelf
+
+https://blog.mgechev.com/2016/01/23/angular2-viewchildren-contentchildren-difference-viewproviders/
+Angular 中区分 view 和 content，也就是当前组件的静态 template 和运行时外部动态传入的 slot。
+
+useService还需要注意这些：
+defineProps // 可以在组件外调用，没有异常，但是也无任何作用
+defineEmits // 可以在组件外调用，没有异常，但是也无任何作用
+defineModel // 可以在组件外调用，没有异常，但是也无任何作用
+useSlots // 依赖 setupContext，抛出异常
+useAttrs // 依赖 setupContext，抛出异常
+useModel() // 不应该使用，优先使用defineModel
+useTemplateRef() // 可以在任意地方使用，依赖 setupContext，虽然返回了ref，但是没有引用组件的效果
+useId() // 依赖 setupContext，但是没有异常，返回undefined
+defineExpose // 依赖 setupContext，但是没有异常，返回undefined
+defineOptions // 依赖 setupContext，但是没有异常，返回undefined
+defineSlots // 依赖 setupContext，但是没有异常，返回null

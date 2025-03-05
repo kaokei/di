@@ -110,3 +110,61 @@ inversify 的处理逻辑是又重新开始从 child 容器开始寻找，因为
 另一点原因是上面的例子中，如果是先调用`child.get(A)`，再调用`parent.get(A)`，此时是没有问题的，但是如果是反过来，是先调用的`parent.get(A)`，那么 inversify 也是会抛出异常，同样的 container 绑定关系，就因为调用顺序不一样，从而导致不同的结果，这也是本库不能接受的。
 
 相关单元测试请关注 special/DI_HIERARCHY
+
+## 本库对比 inversify 的特性差异
+
+✅ Support for classes
+
+✅ Support for Token instance
+
+✅ Container API
+
+✅ Declaring optional dependencies
+
+✅ Injecting a constant or dynamic value
+
+✅ Injecting a class constructor
+
+✅ Activation handler
+
+✅ Deactivation handler
+
+✅ Post Construct decorator
+
+✅ Support for hierarchical DI systems
+
+✅ Property injection
+
+✅ Circular dependencies
+
+✅ Inheritance
+
+❌ ~~Support for Symbols~~ 字符串和 Symbol 都需要转为 Token 实例
+
+❌ ~~Declaring container modules~~
+
+❌ ~~Container snapshots~~
+
+❌ ~~Controlling the scope of the dependencies~~ 只支持单例模式
+
+❌ ~~Injecting a Factory~~
+
+❌ ~~Auto factory~~
+
+❌ ~~Auto named factory~~
+
+❌ ~~Injecting a Provider (asynchronous Factory)~~
+
+❌ ~~Middleware~~
+
+❌ ~~Multi-injection~~
+
+❌ ~~Tagged bindings~~
+
+❌ ~~Create your own tag decorators~~
+
+❌ ~~Named bindings~~
+
+❌ ~~Default target~~
+
+❌ ~~Contextual bindings & @targetName~~
