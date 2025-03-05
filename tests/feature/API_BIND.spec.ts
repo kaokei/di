@@ -129,8 +129,13 @@ describe('Unbind', () => {
 
     container.unbind(B);
     expect(() => {
+      // @notice unbind(B)之后就不能再次get(B)
       container.get(B);
     }).toThrowError(BindingNotFoundError);
+
+    expect(b).toBeInstanceOf(B);
+    expect(b.id).toBe(2);
+    expect(b.name).toBe('B');
   });
 });
 

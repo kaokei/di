@@ -110,9 +110,9 @@ describe('User depends on UserClass (User inside parent container)', () => {
     child.bind(UserClass).toSelf().inSingletonScope();
   });
 
-  test('child.get(User) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('child.get(User) should work correctly', async () => {
     // @notice
-    // inversify寻找UserClass是从child容器开始的
+    // inversify寻找UserClass是从child容器开始的，所以没有异常
     const user = child.get(User);
     expect(user).toBeInstanceOf(User);
   });

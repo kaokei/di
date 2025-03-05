@@ -95,7 +95,7 @@ describe('Unbind', () => {
   beforeEach(() => {
     container = new Container();
     container.bind(A).toSelf().inSingletonScope();
-    container.bind(B).toSelf();
+    container.bind(B).toSelf().inSingletonScope();
   });
 
   test('container.get(A) should work correctly', async () => {
@@ -134,8 +134,13 @@ describe('Unbind', () => {
 
     container.unbind(B);
     expect(() => {
+      // @notice unbind(B)之后就不能再次get(B)
       container.get(B);
     }).toThrowError(BindingNotFoundError);
+
+    expect(b).toBeInstanceOf(B);
+    expect(b.id).toBe(2);
+    expect(b.name).toBe('B');
   });
 });
 

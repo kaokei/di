@@ -110,6 +110,8 @@ describe('User depends on UserClass (User inside parent container)', () => {
   });
 
   test('child.get(User) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+    // @notice
+    // 本库寻找UserClass是从parent容器开始的，所以找不到UserClass导致异常
     expect(() => {
       child.get(User);
     }).toThrowError(BindingNotFoundError);

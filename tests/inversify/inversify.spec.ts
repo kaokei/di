@@ -1,4 +1,8 @@
 import { Container } from 'inversify';
+import {
+  BindingNotFoundError,
+  BindingNotValidError,
+} from '@tests/inversify/constant.ts';
 
 class A {
   public name = 'A';
@@ -44,13 +48,13 @@ describe('inversify activation', () => {
   test(`container.get(B) should throw error`, async () => {
     expect(() => {
       container.get(B);
-    }).toThrowError('No matching bindings found for serviceIdentifier: B');
+    }).toThrowError(BindingNotFoundError);
   });
 
   test(`container.get(B) should throw error`, async () => {
     expect(() => {
       container.bind(B);
       container.get(B);
-    }).toThrowError('Invalid binding type: B');
+    }).toThrowError(BindingNotValidError);
   });
 });
