@@ -2,13 +2,13 @@
 
 ## inSingletonScope 模式
 
-注意到 inversify 中支持 3 中不同的 scope 模式，但是本库只支持 inSingletonScope 模式。
+inversify 中支持 3 中不同的 scope 模式，但是本库只支持 inSingletonScope 模式。
 
 ## Container 的部分 API 集合
 
-注意到本库的 Container 只实现了 inversify 的部分 API。
+本库的 Container 只实现了 inversify 的部分 API。
 
-缺少相关异步方法，name 相关方法，tag 相关方法，applyMiddleware 方法，resolve 方法。
+本库缺少相关异步方法，name 相关方法，tag 相关方法，applyMiddleware 方法，resolve 方法。
 
 ## onActivation 和 onDeactivation
 
@@ -53,7 +53,7 @@ inversify 默认是不支持循环依赖的，必须通过第三方的 [lazyInje
 
 @todo
 
-需要注意此时如果再 PostConstruct 函数中方法未注入的属性，会不会放生异常，这里可能会导致 PostConstruct 的执行时机不能和 inversify 保持一致了。
+需要注意此时如果再 PostConstruct 函数中访问未注入的属性，会不会放生异常，这里可能会导致 PostConstruct 的执行时机不能和 inversify 保持一致了。
 
 ## 没有@injectable 装饰器
 
@@ -112,6 +112,8 @@ inversify 的处理逻辑是又重新开始从 child 容器开始寻找，因为
 相关单元测试请关注 special/DI_HIERARCHY
 
 ## 本库对比 inversify 的特性差异
+
+[inversify 特性列表](https://github.com/inversify/InversifyJS/tree/develop/v6?tab=readme-ov-file#-the-inversifyjs-features-and-api)
 
 ✅ Support for classes
 
