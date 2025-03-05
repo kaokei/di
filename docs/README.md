@@ -111,15 +111,50 @@ https://angular.dev/api?type=decorator
 https://blog.mgechev.com/2016/01/23/angular2-viewchildren-contentchildren-difference-viewproviders/
 Angular 中区分 view 和 content，也就是当前组件的静态 template 和运行时外部动态传入的 slot。
 
-useService还需要注意这些：
+useService 还需要注意这些：
 defineProps // 可以在组件外调用，没有异常，但是也无任何作用
 defineEmits // 可以在组件外调用，没有异常，但是也无任何作用
 defineModel // 可以在组件外调用，没有异常，但是也无任何作用
 useSlots // 依赖 setupContext，抛出异常
 useAttrs // 依赖 setupContext，抛出异常
-useModel() // 不应该使用，优先使用defineModel
-useTemplateRef() // 可以在任意地方使用，依赖 setupContext，虽然返回了ref，但是没有引用组件的效果
-useId() // 依赖 setupContext，但是没有异常，返回undefined
-defineExpose // 依赖 setupContext，但是没有异常，返回undefined
-defineOptions // 依赖 setupContext，但是没有异常，返回undefined
-defineSlots // 依赖 setupContext，但是没有异常，返回null
+useModel() // 不应该使用，优先使用 defineModel
+useTemplateRef() // 可以在任意地方使用，依赖 setupContext，虽然返回了 ref，但是没有引用组件的效果
+useId() // 依赖 setupContext，但是没有异常，返回 undefined
+defineExpose // 依赖 setupContext，但是没有异常，返回 undefined
+defineOptions // 依赖 setupContext，但是没有异常，返回 undefined
+defineSlots // 依赖 setupContext，但是没有异常，返回 null
+
+## 避免使用 useRootService
+
+```ts
+export function useAppService<T>(
+  token: interfaces.ServiceIdentifier<T>,
+  app: any
+) {
+  return app.runWithContext(() => useService(token));
+}
+```
+
+#### vue 指令内 部访问 useRootService
+
+可以通过 useNuxtApp 获取 nuxtApp 对象
+
+然后通过 useAppService 获取 app 上的服务
+
+useNuxtApp 可以使用的地方：plugin, Nuxt hook, Nuxt middleware, or Vue setup function
+
+#### defineNuxtRouteMiddleware middleware 内部访问 useRootService
+
+可以通过 useNuxtApp 获取 nuxtApp 对象
+
+然后通过 useAppService 获取 app 上的服务
+
+useNuxtApp 可以使用的地方：plugin, Nuxt hook, Nuxt middleware, or Vue setup function
+
+#### defineNuxtPlugin 内部访问 useRootService
+
+可以获取 nuxtApp
+
+#### utils 内部工具方法 内部访问 useRootService
+
+只能手动把 utils 方法转为 service
