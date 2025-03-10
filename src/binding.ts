@@ -140,20 +140,31 @@ export class Binding<T = unknown> {
   private resolveInstanceValue(options?: Options<T>) {
     this.status = STATUS.INITING;
     const ClassName = this.classValue as Newable<T>;
+    // @notice 这里可能会有循环引用
     const params = this.getContructorParameters(ClassName, options);
     const inst = new ClassName(...params);
+    // @notice 这里可能会有循环引用
     this.cache = this.activate(inst);
-    // 实例化成功，此时不会再有死循环问题
-    this.status = STATUS.CONSTRUCTED;
+    // 实例化成功，并存入缓存，此时不会再有循环引用问题
+    this.status = STATUS.ACTIVATED;
+    // 所以属性注入不会导致循环引用问题
     const properties = this.getInjectProperties(ClassName, options);
     Object.assign(this.cache as T as RecordObject, properties);
-    this.status = STATUS.ACTIVATED;
+    this.status = STATUS.CONSTRUCTED;
     // todo postConstruct 应该在active之前
     this.postConstruct();
+    // 1. 检查是否有循环依赖
+    // 2. 检查是否需要等待前置异步任务
+    // 2.1 获取依赖列表【token列表】【binding列表】【cache列表】
+    // 2.2 判断依赖依赖是否是构造函数参数以及属性注入的子集
+    // 2.3 token列表转为实例对象的列表
+    // 2.4 获取实例对象的[[symbol]]属性，也就是postConstruct的promise返回值
+    // 2.5 有前置异步任务：Promise.all([promise列表]).then(() => this.postConstruct())
     return this.cache;
   }
 
   private resolveConstantValue() {
+    this.status = STATUS.INITING;
     this.cache = this.activate(this.constantValue as T);
     this.status = STATUS.ACTIVATED;
     return this.cache;
