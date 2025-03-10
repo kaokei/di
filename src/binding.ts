@@ -4,6 +4,7 @@ import { getMetadata, getOwnMetadata } from './cachemap';
 import { resolveToken } from './token';
 import { CircularDependencyError } from './errors/CircularDependencyError';
 import { BindingNotValidError } from './errors/BindingNotValidError';
+import { PostConstructError } from './errors/PostConstructError';
 import type {
   ActivationHandler,
   CommonToken,
@@ -34,6 +35,8 @@ export class Binding<T = unknown> {
   public dynamicValue?: DynamicValue<T>;
 
   public cache?: T;
+
+  public postConstructResult?: Promise<void>;
 
   public onActivationHandler?: ActivationHandler<T>;
 
@@ -95,10 +98,7 @@ export class Binding<T = unknown> {
   public get(options?: Options<T>) {
     if (STATUS.INITING === this.status) {
       throw new CircularDependencyError(this.token, options);
-    } else if (
-      STATUS.ACTIVATED === this.status ||
-      STATUS.CONSTRUCTED === this.status
-    ) {
+    } else if (STATUS.ACTIVATED === this.status) {
       return this.cache;
     } else if (BINDING.Instance === this.type) {
       return this.resolveInstanceValue(options);
@@ -111,11 +111,26 @@ export class Binding<T = unknown> {
     }
   }
 
-  public postConstruct() {
-    const key = getMetadata(KEYS.POST_CONSTRUCT, this.token);
-    if (key) {
-      const value = (this.cache as any)[key];
-      value?.call(this.cache);
+  public postConstruct(options?: Options<T>) {
+    if (BINDING.Instance === this.type) {
+      const key = getMetadata(KEYS.POST_CONSTRUCT, this.token);
+      if (key) {
+        const binding1 = this.getContructorParameterBindings(options);
+        const binding2 = this.getInjectPropertyBindings(options);
+        const bindings = [...binding1, ...binding2];
+        for (const binding of bindings) {
+          if (binding) {
+            if (binding.postConstructResult === void 0) {
+              throw new PostConstructError(binding.token, options);
+            }
+          }
+        }
+        const list = bindings.map(item => item?.postConstructResult);
+        return Promise.all(list).then(() => {
+          const value = (this.cache as any)[key];
+          this.postConstructResult = value?.call(this.cache);
+        });
+      }
     }
   }
 
@@ -141,18 +156,17 @@ export class Binding<T = unknown> {
     this.status = STATUS.INITING;
     const ClassName = this.classValue as Newable<T>;
     // @notice 这里可能会有循环引用
-    const params = this.getContructorParameters(ClassName, options);
+    const params = this.getContructorParameters(options);
     const inst = new ClassName(...params);
     // @notice 这里可能会有循环引用
     this.cache = this.activate(inst);
     // 实例化成功，并存入缓存，此时不会再有循环引用问题
     this.status = STATUS.ACTIVATED;
     // 所以属性注入不会导致循环引用问题
-    const properties = this.getInjectProperties(ClassName, options);
+    const properties = this.getInjectProperties(options);
     Object.assign(this.cache as T as RecordObject, properties);
-    this.status = STATUS.CONSTRUCTED;
     // todo postConstruct 应该在active之前
-    this.postConstruct();
+    this.postConstruct(options);
     // 1. 检查是否有循环依赖
     // 2. 检查是否需要等待前置异步任务
     // 2.1 获取依赖列表【token列表】【binding列表】【cache列表】
@@ -178,8 +192,9 @@ export class Binding<T = unknown> {
     return this.cache;
   }
 
-  private getContructorParameters(ClassName: Newable<T>, options?: Options<T>) {
-    const params = getOwnMetadata(KEYS.INJECTED_PARAMS, ClassName) || [];
+  private getContructorParameters(options?: Options<T>) {
+    const params =
+      getOwnMetadata(KEYS.INJECTED_PARAMS, this.classValue as Newable) || [];
     const result = params.map((meta: RecordObject) => {
       const { inject, ...rest } = meta;
       return this.container.get(resolveToken(inject as GenericToken), {
@@ -191,8 +206,9 @@ export class Binding<T = unknown> {
     return result;
   }
 
-  private getInjectProperties(ClassName: Newable<T>, options?: Options<T>) {
-    const props = getMetadata(KEYS.INJECTED_PROPS, ClassName) || {};
+  private getInjectProperties(options?: Options<T>) {
+    const props =
+      getMetadata(KEYS.INJECTED_PROPS, this.classValue as Newable) || {};
     const propKeys = Object.keys(props);
     return propKeys.reduce((acc: RecordObject, prop: string) => {
       const meta = props[prop];
@@ -210,5 +226,35 @@ export class Binding<T = unknown> {
       }
       return acc;
     }, Object.create(null) as RecordObject);
+  }
+
+  private getContructorParameterBindings(
+    options?: Options<T>
+  ): (void | Binding)[] {
+    const params =
+      getOwnMetadata(KEYS.INJECTED_PARAMS, this.classValue as Newable) || [];
+    return params.map((meta: RecordObject) => {
+      const { inject, ...rest } = meta;
+      return this.container.getBinding(resolveToken(inject as GenericToken), {
+        ...rest,
+        parent: options,
+        token: this.token,
+      });
+    });
+  }
+
+  private getInjectPropertyBindings(options?: Options<T>) {
+    const props =
+      getMetadata(KEYS.INJECTED_PROPS, this.classValue as Newable) || {};
+    const propKeys = Object.keys(props);
+    return propKeys.map((prop: string) => {
+      const meta = props[prop];
+      const { inject, ...rest } = meta;
+      return this.container.getBinding(resolveToken(inject as GenericToken), {
+        ...rest,
+        parent: options,
+        token: this.token,
+      });
+    });
   }
 }

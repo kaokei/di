@@ -20,7 +20,6 @@ export const KEYS = {
 export const STATUS = {
   DEFAULT: 'default',
   INITING: 'initing',
-  CONSTRUCTED: 'constructed',
   ACTIVATED: 'activated',
 };
 
