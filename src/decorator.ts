@@ -78,13 +78,17 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
   };
 }
 
-function createEventDecorator(eventKey: string, errorMessage: string) {
-  return () => {
+function createMetaDecorator(metaKey: string, errorMessage: string) {
+  return (metaValue?: any) => {
     return (target: any, propertyKey: string) => {
-      if (getOwnMetadata(eventKey, target.constructor)) {
+      if (getOwnMetadata(metaKey, target.constructor)) {
         throw new Error(errorMessage);
       }
-      defineMetadata(eventKey, propertyKey, target.constructor);
+      defineMetadata(
+        metaKey,
+        { key: propertyKey, value: metaValue },
+        target.constructor
+      );
     };
   };
 }
@@ -104,13 +108,13 @@ export const SkipSelf = createDecorator(KEYS.SKIP_SELF, true);
 export const Optional = createDecorator(KEYS.OPTIONAL, true);
 
 // 一个类最多只有一个PostConstruct
-export const PostConstruct = createEventDecorator(
+export const PostConstruct = createMetaDecorator(
   KEYS.POST_CONSTRUCT,
   ERRORS.POST_CONSTRUCT
 );
 
 // 一个类最多只有一个PreDestroy
-export const PreDestroy = createEventDecorator(
+export const PreDestroy = createMetaDecorator(
   KEYS.PRE_DESTROY,
   ERRORS.PRE_DESTROY
 );

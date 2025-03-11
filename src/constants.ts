@@ -32,7 +32,9 @@ export const BINDING = {
 
 export const ERRORS = {
   POST_CONSTRUCT:
-    'Cannot apply @postConstruct decorator multiple times in the same class',
+    'Cannot apply @PostConstruct decorator multiple times in the same class',
   PRE_DESTROY:
-    'Cannot apply @preDestroy decorator multiple times in the same class',
+    'Cannot apply @PreDestroy decorator multiple times in the same class',
 };
+
+export const DEFAULT_VALUE = Symbol();

@@ -1,4 +1,4 @@
-import { BINDING, KEYS, STATUS } from './constants';
+import { BINDING, KEYS, STATUS, DEFAULT_VALUE } from './constants';
 import { Container } from './container';
 import { getMetadata, getOwnMetadata } from './cachemap';
 import { resolveToken } from './token';
@@ -36,7 +36,7 @@ export class Binding<T = unknown> {
 
   public cache?: T;
 
-  public postConstructResult?: Promise<void>;
+  public postConstructResult: Promise<void> | Symbol = DEFAULT_VALUE;
 
   public onActivationHandler?: ActivationHandler<T>;
 
@@ -111,32 +111,52 @@ export class Binding<T = unknown> {
     }
   }
 
+  private getAwaitBindings(bindings: Binding[], filter: any): Binding[] {
+    if (filter === true) {
+      return bindings;
+    } else if (Array.isArray(filter)) {
+      return bindings.filter(item => filter.includes(item.token));
+    } else if (typeof filter === 'function') {
+      return filter(bindings);
+    } else {
+      return [];
+    }
+  }
+
   public postConstruct(options?: Options<T>) {
     if (BINDING.Instance === this.type) {
-      const key = getMetadata(KEYS.POST_CONSTRUCT, this.token);
+      const { key, value } = getMetadata(KEYS.POST_CONSTRUCT, this.token) || {};
       if (key) {
-        const binding1 = this.getContructorParameterBindings(options);
-        const binding2 = this.getInjectPropertyBindings(options);
-        const bindings = [...binding1, ...binding2];
-        for (const binding of bindings) {
-          if (binding) {
-            if (binding.postConstructResult === void 0) {
-              throw new PostConstructError(binding.token, options);
+        if (value) {
+          const binding1 = this.getContructorParameterBindings(options);
+          const binding2 = this.getInjectPropertyBindings(options);
+          const bindings = [...binding1, ...binding2].filter(
+            item => BINDING.Instance === item?.type
+          ) as Binding[];
+          const awaitBindings = this.getAwaitBindings(bindings, value);
+          for (const binding of awaitBindings) {
+            if (binding) {
+              if (binding.postConstructResult === DEFAULT_VALUE) {
+                throw new PostConstructError(binding.token, options);
+              }
             }
           }
+          const list = awaitBindings.map(item => item.postConstructResult);
+          return Promise.all(list).then(() => {
+            const postConstructor = (this.cache as any)[key];
+            this.postConstructResult = postConstructor?.call(this.cache);
+          });
+        } else {
+          const postConstructor = (this.cache as any)[key];
+          this.postConstructResult = postConstructor?.call(this.cache);
         }
-        const list = bindings.map(item => item?.postConstructResult);
-        return Promise.all(list).then(() => {
-          const value = (this.cache as any)[key];
-          this.postConstructResult = value?.call(this.cache);
-        });
       }
     }
   }
 
   public preDestroy() {
     if (BINDING.Instance === this.type) {
-      const key = getMetadata(KEYS.PRE_DESTROY, this.token);
+      const { key } = getMetadata(KEYS.PRE_DESTROY, this.token) || {};
       if (key) {
         const value = (this.cache as any)[key];
         value?.call(this.cache);
