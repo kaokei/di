@@ -34,7 +34,8 @@ describe('PRE_DESTROY_1 A -> B', () => {
     }
   }
 
-  let container: Container;
+  let parent: Container;
+  let child: Container;
 
   let initSpyA: any;
   let initSpyB: any;
@@ -42,9 +43,10 @@ describe('PRE_DESTROY_1 A -> B', () => {
   let initSpyBAfter: any;
 
   beforeEach(() => {
-    container = new Container();
-    container.bind(A).toSelf().inSingletonScope();
-    container.bind(B).toSelf().inSingletonScope();
+    parent = new Container();
+    child = parent.createChild();
+    child.bind(A).toSelf().inSingletonScope();
+    parent.bind(B).toSelf().inSingletonScope();
 
     initSpyA = vi.spyOn(A.prototype, 'close');
     initSpyB = vi.spyOn(B.prototype, 'close');
@@ -53,17 +55,18 @@ describe('PRE_DESTROY_1 A -> B', () => {
   });
 
   test('container.get(A) should work correctly', async () => {
-    container.get(A);
+    child.get(A);
 
-    await container.unbindAllAsync();
+    await child.unbindAllAsync();
 
-    expect(initSpyA).toHaveBeenCalledBefore(initSpyB);
-    expect(initSpyB).toHaveBeenCalledBefore(initSpyBBefore);
-    expect(initSpyBBefore).toHaveBeenCalledBefore(initSpyBAfter);
+    expect(initSpyA).toHaveBeenCalled();
+    expect(initSpyB).not.toHaveBeenCalled();
+    expect(initSpyBBefore).not.toHaveBeenCalled();
+    expect(initSpyBAfter).not.toHaveBeenCalled();
   });
 });
 
-describe('PRE_DESTROY_2 B -> A', () => {
+describe('PRE_DESTROY_2 A -> B', () => {
   @Injectable()
   class B {
     beforeClose() {
@@ -92,7 +95,8 @@ describe('PRE_DESTROY_2 B -> A', () => {
     }
   }
 
-  let container: Container;
+  let parent: Container;
+  let child: Container;
 
   let initSpyA: any;
   let initSpyB: any;
@@ -100,9 +104,10 @@ describe('PRE_DESTROY_2 B -> A', () => {
   let initSpyBAfter: any;
 
   beforeEach(() => {
-    container = new Container();
-    container.bind(B).toSelf().inSingletonScope();
-    container.bind(A).toSelf().inSingletonScope();
+    parent = new Container();
+    child = parent.createChild();
+    child.bind(A).toSelf().inSingletonScope();
+    parent.bind(B).toSelf().inSingletonScope();
 
     initSpyA = vi.spyOn(A.prototype, 'close');
     initSpyB = vi.spyOn(B.prototype, 'close');
@@ -111,17 +116,14 @@ describe('PRE_DESTROY_2 B -> A', () => {
   });
 
   test('container.get(A) should work correctly', async () => {
-    container.get(A);
+    child.get(A);
 
-    await container.unbindAllAsync();
+    await parent.unbindAllAsync();
 
-    expect(initSpyB).toHaveBeenCalledBefore(initSpyBBefore);
-    expect(initSpyBBefore).toHaveBeenCalledBefore(initSpyBAfter);
-
-    expect(initSpyB).toHaveBeenCalledBefore(initSpyA);
-    expect(initSpyBBefore).toHaveBeenCalledBefore(initSpyA);
-    // 这里可以证明initSpyA没有等待initSpyB执行完成之后再执行，相当于是并行执行的
-    expect(initSpyA).toHaveBeenCalledBefore(initSpyBAfter);
+    expect(initSpyA).not.toHaveBeenCalled();
+    expect(initSpyB).toHaveBeenCalled();
+    expect(initSpyBBefore).toHaveBeenCalled();
+    expect(initSpyBAfter).toHaveBeenCalled();
   });
 });
 
@@ -155,7 +157,8 @@ describe('PRE_DESTROY_3 A -> B', () => {
     }
   }
 
-  let container: Container;
+  let parent: Container;
+  let child: Container;
 
   let initSpyA: any;
   let initSpyB: any;
@@ -163,9 +166,10 @@ describe('PRE_DESTROY_3 A -> B', () => {
   let initSpyBAfter: any;
 
   beforeEach(() => {
-    container = new Container();
-    container.bind(A).toSelf().inSingletonScope();
-    container.bind(B).toSelf().inSingletonScope();
+    parent = new Container();
+    child = parent.createChild();
+    child.bind(A).toSelf().inSingletonScope();
+    parent.bind(B).toSelf().inSingletonScope();
 
     initSpyA = vi.spyOn(A.prototype, 'close');
     initSpyB = vi.spyOn(B.prototype, 'close');
@@ -174,17 +178,18 @@ describe('PRE_DESTROY_3 A -> B', () => {
   });
 
   test('container.get(A) should work correctly', async () => {
-    container.get(A);
+    child.get(A);
 
-    await container.unbindAllAsync();
+    await child.unbindAllAsync();
 
-    expect(initSpyA).toHaveBeenCalledBefore(initSpyB);
-    expect(initSpyB).toHaveBeenCalledBefore(initSpyBBefore);
-    expect(initSpyBBefore).toHaveBeenCalledBefore(initSpyBAfter);
+    expect(initSpyA).toHaveBeenCalled();
+    expect(initSpyB).not.toHaveBeenCalled();
+    expect(initSpyBBefore).not.toHaveBeenCalled();
+    expect(initSpyBAfter).not.toHaveBeenCalled();
   });
 });
 
-describe('PRE_DESTROY_4 B -> A', () => {
+describe('PRE_DESTROY_4 A -> B', () => {
   @Injectable()
   class B {
     beforeClose() {
@@ -214,7 +219,8 @@ describe('PRE_DESTROY_4 B -> A', () => {
     }
   }
 
-  let container: Container;
+  let parent: Container;
+  let child: Container;
 
   let initSpyA: any;
   let initSpyB: any;
@@ -222,9 +228,10 @@ describe('PRE_DESTROY_4 B -> A', () => {
   let initSpyBAfter: any;
 
   beforeEach(() => {
-    container = new Container();
-    container.bind(B).toSelf().inSingletonScope();
-    container.bind(A).toSelf().inSingletonScope();
+    parent = new Container();
+    child = parent.createChild();
+    child.bind(A).toSelf().inSingletonScope();
+    parent.bind(B).toSelf().inSingletonScope();
 
     initSpyA = vi.spyOn(A.prototype, 'close');
     initSpyB = vi.spyOn(B.prototype, 'close');
@@ -233,16 +240,13 @@ describe('PRE_DESTROY_4 B -> A', () => {
   });
 
   test('container.get(A) should work correctly', async () => {
-    container.get(A);
+    child.get(A);
 
-    await container.unbindAllAsync();
+    await parent.unbindAllAsync();
 
-    expect(initSpyB).toHaveBeenCalledBefore(initSpyBBefore);
-    expect(initSpyBBefore).toHaveBeenCalledBefore(initSpyBAfter);
-
-    expect(initSpyB).toHaveBeenCalledBefore(initSpyA);
-    expect(initSpyBBefore).toHaveBeenCalledBefore(initSpyA);
-    // 这里可以证明initSpyA没有等待initSpyB执行完成之后再执行，相当于是并行执行的
-    expect(initSpyA).toHaveBeenCalledBefore(initSpyBAfter);
+    expect(initSpyA).not.toHaveBeenCalled();
+    expect(initSpyB).toHaveBeenCalled();
+    expect(initSpyBBefore).toHaveBeenCalled();
+    expect(initSpyBAfter).toHaveBeenCalled();
   });
 });
