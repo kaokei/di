@@ -5,11 +5,9 @@ import {
   inject as Inject,
 } from 'inversify';
 
-describe.only('PRE_DESTROY_1 A -> B', () => {
+describe('PRE_DESTROY_1 A -> B', () => {
   @Injectable()
   class B {
-    public closed = false;
-
     beforeClose() {
       console.log('BService PreDestroy 开始');
     }
@@ -23,20 +21,16 @@ describe.only('PRE_DESTROY_1 A -> B', () => {
       this.beforeClose();
       await new Promise(resolve => setTimeout(resolve, 500));
       this.afterClose();
-      this.closed = true;
     }
   }
 
   @Injectable()
   class A {
-    public closed = false;
-
     constructor(@Inject(B) public b: B) {}
 
     @PreDestroy()
     async close() {
       console.log('AService PreDestroy 调用');
-      this.closed = true;
     }
   }
 
@@ -59,12 +53,9 @@ describe.only('PRE_DESTROY_1 A -> B', () => {
   });
 
   test('container.get(A) should work correctly', async () => {
-    const a = container.get(A);
+    container.get(A);
 
-    container.unbindAllAsync();
-
-    await vi.waitUntil(() => a.closed);
-    await vi.waitUntil(() => a.b.closed);
+    await container.unbindAllAsync();
 
     expect(initSpyA).toHaveBeenCalledBefore(initSpyB);
     expect(initSpyB).toHaveBeenCalledBefore(initSpyBBefore);
@@ -72,11 +63,9 @@ describe.only('PRE_DESTROY_1 A -> B', () => {
   });
 });
 
-describe.only('PRE_DESTROY_1 B -> A', () => {
+describe('PRE_DESTROY_2 B -> A', () => {
   @Injectable()
   class B {
-    public closed = false;
-
     beforeClose() {
       console.log('BService PreDestroy 开始');
     }
@@ -90,20 +79,16 @@ describe.only('PRE_DESTROY_1 B -> A', () => {
       this.beforeClose();
       await new Promise(resolve => setTimeout(resolve, 500));
       this.afterClose();
-      this.closed = true;
     }
   }
 
   @Injectable()
   class A {
-    public closed = false;
-
     constructor(@Inject(B) public b: B) {}
 
     @PreDestroy()
     async close() {
       console.log('AService PreDestroy 调用');
-      this.closed = true;
     }
   }
 
@@ -126,12 +111,9 @@ describe.only('PRE_DESTROY_1 B -> A', () => {
   });
 
   test('container.get(A) should work correctly', async () => {
-    const a = container.get(A);
+    container.get(A);
 
-    container.unbindAllAsync();
-
-    await vi.waitUntil(() => a.closed);
-    await vi.waitUntil(() => a.b.closed);
+    await container.unbindAllAsync();
 
     expect(initSpyB).toHaveBeenCalledBefore(initSpyBBefore);
     expect(initSpyBBefore).toHaveBeenCalledBefore(initSpyBAfter);
@@ -143,11 +125,9 @@ describe.only('PRE_DESTROY_1 B -> A', () => {
   });
 });
 
-describe.only('PRE_DESTROY_1 A -> B', () => {
+describe('PRE_DESTROY_3 A -> B', () => {
   @Injectable()
   class B {
-    public closed = false;
-
     beforeClose() {
       console.log('BService PreDestroy 开始');
     }
@@ -161,21 +141,17 @@ describe.only('PRE_DESTROY_1 A -> B', () => {
       this.beforeClose();
       await new Promise(resolve => setTimeout(resolve, 500));
       this.afterClose();
-      this.closed = true;
     }
   }
 
   @Injectable()
   class A {
-    public closed = false;
-
     @Inject(B)
     public b!: B;
 
     @PreDestroy()
     async close() {
       console.log('AService PreDestroy 调用');
-      this.closed = true;
     }
   }
 
@@ -198,12 +174,9 @@ describe.only('PRE_DESTROY_1 A -> B', () => {
   });
 
   test('container.get(A) should work correctly', async () => {
-    const a = container.get(A);
+    container.get(A);
 
-    container.unbindAllAsync();
-
-    await vi.waitUntil(() => a.closed);
-    await vi.waitUntil(() => a.b.closed);
+    await container.unbindAllAsync();
 
     expect(initSpyA).toHaveBeenCalledBefore(initSpyB);
     expect(initSpyB).toHaveBeenCalledBefore(initSpyBBefore);
@@ -211,11 +184,9 @@ describe.only('PRE_DESTROY_1 A -> B', () => {
   });
 });
 
-describe.only('PRE_DESTROY_1 B -> A', () => {
+describe('PRE_DESTROY_4 B -> A', () => {
   @Injectable()
   class B {
-    public closed = false;
-
     beforeClose() {
       console.log('BService PreDestroy 开始');
     }
@@ -229,21 +200,17 @@ describe.only('PRE_DESTROY_1 B -> A', () => {
       this.beforeClose();
       await new Promise(resolve => setTimeout(resolve, 500));
       this.afterClose();
-      this.closed = true;
     }
   }
 
   @Injectable()
   class A {
-    public closed = false;
-
     @Inject(B)
     public b!: B;
 
     @PreDestroy()
     async close() {
       console.log('AService PreDestroy 调用');
-      this.closed = true;
     }
   }
 
@@ -266,12 +233,9 @@ describe.only('PRE_DESTROY_1 B -> A', () => {
   });
 
   test('container.get(A) should work correctly', async () => {
-    const a = container.get(A);
+    container.get(A);
 
-    container.unbindAllAsync();
-
-    await vi.waitUntil(() => a.closed);
-    await vi.waitUntil(() => a.b.closed);
+    await container.unbindAllAsync();
 
     expect(initSpyB).toHaveBeenCalledBefore(initSpyBBefore);
     expect(initSpyBBefore).toHaveBeenCalledBefore(initSpyBAfter);
