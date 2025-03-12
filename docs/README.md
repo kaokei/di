@@ -74,6 +74,9 @@ inversify 默认是不支持循环依赖的，必须通过第三方的 lazyInjec
 
 https://github.com/inversify/inversify-inject-decorators
 
+errors 补充 case
+继承 补充 case
+
 ## 对比 inversify 的不同
 
 1. container 只支持 inSingletonScope 这一种模式

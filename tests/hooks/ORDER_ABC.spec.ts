@@ -1,14 +1,8 @@
-import {
-  Container,
-  postConstruct as PostConstruct,
-  injectable as Injectable,
-  inject as Inject,
-} from 'inversify';
+import { Inject, Container, PostConstruct, Token } from '@/index';
 
-const tokenB = 'tokenB';
-const tokenC = 'tokenC';
+const tokenB = new Token<string>('tokenB');
+const tokenC = new Token<string>('tokenC');
 
-@Injectable()
 class A {
   @Inject(tokenC)
   public c!: string;
@@ -31,6 +25,7 @@ describe('inversify order', () => {
   let activationBindingA: any;
   let activationBindingB: any;
   let activationBindingC: any;
+  let activationContainer: any;
   let activationContainerA: any;
   let activationContainerB: any;
   let activationContainerC: any;
@@ -56,40 +51,41 @@ describe('inversify order', () => {
     activationBindingC = vi.fn().mockImplementation((_: any, inst: any) => {
       return inst + '_activationBindingC';
     });
-    activationContainerA = vi.fn().mockImplementation((_: any, inst: any) => {
-      inst.b += '_activationContainerA';
-      inst.c += '_activationContainerA';
-      // 必须return，否则container.get(A)返回undefined
-      return inst;
-    });
-    activationContainerB = vi.fn().mockImplementation((_: any, inst: any) => {
-      return inst + '_activationContainerB';
-    });
-    activationContainerC = vi.fn().mockImplementation((_: any, inst: any) => {
-      return inst + '_activationContainerC';
-    });
+    activationContainerA = vi.fn();
+    activationContainerB = vi.fn();
+    activationContainerC = vi.fn();
+    activationContainer = vi
+      .fn()
+      .mockImplementation((_: any, inst: any, token) => {
+        if (token === A) {
+          activationContainerA();
+          inst.b += '_activationContainerA';
+          inst.c += '_activationContainerA';
+          // 必须return，否则container.get(A)返回undefined
+          return inst;
+        } else if (token === tokenB) {
+          activationContainerB();
+          return inst + '_activationContainerB';
+        } else if (token === tokenC) {
+          activationContainerC();
+          return inst + '_activationContainerC';
+        }
+        return inst;
+      });
 
     initSpy = vi.spyOn(A.prototype, 'init');
 
     container = new Container();
-    container
-      .bind(A)
-      .toSelf()
-      .inSingletonScope()
-      .onActivation(activationBindingA);
+    container.bind(A).toSelf().onActivation(activationBindingA);
     container
       .bind(tokenB)
       .toDynamicValue(mockB)
-      .inSingletonScope()
       .onActivation(activationBindingB);
     container
       .bind(tokenC)
       .toDynamicValue(mockC)
-      .inSingletonScope()
       .onActivation(activationBindingC);
-    container.onActivation(A, activationContainerA);
-    container.onActivation(tokenB, activationContainerB);
-    container.onActivation(tokenC, activationContainerC);
+    container.onActivation(activationContainer);
   });
 
   test('container.get(A) should work correctly', async () => {
@@ -98,9 +94,11 @@ describe('inversify order', () => {
     expect(a.b).toBe(
       'mockB_activationBindingB_activationContainerB_activationBindingA_activationContainerA'
     );
-    expect(a.c).toBe(
-      'mockC_activationBindingC_activationContainerC_activationBindingA_activationContainerA'
-    );
+    // @notice
+    // 属性注入器晚于activation，所以activation不能访问注入的属性。
+    // 一方面是访问不到，因为此时属性还没有注入。
+    // 另一方面就算在activation中设置了属性值，后续也会被属性注入重新覆盖。
+    expect(a.c).toBe('mockC_activationBindingC_activationContainerC');
 
     expect(mockB).toHaveBeenCalledTimes(1);
     expect(mockC).toHaveBeenCalledTimes(1);
@@ -108,6 +106,7 @@ describe('inversify order', () => {
     expect(activationBindingA).toHaveBeenCalledTimes(1);
     expect(activationBindingB).toHaveBeenCalledTimes(1);
     expect(activationBindingC).toHaveBeenCalledTimes(1);
+    expect(activationContainer).toHaveBeenCalledTimes(3);
     expect(activationContainerA).toHaveBeenCalledTimes(1);
     expect(activationContainerB).toHaveBeenCalledTimes(1);
     expect(activationContainerC).toHaveBeenCalledTimes(1);
@@ -115,13 +114,14 @@ describe('inversify order', () => {
     // 优先获取构造函数的参数依赖
     expect(mockB).toHaveBeenCalledBefore(activationBindingB);
     expect(activationBindingB).toHaveBeenCalledBefore(activationContainerB);
-    expect(activationContainerB).toHaveBeenCalledBefore(mockC);
-    // 再获取属性注入依赖
+    expect(activationContainerB).toHaveBeenCalledBefore(activationBindingA);
+    // 先执行自己的activation逻辑，再获取属性注入依赖
+    expect(activationBindingA).toHaveBeenCalledBefore(activationContainerA);
+    expect(activationContainerA).toHaveBeenCalledBefore(mockC);
+    // 此时再获取属性注入依赖
     expect(mockC).toHaveBeenCalledBefore(activationBindingC);
     expect(activationBindingC).toHaveBeenCalledBefore(activationContainerC);
+    // 最后再执行postConstruct
     expect(activationContainerC).toHaveBeenCalledBefore(initSpy);
-    // 先执行postConstruct再执行activation
-    expect(initSpy).toHaveBeenCalledBefore(activationBindingA);
-    expect(activationBindingA).toHaveBeenCalledBefore(activationContainerA);
   });
 });

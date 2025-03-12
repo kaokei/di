@@ -141,13 +141,13 @@ inversify 的处理逻辑是又重新开始从 child 容器开始寻找，因为
 
 ✅ Inheritance
 
-❌ ✅ ~~Injecting a Factory~~ 类似toDynamicValue，但是返回一个工厂函数。正常的toDynamicValue应该返回一个对象，这里返回一个工厂函数
+❌ ~~Injecting a Factory~~ 类似toDynamicValue，但是返回一个工厂函数。正常的toDynamicValue应该返回一个对象，这里返回一个工厂函数
 
-❌ ✅ ~~Auto factory~~ 类似toFactory版本的toService，返回一个自动生成的工厂函数
+❌ ~~Auto factory~~ 类似toFactory版本的toService，返回一个自动生成的工厂函数
 
-❌ ✅ ~~Auto named factory~~ toAutoFactory+whenTargetNamed，可以根据name返回对应的工厂函数
+❌ ~~Auto named factory~~ toAutoFactory+whenTargetNamed，可以根据name返回对应的工厂函数
 
-❌ ✅ ~~Injecting a Provider (asynchronous Factory)~~ 返回一个异步工厂函数
+❌ ~~Injecting a Provider (asynchronous Factory)~~ 返回一个异步工厂函数
 
 ❌ ~~Support for Symbols~~ 字符串和 Symbol 都需要转为 Token 实例
 
