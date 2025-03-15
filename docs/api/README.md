@@ -23,7 +23,7 @@ const container = new Container();
 ## Token
 
 ```ts
-const token = new Token(name: string)
+const token = new Token<ServiceType>(name: string)
 ```
 
 示例：
