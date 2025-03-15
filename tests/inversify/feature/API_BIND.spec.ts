@@ -310,6 +310,8 @@ describe('Rebind atoken', () => {
     expect(a.b.id).toBe(2);
     expect(a.b.name).toBe('B');
 
+    // inversify@6还是有rebind方法的
+    // inversify@7已经删除rebind方法
     container.rebind(atoken).to(ABackup);
     const a2: any = container.get(atoken);
     expect(a).not.toBe(a2);

@@ -23,11 +23,6 @@ export class Container {
     return binding;
   }
 
-  public rebind<T>(token: CommonToken<T>) {
-    this.unbind(token);
-    return this.bind(token);
-  }
-
   public unbind<T>(token: CommonToken<T>) {
     if (this.bindings.has(token)) {
       const binding = this._getBinding(token);

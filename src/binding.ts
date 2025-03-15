@@ -185,8 +185,8 @@ export class Binding<T = unknown> {
     // 所以属性注入不会导致循环引用问题
     const properties = this.getInjectProperties(options);
     Object.assign(this.cache as T as RecordObject, properties);
-    // todo postConstruct 应该在active之前
-    this.postConstruct(options);
+    // 本库postConstruct特意放在了getInjectProperties之后
+    // 这样postConstruct就能访问注入的属性了
     // 1. 检查是否有循环依赖
     // 2. 检查是否需要等待前置异步任务
     // 2.1 获取依赖列表【token列表】【binding列表】【cache列表】
@@ -194,6 +194,7 @@ export class Binding<T = unknown> {
     // 2.3 token列表转为实例对象的列表
     // 2.4 获取实例对象的[[symbol]]属性，也就是postConstruct的promise返回值
     // 2.5 有前置异步任务：Promise.all([promise列表]).then(() => this.postConstruct())
+    this.postConstruct(options);
     return this.cache;
   }
 

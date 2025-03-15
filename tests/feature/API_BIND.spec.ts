@@ -1,4 +1,4 @@
-// 测试bind，unbind，unbindAll，rebind
+// 测试bind，unbind，unbindAll
 import { Inject, Container, LazyToken, Token } from '@/index';
 import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
 import { hasOwn } from '@tests/utils';
@@ -280,37 +280,5 @@ describe('Unbind all with hierarchical container', () => {
     expect(() => {
       parent.get(A);
     }).toThrowError(BindingNotFoundError);
-  });
-});
-
-describe('Rebind atoken', () => {
-  let container: Container;
-
-  beforeEach(() => {
-    container = new Container();
-    container.bind(A).toSelf();
-    container.bind(B).toSelf();
-    container.bind(atoken).to(A);
-  });
-
-  test('container.get(A) should work correctly', async () => {
-    const a = container.get(atoken);
-    expect(a).toBeInstanceOf(A);
-    expect(a.id).toBe(1);
-    expect(a.name).toBe('A');
-    expect(a.b).toBeInstanceOf(B);
-    expect(a.b.id).toBe(2);
-    expect(a.b.name).toBe('B');
-
-    container.rebind(atoken).to(ABackup);
-    const a2 = container.get(atoken);
-    expect(a).not.toBe(a2);
-
-    expect(a2).toBeInstanceOf(ABackup);
-    expect(a2.id).toBe(11);
-    expect(a2.name).toBe('ABackup');
-    expect(a2.b).toBeInstanceOf(B);
-    expect(a2.b.id).toBe(2);
-    expect(a2.b.name).toBe('B');
   });
 });
