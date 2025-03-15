@@ -198,7 +198,7 @@ export class DemoService {
 ## @PostConstruct
 
 ```ts
-@PostConstruct(boolean | Array<Token|Newable> | FilterFunction)
+@PostConstruct(void | boolean | Array<Token|Newable> | FilterFunction)
 ```
 
 示例：
