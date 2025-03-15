@@ -5,10 +5,10 @@
 - [Container](#container)
 - [Token](#token)
 - [LazyToken](#lazytoken)
-- [@Inject](#-inject)
-- [@Self + @SkipSelf + @Optional](#-self----skipself----optional)
-- [@PostConstruct](#-postconstruct)
-- [@PreDestroy](#-predestroy)
+- [@Inject](#inject)
+- [@Self + @SkipSelf + @Optional](#self--skipself--optional)
+- [@PostConstruct](#postconstruct)
+- [@PreDestroy](#predestroy)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
