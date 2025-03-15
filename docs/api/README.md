@@ -14,9 +14,21 @@
 
 ## Container
 
+使用：
+
+```ts
+const container = new Container();
+```
+
 [具体文档参考这里。](./API_CONTAINER.md)
 
 ## Token
+
+使用：
+
+```ts
+const token = new Token(name: string)
+```
 
 示例：
 
@@ -53,6 +65,12 @@ const logger2 = container.get(LoggerService);
 
 ## LazyToken
 
+使用：
+
+```ts
+new LazyToken(() => Token | Newable);
+```
+
 示例：
 
 ```ts
@@ -80,6 +98,12 @@ export class B {
 @guide 具体哪些场景的循环依赖是被支持的可以参考这里。
 
 ## @Inject
+
+使用：
+
+```ts
+@Inject(Token | Newable | LazyToken)
+```
 
 用法：
 
@@ -180,6 +204,12 @@ export class DemoService {
 > 这 3 个装饰器来源于 Angular 的 API，但是实际上使用到的业务场景较少。
 
 ## @PostConstruct
+
+使用：
+
+```ts
+@PostConstruct(boolean | Array<Token|Newable> | FilterFunction)
+```
 
 示例：
 
