@@ -9,9 +9,9 @@
 
 </div>
 
-- [documentation](https://kaokei.com/project/di/)
+- [documentation](./docs/guide/README.md)
 - [online playground](https://codesandbox.io/s/di-playground-zjnyv)
-- [online demo](https://kaokei.com/project/di/)
+- [online demo](https://codesandbox.io/s/di-playground-zjnyv)
 
 ```bash
 npm install @kaokei/di
