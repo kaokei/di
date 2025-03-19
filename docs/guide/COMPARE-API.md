@@ -1,12 +1,11 @@
-# 本库 和 inversify 等效的 API
+# 本库 API 和 inversify API 的对比
 
 ## Container
 
 本库和 inversify 都使用 Container。
 历史版本中本库使用 Injector 作为服务的容器，新版本改为 Container。
 
-本库只实现了 inversify 中 Container 的部分方法。绝大多数方法应该是和 inversify 等效的。
-确定的只有 onActivation 和 onDeactivation 的接口定义发生了变化。详见源码。
+本库只实现了 inversify 中 Container 的部分方法。已经实现的方法绝大多数应该是和 inversify 等效的。确定的只有 onActivation 和 onDeactivation 的接口定义发生了变化。
 
 ## Token
 
@@ -16,17 +15,17 @@ inversify 中没有对 token 类型做限制，基本上任何 js 变量都可�
 
 本库也支持直接把 class 类作为 token。
 
-实际上本库只支持 Token 实例和 class 类作为 token，这样可以方便 ide 自动推导类型。
+实际上本库只支持 Token 实例和 class 类作为 token，是因为这样可以方便 ide 自动推导类型。
 
 ## LazyToken
 
 inversify 的 LazyServiceIdentifier
 
-## Inject
+## @Inject
 
 inversify 的 inject
 
-## Optional
+## @Optional
 
 inversify 的 optional
 
@@ -42,11 +41,11 @@ inversify 没有提供 @SkipSelf 装饰器
 
 本库是借鉴的 Angular 中的@SkipSelf 这个 API
 
-## PostConstruct
+## @PostConstruct
 
 inversify 的 postConstruct
 
-## PreDestroy
+## @PreDestroy
 
 inversify 的 preDestroy
 

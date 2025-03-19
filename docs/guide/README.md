@@ -27,8 +27,6 @@ npm install @kaokei/di
 
 最常见的使用场景就是通过`container.get(token)`代替手动 new 一个类来获取实例对象。
 
-优点在于
-
 ```ts
 import { Container, Inject } from '@kaokei/di';
 
