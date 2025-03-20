@@ -21,3 +21,30 @@
 - [博客文章](./docs/note/01.什么是Token.md)
 - [online playground](https://codesandbox.io/s/di-playground-zjnyv)
 - [online demo](https://codesandbox.io/s/di-playground-zjnyv)
+
+## todo
+
+需要打通**DEV**和异常检测以及异常输出
+中间件和插件的处理
+todo: 父类和子类都有 PostConstruct 是否会有异常，因为按照定义只能有一个 PostConstruct
+Container.parent = null
+
+1. 完善更多的单元测试
+1. 更多场景
+1. 和 inversely 的对比测试用例
+1. 完善中英文文档并部署
+1. 完成所有 todo 项目
+1. 完善代码中所有类型信息
+
+特殊依赖案例
+https://github.com/inversify/InversifyJS/issues/543
+
+inversify 默认是不支持循环依赖的，必须通过第三方的 lazyInject 才能实现循环依赖。
+其中 LazyServiceIdentifier 只能解决 import 时的依赖问题，并不能解决 container.get()在实例化对象时的循环依赖问题。
+
+https://github.com/inversify/inversify-inject-decorators
+
+errors 补充 case
+继承 补充 case
+
+1. postConstruct 和 predestroy 单元测试
