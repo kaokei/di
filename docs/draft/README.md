@@ -1,9 +1,3 @@
-## 发布命令
-
-```
-npm publish --access public
-```
-
 ## @injectable()
 
 这个装饰器主要是收集构造函数的参数的元数据，以用于构造函数的依赖注入。

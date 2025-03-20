@@ -10,9 +10,9 @@ inversify 中支持 3 种不同的 scope 模式，但是本库只支持 inSingle
 
 ## Container 的部分 API 集合
 
-本库的 Container 只实现了 inversify 的部分 API。
+本库的 Container 只实现了 inversify 的部分基础 API。
 
-本库缺少相关异步方法，name 相关方法，tag 相关方法，applyMiddleware 方法，resolve 方法等其他方法。
+本库没有实现 inversify 中异步相关方法，name 相关方法，tag 相关方法，applyMiddleware 方法，resolve 方法等其他方法。
 
 ## onActivation 和 onDeactivation
 
@@ -22,8 +22,9 @@ inversify 中支持 3 种不同的 scope 模式，但是本库只支持 inSingle
 
 第二点不同在于 inversify 的方法需要提前指定 token 的名称，为具体的 token 设置回调方法。
 本库则不需要指定 token，而是所有 token 共享的回调方法，当然可以在回调方法中知道当前执行回调方法的是哪一个 token。
+
 但是一般情况是不需要的，因为理论上 container 的 Activation 回调 和 Deactivation 回调应该是所有 token 共享的。
-如果确实需要有差异化的逻辑，那么应该采用 binding 级别的回调方法。
+如果确实需要有差异化的逻辑，那么应该采用 binding 级别的 onActivation 方法 和 onDeactivation 方法。
 
 ## 继承父类的依赖注入
 
@@ -43,6 +44,10 @@ inversify 比较强大，在处理继承时可以同时支持构造函数参数�
 
 但是子类在继承父类时，构造函数的参数是没有继承/覆盖的逻辑的，因为可以在子类中手动调用 super 方法自定义父类的初始化逻辑，这样就没有办法统一处理。
 
+具体例子就是假设父类构造函数有 2 个注入参数，子类构造函数也有 2 个注入参数。按道理讲依赖注入框架应该总共注入 4 个依赖参数。
+但是如果子类的构造函数中调用了`super(param1)`或者`super(param1, param2)`，此时依赖注入框架就需要相应的减少注入参数的个数，因为子类已经提供了相应的参数了。
+这种处理逻辑是非常繁琐的，所以本库没有支持继承父类的构造函数参数注入。
+
 就算是 inversify 中可以支持继承构造函数参数注入，也是有很多前提约束条件的，必须满足前提条件才能继承父类构造函数参数。
 
 本库认为一般业务代码中直接使用属性依赖注入就能满足业务的继承需求了。
@@ -61,9 +66,11 @@ inversify 默认是不支持循环依赖的，必须通过第三方的 [lazyInje
 
 ## 没有@injectable 装饰器
 
-本库没有@injectable 装饰器，也就是没有 inversify 中的 autoBindInjectable:true 机制。
+在 inversify 中这个装饰器主要是收集构造函数的参数的元数据，以用于构造函数的默认依赖注入，如果参数的类型是类，那么就不需要明确使用@Inject 来指定依赖的 token。
 
-也就是所有 Class 不支持默认注入，所有 Class 必须明确声明 container 的绑定关系
+本库不支持通过参数类型信息完成自动注入，不管是属性注入还是构造函数注入都需要明确通过@Inject 指定依赖的 token。
+
+根本原因是不期望依赖 typescript 的 emitDecoratorMetadata 选项。
 
 ## 不支持类型信息的依赖注入
 
