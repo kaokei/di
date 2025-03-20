@@ -6,6 +6,10 @@ import {
 import { BindingNotFoundError } from '@tests/inversify/constant.ts';
 import { hasOwn } from '@tests/utils';
 
+// https://github.com/inversify/InversifyJS/issues/543
+// Class A injects two classes B and C
+// Class B injects C
+
 interface IA {
   name: string;
   id: number;
