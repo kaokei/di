@@ -10,9 +10,6 @@
 
 本库一般不是直接用于业务开发，而是作为[其他库](https://github.com/kaokei/use-vue-service)的依赖，提供统一的依赖注入能力。
 
-- [online playground](https://codesandbox.io/s/di-playground-zjnyv)
-- [online demo](https://codesandbox.io/s/di-playground-zjnyv)
-
 ## 安装
 
 ```sh

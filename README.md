@@ -10,12 +10,14 @@
 
 </div>
 
-- [documentation](./docs/guide/README.md)
-- [online playground](https://codesandbox.io/s/di-playground-zjnyv)
-- [online demo](https://codesandbox.io/s/di-playground-zjnyv)
-
 ## 简介
 
 本库是一个轻量级的依赖注入库，类似的其他比较流行的库有`InversifyJS`和`typedi`。
 
 本库主要特点是参考借鉴了`InversifyJS`的优秀 API 设计，不依赖`reflect-metadata`，支持循环依赖。
+
+- [入门指南](./docs/guide/README.md)
+- [API 文档](./docs/api/README.md)
+- [博客文章](./docs/note/01.什么是Token.md)
+- [online playground](https://codesandbox.io/s/di-playground-zjnyv)
+- [online demo](https://codesandbox.io/s/di-playground-zjnyv)
