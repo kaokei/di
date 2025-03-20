@@ -8,6 +8,8 @@
 
 inversify 中支持 3 种不同的 scope 模式，但是本库只支持 inSingletonScope 模式。
 
+[inversify 关于不同 scope 的解释](https://github.com/inversify/InversifyJS/blob/develop/v6/wiki/scope.md)
+
 ## Container 的部分 API 集合
 
 本库的 Container 只实现了 inversify 的部分基础 API。
@@ -72,17 +74,9 @@ inversify 默认是不支持循环依赖的，必须通过第三方的 [lazyInje
 
 根本原因是不期望依赖 typescript 的 emitDecoratorMetadata 选项。
 
-## 不支持类型信息的依赖注入
-
-所有依赖，包括构造函数的依赖和属性依赖，都必须通过@inject 明确声明依赖的 token，并不会自动分析参数类型来自动注入。
-
-本库的历史版本曾经是支持 typescript 中的 emitDecoratorMetadata 支持获取类型信息，从而自动注入实例，新版本已经废除了。
-
-所以也不需要开启 emitDecoratorMetadata:true 这个特性。
-
 ## 不支持重复绑定
 
-inversify 是支持在同一个 token 上绑定多个服务的，最终可以实现按条件注入，获取注入多个对象。
+inversify 是支持在同一个 token 上绑定多个服务的，最终可以实现按条件注入，获取注入多个对象。[参考这里](https://github.com/inversify/InversifyJS/blob/develop/v6/wiki/multi_injection.md)
 
 本库因为不支持 container.getTagged 、 container.getNamed 、 container.getAll 这些方法，所以也不支持重复绑定同一个 token。
 
