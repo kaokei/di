@@ -31,3 +31,9 @@ errors 补充 case
 postConstruct 和 predestroy 单元测试
 
 父类和子类都有 PostConstruct 是否会有异常，因为按照定义只能有一个 PostConstruct
+
+1. 实现LazyInject功能
+关键是怎么实现container和class的绑定
+正常inject时，是可以通过container.get获取上下文的，但是lazyInject拿不到这个上下文
+
+2. 优化https://github.com/kaokei/utils/blob/main/src/index.ts的文档

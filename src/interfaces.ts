@@ -1,5 +1,6 @@
 import type { Token, LazyToken } from './token';
 import type { Container } from './container';
+import type { Binding } from './binding';
 
 export type Newable<
   TInstance = unknown,
@@ -43,3 +44,9 @@ export type DeactivationHandler<T = unknown> = (
   input: T,
   token?: CommonToken<T>
 ) => void;
+
+export type PostConstructParam =
+  | void
+  | true
+  | CommonToken[]
+  | ((item: Binding, index: number, arr: Binding[]) => boolean);

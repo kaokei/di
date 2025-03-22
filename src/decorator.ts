@@ -20,7 +20,7 @@
 
 import { getMetadata, getOwnMetadata, defineMetadata } from './cachemap';
 import { KEYS, ERRORS } from './constants';
-import type { RequiredParameters } from './interfaces';
+import type { RequiredParameters, PostConstructParam } from './interfaces';
 
 /**
  * 创建装饰器的高阶函数
@@ -78,8 +78,8 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
   };
 }
 
-function createMetaDecorator(metaKey: string, errorMessage: string) {
-  return (metaValue?: any) => {
+function createMetaDecorator<T = void>(metaKey: string, errorMessage: string) {
+  return (metaValue: T) => {
     return (target: any, propertyKey: string) => {
       if (getOwnMetadata(metaKey, target.constructor)) {
         throw new Error(errorMessage);
@@ -108,7 +108,7 @@ export const SkipSelf = createDecorator(KEYS.SKIP_SELF, true);
 export const Optional = createDecorator(KEYS.OPTIONAL, true);
 
 // 一个类最多只有一个PostConstruct
-export const PostConstruct = createMetaDecorator(
+export const PostConstruct = createMetaDecorator<PostConstructParam>(
   KEYS.POST_CONSTRUCT,
   ERRORS.POST_CONSTRUCT
 );

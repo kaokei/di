@@ -15,6 +15,7 @@ import type {
   Options,
   RecordObject,
   GenericToken,
+  PostConstructParam,
 } from './interfaces';
 
 export class Binding<T = unknown> {
@@ -111,13 +112,16 @@ export class Binding<T = unknown> {
     }
   }
 
-  private getAwaitBindings(bindings: Binding[], filter: any): Binding[] {
+  private getAwaitBindings(
+    bindings: Binding[],
+    filter: PostConstructParam
+  ): Binding[] {
     if (filter === true) {
       return bindings;
     } else if (Array.isArray(filter)) {
       return bindings.filter(item => filter.includes(item.token));
     } else if (typeof filter === 'function') {
-      return filter(bindings);
+      return bindings.filter(filter);
     } else {
       return [];
     }
@@ -137,7 +141,10 @@ export class Binding<T = unknown> {
           for (const binding of awaitBindings) {
             if (binding) {
               if (binding.postConstructResult === DEFAULT_VALUE) {
-                throw new PostConstructError(binding.token, options);
+                throw new PostConstructError(binding.token, {
+                  parent: options,
+                  token: this.token,
+                });
               }
             }
           }
