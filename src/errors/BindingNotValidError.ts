@@ -1,9 +1,8 @@
+import { BaseError } from './BaseError';
 import type { CommonToken } from '../interfaces';
 
-export class BindingNotValidError extends Error {
+export class BindingNotValidError extends BaseError {
   constructor(token: CommonToken) {
-    super();
-    this.name = 'BindingNotValidError';
-    this.message = `Invalid binding: ${token?.name}`;
+    super('Invalid binding: ', token);
   }
 }

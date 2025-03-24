@@ -1,8 +1,9 @@
+import { BaseError } from './BaseError';
 import type { Options } from '../interfaces';
 
-export class CircularDependencyError extends Error {
+export class CircularDependencyError extends BaseError {
   constructor(options: Options<any>) {
-    super();
+    super('');
 
     const tokenArr = [];
     let parent = options as Options | undefined;
@@ -15,7 +16,6 @@ export class CircularDependencyError extends Error {
       .map(item => item.name)
       .join(' --> ');
 
-    this.name = 'CircularDependencyError';
     this.message = `Circular dependency found: ${tokenListText}`;
   }
 }
