@@ -1,5 +1,5 @@
 // 单独测试binding的activation
-import { Container } from '@/index';
+import { Container, Token } from '@/index';
 
 class A {
   public name = 'A';
@@ -27,6 +27,10 @@ describe('container activation', () => {
     });
 
     const container = new Container();
+
+    const token1 = new Token<A>('A');
+    const token2 = new Token<B>('B');
+    container.bind(token1).toSelf();
 
     container.bind(A).toSelf().onActivation(mockBindingActivationA);
     container.bind(B).toSelf().onActivation(mockBindingActivationB);

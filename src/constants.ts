@@ -15,26 +15,26 @@ export const KEYS = {
   POST_CONSTRUCT: 'postConstruct',
   // PreDestroy装饰器的key
   PRE_DESTROY: 'preDestroy',
-};
+} as const;
 
 export const STATUS = {
   DEFAULT: 'default',
   INITING: 'initing',
   ACTIVATED: 'activated',
-};
+} as const;
 
 export const BINDING = {
   Invalid: 'Invalid',
   Instance: 'Instance',
   ConstantValue: 'ConstantValue',
   DynamicValue: 'DynamicValue',
-};
+} as const;
 
 export const ERRORS = {
   POST_CONSTRUCT:
     'Cannot apply @PostConstruct decorator multiple times in the same class',
   PRE_DESTROY:
     'Cannot apply @PreDestroy decorator multiple times in the same class',
-};
+} as const;
 
 export const DEFAULT_VALUE = Symbol();

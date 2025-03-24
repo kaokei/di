@@ -2,7 +2,7 @@ import { BaseError } from './BaseError';
 import type { Options } from '../interfaces';
 
 export class CircularDependencyError extends BaseError {
-  constructor(options: Options<any>) {
+  constructor(options: Options) {
     super('');
 
     const tokenArr = [];

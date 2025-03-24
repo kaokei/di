@@ -10,7 +10,7 @@ import type {
 
 export class Container {
   public parent?: Container;
-  private bindings: Map<CommonToken, Binding<any>> = new Map();
+  private bindings: Map<CommonToken, Binding> = new Map();
   private onActivationHandler?: ActivationHandler;
   private onDeactivationHandler?: DeactivationHandler;
 
@@ -19,7 +19,7 @@ export class Container {
       throw new DuplicateBindingError(token);
     }
     const binding = this.buildBinding(token);
-    this.bindings.set(token, binding);
+    this.bindings.set(token, binding as Binding);
     return binding;
   }
 
