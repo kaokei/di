@@ -1,6 +1,11 @@
 // key是token或者class
-import type { CommonToken } from './interfaces';
-const map = new WeakMap<CommonToken, Record<string, any>>();
+import type {
+  CommonToken,
+  CacheMapValue,
+  META_KEY_INJECTED_PROPS,
+  META_KEYS,
+} from './interfaces';
+const map = new WeakMap<CommonToken, CacheMapValue>();
 
 function hasParentClass(cls: CommonToken) {
   return (
@@ -10,12 +15,12 @@ function hasParentClass(cls: CommonToken) {
 }
 
 // 注意重复调用会覆盖之前的结果
-export function defineMetadata(
-  metadataKey: string,
-  metadataValue: any,
+export function defineMetadata<T extends META_KEYS>(
+  metadataKey: T,
+  metadataValue: CacheMapValue[T],
   target: CommonToken
 ) {
-  const found = map.get(target) || {};
+  const found = map.get(target) || ({} as CacheMapValue);
   found[metadataKey] = metadataValue;
   map.set(target, found);
 }
@@ -23,8 +28,11 @@ export function defineMetadata(
 // 可能返回undefined
 // 可能返回object，因为是属性装饰器数据
 // 可能返回array，因为时构造函数参数装饰器数据
-export function getOwnMetadata(metadataKey: string, target: CommonToken) {
-  const found = map.get(target) || {};
+export function getOwnMetadata<T extends META_KEYS>(
+  metadataKey: T,
+  target: CommonToken
+): CacheMapValue[T] | undefined {
+  const found = map.get(target) || ({} as CacheMapValue);
   return found[metadataKey];
 }
 
@@ -34,7 +42,10 @@ export function getOwnMetadata(metadataKey: string, target: CommonToken) {
 // getMetadata只支持获取属性装饰器数据或者没有父类的构造函数参数装饰器数据
 // 因为getMetadata默认写死返回对象而不是数组，这只能满足属性装饰器数据合并，不满足构造函数参数装饰数据合并
 // 所以本库只支持继承父类的属性注入，不支持父类的构造函数参数注入
-export function getMetadata(metadataKey: string, target: CommonToken): any {
+export function getMetadata<T extends META_KEY_INJECTED_PROPS>(
+  metadataKey: T,
+  target: CommonToken
+): CacheMapValue[T] | undefined {
   const ownMetadata = getOwnMetadata(metadataKey, target);
 
   if (!hasParentClass(target)) {

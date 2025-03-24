@@ -20,7 +20,16 @@
 
 import { getMetadata, getOwnMetadata, defineMetadata } from './cachemap';
 import { KEYS, ERRORS } from './constants';
-import type { RequiredParameters, PostConstructParam } from './interfaces';
+import type {
+  RequiredParameters,
+  PostConstructParam,
+  META_KEY_POST_CONSTRUCT,
+  META_KEY_PRE_DESTROY,
+  ExtractKV,
+  Options,
+  META_KEY_INJECTED_PROPS,
+  CacheMapValue,
+} from './interfaces';
 
 /**
  * 创建装饰器的高阶函数
@@ -58,9 +67,9 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
       // 如果是实例属性装饰器，这个对象中的key是属性名
       // 这里有一个坑，必须使用getOwnMetadata而不是getMetadata
       // 否则在继承的场景中会有问题
-      const paramsOrPropertiesMetadata = isParameterDecorator
+      const paramsOrPropertiesMetadata: any = isParameterDecorator
         ? getOwnMetadata(metadataKey, Ctor) || []
-        : getMetadata(metadataKey, Ctor) || {};
+        : getMetadata(metadataKey as META_KEY_INJECTED_PROPS, Ctor) || {};
 
       // 每个参数或者实例属性都可以有多个装饰器
       // 所以paramsOrPropertiesMetadata这个大对象的每个key(实例属性)对应的value都是一个对象
@@ -78,15 +87,17 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
   };
 }
 
-function createMetaDecorator<T = void>(metaKey: string, errorMessage: string) {
-  return (metaValue: T) => {
+function createMetaDecorator<
+  T extends META_KEY_POST_CONSTRUCT | META_KEY_PRE_DESTROY
+>(metaKey: T, errorMessage: string) {
+  return (metaValue: ExtractKV<T>) => {
     return (target: any, propertyKey: string) => {
       if (getOwnMetadata(metaKey, target.constructor)) {
         throw new Error(errorMessage);
       }
       defineMetadata(
         metaKey,
-        { key: propertyKey, value: metaValue },
+        { key: propertyKey, value: metaValue } as CacheMapValue[T],
         target.constructor
       );
     };
@@ -108,7 +119,7 @@ export const SkipSelf = createDecorator(KEYS.SKIP_SELF, true);
 export const Optional = createDecorator(KEYS.OPTIONAL, true);
 
 // 一个类最多只有一个PostConstruct
-export const PostConstruct = createMetaDecorator<PostConstructParam>(
+export const PostConstruct = createMetaDecorator(
   KEYS.POST_CONSTRUCT,
   ERRORS.POST_CONSTRUCT
 );
