@@ -92,16 +92,17 @@ export class Binding<T = unknown> {
 
   public toService(token: CommonToken<T>) {
     return this.toDynamicValue((context: Context) =>
-      context.container.get(token, { token: this.token })
+      context.container.get(token, { parent: { token: this.token } })
     );
   }
 
-  public get(options?: Options<T>) {
+  public get(options: Options<T>) {
     if (STATUS.INITING === this.status) {
       throw new CircularDependencyError(this.token, options);
     } else if (STATUS.ACTIVATED === this.status) {
       return this.cache;
     } else if (BINDING.Instance === this.type) {
+      options.token = this.token;
       return this.resolveInstanceValue(options);
     } else if (BINDING.ConstantValue === this.type) {
       return this.resolveConstantValue();
@@ -127,7 +128,7 @@ export class Binding<T = unknown> {
     }
   }
 
-  public postConstruct(options?: Options<T>) {
+  public postConstruct(options: Options<T>) {
     if (BINDING.Instance === this.type) {
       const { key, value } = getMetadata(KEYS.POST_CONSTRUCT, this.token) || {};
       if (key) {
@@ -143,7 +144,6 @@ export class Binding<T = unknown> {
               if (binding.postConstructResult === DEFAULT_VALUE) {
                 throw new PostConstructError(binding.token, {
                   parent: options,
-                  token: this.token,
                 });
               }
             }
@@ -179,7 +179,7 @@ export class Binding<T = unknown> {
    * 权衡之后还是选择方案1，相对来说方案1的缺点是稳定可控的，只要保证在activate方法中不依赖注入属性即可。
    * 但是方案2可能导致系统表面上可以正常运行，但是隐藏了未知的异常风险。
    */
-  private resolveInstanceValue(options?: Options<T>) {
+  private resolveInstanceValue(options: Options<T>) {
     this.status = STATUS.INITING;
     const ClassName = this.classValue as Newable<T>;
     // @notice 这里可能会有循环引用
@@ -220,7 +220,7 @@ export class Binding<T = unknown> {
     return this.cache;
   }
 
-  private getContructorParameters(options?: Options<T>) {
+  private getContructorParameters(options: Options<T>) {
     const params =
       getOwnMetadata(KEYS.INJECTED_PARAMS, this.classValue as Newable) || [];
     const result = params.map((meta: RecordObject) => {
@@ -228,13 +228,12 @@ export class Binding<T = unknown> {
       return this.container.get(resolveToken(inject as GenericToken), {
         ...rest,
         parent: options,
-        token: this.token,
       });
     });
     return result;
   }
 
-  private getInjectProperties(options?: Options<T>) {
+  private getInjectProperties(options: Options<T>) {
     const props =
       getMetadata(KEYS.INJECTED_PROPS, this.classValue as Newable) || {};
     const propKeys = Object.keys(props);
@@ -246,7 +245,6 @@ export class Binding<T = unknown> {
         {
           ...rest,
           parent: options,
-          token: this.token,
         }
       );
       if (!(property === void 0 && meta.optional)) {
@@ -257,7 +255,7 @@ export class Binding<T = unknown> {
   }
 
   private getContructorParameterBindings(
-    options?: Options<T>
+    options: Options<T>
   ): (void | Binding)[] {
     const params =
       getOwnMetadata(KEYS.INJECTED_PARAMS, this.classValue as Newable) || [];
@@ -266,12 +264,11 @@ export class Binding<T = unknown> {
       return this.container.getBinding(resolveToken(inject as GenericToken), {
         ...rest,
         parent: options,
-        token: this.token,
       });
     });
   }
 
-  private getInjectPropertyBindings(options?: Options<T>) {
+  private getInjectPropertyBindings(options: Options<T>) {
     const props =
       getMetadata(KEYS.INJECTED_PROPS, this.classValue as Newable) || {};
     const propKeys = Object.keys(props);
@@ -281,7 +278,6 @@ export class Binding<T = unknown> {
       return this.container.getBinding(resolveToken(inject as GenericToken), {
         ...rest,
         parent: options,
-        token: this.token,
       });
     });
   }
