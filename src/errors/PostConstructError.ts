@@ -1,10 +1,10 @@
-import type { CommonToken, Options } from '../interfaces';
+import type { Options } from '../interfaces';
 import { CircularDependencyError } from './CircularDependencyError';
 
 export class PostConstructError extends CircularDependencyError {
-  constructor(token: CommonToken, options?: Options) {
-    super(token, options);
+  constructor(options: Options) {
+    super(options);
 
-    this.name = 'CircularDependencyError inside @postConstruct';
+    this.name = 'CircularDependencyError inside @PostConstruct';
   }
 }

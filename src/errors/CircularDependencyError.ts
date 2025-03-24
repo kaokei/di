@@ -1,11 +1,11 @@
-import type { CommonToken, Options } from '../interfaces';
+import type { Options } from '../interfaces';
 
 export class CircularDependencyError extends Error {
-  constructor(token: CommonToken, options: Options<any>) {
+  constructor(options: Options<any>) {
     super();
 
-    const tokenArr = [token];
-    let parent = options.parent;
+    const tokenArr = [];
+    let parent = options as Options | undefined;
     while (parent && parent.token) {
       tokenArr.push(parent.token);
       parent = parent.parent;

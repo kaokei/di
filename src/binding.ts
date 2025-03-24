@@ -98,7 +98,7 @@ export class Binding<T = unknown> {
 
   public get(options: Options<T>) {
     if (STATUS.INITING === this.status) {
-      throw new CircularDependencyError(this.token, options);
+      throw new CircularDependencyError(options);
     } else if (STATUS.ACTIVATED === this.status) {
       return this.cache;
     } else if (BINDING.Instance === this.type) {
@@ -143,7 +143,8 @@ export class Binding<T = unknown> {
           for (const binding of awaitBindings) {
             if (binding) {
               if (binding.postConstructResult === DEFAULT_VALUE) {
-                throw new PostConstructError(binding.token, {
+                throw new PostConstructError({
+                  token: binding.token,
                   parent: options,
                 });
               }
