@@ -1,7 +1,7 @@
 import type { CommonToken, Options } from '../interfaces';
 
 export class CircularDependencyError extends Error {
-  constructor(token: CommonToken, options: Options) {
+  constructor(token: CommonToken, options: Options<any>) {
     super();
 
     const tokenArr = [token];

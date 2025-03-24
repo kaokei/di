@@ -102,7 +102,6 @@ export class Binding<T = unknown> {
     } else if (STATUS.ACTIVATED === this.status) {
       return this.cache;
     } else if (BINDING.Instance === this.type) {
-      options.token = this.token;
       return this.resolveInstanceValue(options);
     } else if (BINDING.ConstantValue === this.type) {
       return this.resolveConstantValue();
@@ -128,13 +127,15 @@ export class Binding<T = unknown> {
     }
   }
 
-  public postConstruct(options: Options<T>) {
+  public postConstruct(
+    options: Options<T>,
+    binding1: Binding[],
+    binding2: Binding[]
+  ) {
     if (BINDING.Instance === this.type) {
       const { key, value } = getMetadata(KEYS.POST_CONSTRUCT, this.token) || {};
       if (key) {
         if (value) {
-          const binding1 = this.getContructorParameterBindings(options);
-          const binding2 = this.getInjectPropertyBindings(options);
           const bindings = [...binding1, ...binding2].filter(
             item => BINDING.Instance === item?.type
           ) as Binding[];
@@ -183,14 +184,14 @@ export class Binding<T = unknown> {
     this.status = STATUS.INITING;
     const ClassName = this.classValue as Newable<T>;
     // @notice 这里可能会有循环引用
-    const params = this.getContructorParameters(options);
+    const [params, paramBindings] = this.getContructorParameters(options);
     const inst = new ClassName(...params);
     // @notice 这里可能会有循环引用
     this.cache = this.activate(inst);
     // 实例化成功，并存入缓存，此时不会再有循环引用问题
     this.status = STATUS.ACTIVATED;
     // 所以属性注入不会导致循环引用问题
-    const properties = this.getInjectProperties(options);
+    const [properties, propertyBindings] = this.getInjectProperties(options);
     Object.assign(this.cache as T as RecordObject, properties);
     // 本库postConstruct特意放在了getInjectProperties之后
     // 这样postConstruct就能访问注入的属性了
@@ -201,7 +202,7 @@ export class Binding<T = unknown> {
     // 2.3 token列表转为实例对象的列表
     // 2.4 获取实例对象的[[symbol]]属性，也就是postConstruct的promise返回值
     // 2.5 有前置异步任务：Promise.all([promise列表]).then(() => this.postConstruct())
-    this.postConstruct(options);
+    this.postConstruct(options, paramBindings, propertyBindings);
     return this.cache;
   }
 
@@ -223,62 +224,42 @@ export class Binding<T = unknown> {
   private getContructorParameters(options: Options<T>) {
     const params =
       getOwnMetadata(KEYS.INJECTED_PARAMS, this.classValue as Newable) || [];
-    const result = params.map((meta: RecordObject) => {
+    const result = [];
+    const binding = [] as Binding[];
+    for (let i = 0; i < params.length; i++) {
+      const meta = params[i];
       const { inject, ...rest } = meta;
-      return this.container.get(resolveToken(inject as GenericToken), {
-        ...rest,
-        parent: options,
-      });
-    });
-    return result;
+      rest.parent = options;
+      const ret = this.container.get(
+        resolveToken(inject as GenericToken),
+        rest
+      );
+      result.push(ret);
+      binding.push(rest.binding);
+    }
+    return [result, binding] as const;
   }
 
   private getInjectProperties(options: Options<T>) {
     const props =
       getMetadata(KEYS.INJECTED_PROPS, this.classValue as Newable) || {};
     const propKeys = Object.keys(props);
-    return propKeys.reduce((acc: RecordObject, prop: string) => {
+    const result = Object.create(null) as RecordObject;
+    const binding = [] as Binding[];
+    for (let i = 0; i < propKeys.length; i++) {
+      const prop = propKeys[i];
       const meta = props[prop];
       const { inject, ...rest } = meta;
-      const property = this.container.get(
+      rest.parent = options;
+      const ret = this.container.get(
         resolveToken(inject as GenericToken),
-        {
-          ...rest,
-          parent: options,
-        }
+        rest
       );
-      if (!(property === void 0 && meta.optional)) {
-        acc[prop] = property;
+      if (!(ret === void 0 && meta.optional)) {
+        result[prop] = ret;
       }
-      return acc;
-    }, Object.create(null) as RecordObject);
-  }
-
-  private getContructorParameterBindings(
-    options: Options<T>
-  ): (void | Binding)[] {
-    const params =
-      getOwnMetadata(KEYS.INJECTED_PARAMS, this.classValue as Newable) || [];
-    return params.map((meta: RecordObject) => {
-      const { inject, ...rest } = meta;
-      return this.container.getBinding(resolveToken(inject as GenericToken), {
-        ...rest,
-        parent: options,
-      });
-    });
-  }
-
-  private getInjectPropertyBindings(options: Options<T>) {
-    const props =
-      getMetadata(KEYS.INJECTED_PROPS, this.classValue as Newable) || {};
-    const propKeys = Object.keys(props);
-    return propKeys.map((prop: string) => {
-      const meta = props[prop];
-      const { inject, ...rest } = meta;
-      return this.container.getBinding(resolveToken(inject as GenericToken), {
-        ...rest,
-        parent: options,
-      });
-    });
+      binding.push(rest.binding);
+    }
+    return [result, binding] as const;
   }
 }

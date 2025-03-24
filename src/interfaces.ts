@@ -31,7 +31,8 @@ export interface Options<T = unknown> {
   self?: boolean;
   skipSelf?: boolean;
   token?: CommonToken<T>;
-  parent?: Options;
+  binding?: Binding<T>;
+  parent?: Options<any>;
 }
 
 export type ActivationHandler<T = unknown> = (

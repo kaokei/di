@@ -65,56 +65,23 @@ export class Container {
     const binding = this._getBinding(token);
     if (options.skipSelf) {
       if (this.parent) {
-        return this.parent.get(token, {
-          ...options,
-          skipSelf: false,
-        });
-      } else {
-        this.checkBindingNotFoundError(token, options);
+        options.skipSelf = false;
+        return this.parent.get(token, options);
       }
     } else if (options.self) {
       if (binding) {
+        options.token = token;
+        options.binding = binding;
         return binding.get(options) as T;
-      } else {
-        this.checkBindingNotFoundError(token, options);
       }
     } else if (binding) {
+      options.token = token;
+      options.binding = binding;
       return binding.get(options) as T;
     } else if (this.parent) {
       return this.parent.get(token, options);
-    } else {
-      this.checkBindingNotFoundError(token, options);
     }
-    return void 0 as T;
-  }
-
-  public getBinding<T>(
-    token: CommonToken<T>,
-    options: Options<T> = {}
-  ): Binding<T> | void {
-    const binding = this._getBinding(token);
-    if (options.skipSelf) {
-      if (this.parent) {
-        return this.parent.getBinding(token, {
-          ...options,
-          skipSelf: false,
-        });
-      } else {
-        this.checkBindingNotFoundError(token, options);
-      }
-    } else if (options.self) {
-      if (binding) {
-        return binding;
-      } else {
-        this.checkBindingNotFoundError(token, options);
-      }
-    } else if (binding) {
-      return binding;
-    } else if (this.parent) {
-      return this.parent.getBinding(token, options);
-    } else {
-      this.checkBindingNotFoundError(token, options);
-    }
+    return this.checkBindingNotFoundError(token, options) as T;
   }
 
   public onActivation(handler: ActivationHandler) {
@@ -148,7 +115,10 @@ export class Container {
     return this.bindings.get(token) as Binding<T>;
   }
 
-  private checkBindingNotFoundError(token: CommonToken, options: Options) {
+  private checkBindingNotFoundError<T>(
+    token: CommonToken,
+    options: Options<T>
+  ) {
     if (!options.optional) {
       throw new BindingNotFoundError(token);
     }
