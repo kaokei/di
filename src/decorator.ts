@@ -21,14 +21,14 @@
 import { getMetadata, getOwnMetadata, defineMetadata } from './cachemap';
 import { KEYS, ERRORS } from './constants';
 import type {
-  RequiredParameters,
-  PostConstructParam,
   META_KEY_POST_CONSTRUCT,
   META_KEY_PRE_DESTROY,
   ExtractKV,
-  Options,
   META_KEY_INJECTED_PROPS,
   CacheMapValue,
+  Newable,
+  DecoratorTarget,
+  InjectFunction,
 } from './interfaces';
 
 /**
@@ -47,11 +47,17 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
     // target可能是构造函数或者类的原型
     // 如果target是构造函数，targetKey是undefined，index是参数的位置下标
     // 如果target是原型，targetKey是属姓名，index是undefined
-    return function (target: any, targetKey?: string, index?: number) {
+    return function (
+      target: DecoratorTarget,
+      targetKey?: string,
+      index?: number
+    ) {
       // 如果index是number，那么代表是构造函数的参数的装饰器
       const isParameterDecorator = typeof index === 'number';
       // 统一把装饰器数据绑定到构造函数上，后续获取数据比较方便
-      const Ctor = isParameterDecorator ? target : target.constructor;
+      const Ctor = isParameterDecorator
+        ? (target as Newable)
+        : (target.constructor as Newable);
       // 如果是构造函数的参数装饰器，取参数位置下标，否则取实例属性的属性名
       const key: string | number = isParameterDecorator
         ? (index as number)
@@ -91,21 +97,21 @@ function createMetaDecorator<
   T extends META_KEY_POST_CONSTRUCT | META_KEY_PRE_DESTROY
 >(metaKey: T, errorMessage: string) {
   return (metaValue: ExtractKV<T>) => {
-    return (target: any, propertyKey: string) => {
-      if (getOwnMetadata(metaKey, target.constructor)) {
+    return (target: DecoratorTarget, propertyKey: string) => {
+      if (getOwnMetadata(metaKey, target.constructor as Newable)) {
         throw new Error(errorMessage);
       }
       defineMetadata(
         metaKey,
         { key: propertyKey, value: metaValue } as CacheMapValue[T],
-        target.constructor
+        target.constructor as Newable
       );
     };
   };
 }
 
 // 可以使用在类构造函数的参数中和类的实例属性中
-export const Inject: RequiredParameters<ReturnType<typeof createDecorator>> =
+export const Inject: InjectFunction<ReturnType<typeof createDecorator>> =
   createDecorator(KEYS.INJECT);
 
 // 指定只在当前container中寻找服务

@@ -232,9 +232,12 @@ export class Binding<T = unknown> {
       const meta = params[i];
       const { inject, ...rest } = meta;
       rest.parent = options;
-      const ret = this.container.get(resolveToken(inject), rest);
+      const ret = this.container.get(
+        resolveToken(inject as GenericToken),
+        rest
+      );
       result.push(ret);
-      binding.push(rest.binding);
+      binding.push(rest.binding as Binding);
     }
     return [result, binding] as const;
   }
@@ -249,11 +252,14 @@ export class Binding<T = unknown> {
       const meta = props[prop];
       const { inject, ...rest } = meta;
       rest.parent = options;
-      const ret = this.container.get(resolveToken(inject), rest);
+      const ret = this.container.get(
+        resolveToken(inject as GenericToken),
+        rest
+      );
       if (!(ret === void 0 && meta.optional)) {
         result[prop] = ret;
       }
-      binding.push(rest.binding);
+      binding.push(rest.binding as Binding);
     }
     return [result, binding] as const;
   }

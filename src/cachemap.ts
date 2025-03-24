@@ -4,6 +4,7 @@ import type {
   CacheMapValue,
   META_KEY_INJECTED_PROPS,
   META_KEYS,
+  META_KEY_INJECTED_PARAMS,
 } from './interfaces';
 const map = new WeakMap<CommonToken, CacheMapValue>();
 
@@ -42,10 +43,9 @@ export function getOwnMetadata<T extends META_KEYS>(
 // getMetadata只支持获取属性装饰器数据或者没有父类的构造函数参数装饰器数据
 // 因为getMetadata默认写死返回对象而不是数组，这只能满足属性装饰器数据合并，不满足构造函数参数装饰数据合并
 // 所以本库只支持继承父类的属性注入，不支持父类的构造函数参数注入
-export function getMetadata<T extends META_KEY_INJECTED_PROPS>(
-  metadataKey: T,
-  target: CommonToken
-): CacheMapValue[T] | undefined {
+export function getMetadata<
+  T extends Exclude<META_KEYS, META_KEY_INJECTED_PARAMS>
+>(metadataKey: T, target: CommonToken): CacheMapValue[T] | undefined {
   const ownMetadata = getOwnMetadata(metadataKey, target);
 
   if (!hasParentClass(target)) {
@@ -58,6 +58,9 @@ export function getMetadata<T extends META_KEY_INJECTED_PROPS>(
   );
 
   if (parentMetadata || ownMetadata) {
-    return { ...(parentMetadata || {}), ...(ownMetadata || {}) };
+    return {
+      ...(parentMetadata || {}),
+      ...(ownMetadata || {}),
+    } as CacheMapValue[T];
   }
 }
