@@ -18,14 +18,14 @@ export class Container {
     if (this.bindings.has(token)) {
       throw new DuplicateBindingError(token);
     }
-    const binding = this._buildBinding(token);
+    const binding = this.buildBinding(token);
     this.bindings.set(token, binding as Binding);
     return binding;
   }
 
   public unbind<T>(token: CommonToken<T>) {
     if (this.bindings.has(token)) {
-      const binding = this._getBinding(token);
+      const binding = this.getBinding(token);
       this.deactivate(binding);
       binding.preDestroy();
       this.bindings.delete(token);
@@ -56,7 +56,7 @@ export class Container {
   }
 
   public get<T>(token: CommonToken<T>, options: Options<T> = {}): T {
-    const binding = this._getBinding(token);
+    const binding = this.getBinding(token);
     if (options.skipSelf) {
       if (this.parent) {
         options.skipSelf = false;
@@ -71,7 +71,7 @@ export class Container {
     } else if (this.parent) {
       return this.parent.get(token, options);
     }
-    return this._checkBindingNotFoundError(token, options) as T;
+    return this.checkBindingNotFoundError(token, options) as T;
   }
 
   public onActivation(handler: ActivationHandler) {
@@ -94,15 +94,15 @@ export class Container {
     binding.deactivate();
   }
 
-  private _buildBinding<T>(token: CommonToken<T>) {
+  private buildBinding<T>(token: CommonToken<T>) {
     return new Binding<T>(token, this);
   }
 
-  private _getBinding<T>(token: CommonToken<T>) {
+  private getBinding<T>(token: CommonToken<T>) {
     return this.bindings.get(token) as Binding<T>;
   }
 
-  private _checkBindingNotFoundError<T>(
+  private checkBindingNotFoundError<T>(
     token: CommonToken,
     options: Options<T>
   ) {
