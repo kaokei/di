@@ -32,12 +32,11 @@ import type {
 
 /**
  * 创建装饰器的高阶函数
- * 装饰器的通用逻辑就是通过cachemap记录到全局的Map中
- * 所以可以抽象出一个通用逻辑，这里需要注意对Inject装饰器有特殊判断
+ * 装饰器的通用逻辑就是通过cachemap记录到全局的WeakMap中
  *
  * @param {(string )} decoratorKey 代表某个装饰器的名称
  * @param {*} [defaultValue] 该装饰器函数的默认参数
- * @return {*} 一个装饰器
+ * @return {*} 装饰器函数
  */
 function createDecorator(decoratorKey: string, defaultValue?: any) {
   // 因为装饰器本身作为一个函数是有参数的，此处的decoratorValue就是实际使用装饰器的实参
@@ -56,16 +55,14 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
       // 如果是构造函数的参数装饰器，取参数位置下标，否则取实例属性的属性名
       const key = isParameterDecorator ? index : (targetKey as string);
       // 区分构造函数的参数装饰器和实例属性的装饰器
-      // 分别记录到全局Map的不同位置，metadataKey不一样
+      // 分别记录到全局cachemap的不同位置，metadataKey不一样
       const metadataKey = isParameterDecorator
         ? KEYS.INJECTED_PARAMS
         : KEYS.INJECTED_PROPS;
       // 这里是一个大对象，对应的key是metadataKey
-      // 所以全局Map中有两个不同的metadataKey，以及对应的数据对象
-      // 如果是构造函数参数装饰器，这个对象中的key是参数位置下标
-      // 如果是实例属性装饰器，这个对象中的key是属性名
-      // 这里有一个坑，必须使用getOwnMetadata而不是getMetadata
-      // 否则在继承的场景中会有问题
+      // 所以全局cachemap中针对每个Ctor有两个不同的metadataKey，以及对应的数据对象
+      // 如果是构造函数参数装饰器，这个数据是一个数组，使用getOwnMetadata获取数据，不支持继承
+      // 如果是实例属性装饰器，这个数据是一个对象，使用getMetadata获取数据，支持继承
       const paramsOrPropertiesMetadata: any = isParameterDecorator
         ? getOwnMetadata(metadataKey, Ctor) || []
         : getMetadata(metadataKey as META_KEY_INJECTED_PROPS, Ctor) || {};
@@ -80,7 +77,7 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
 
       // 关联这个数组和对应的key
       paramsOrPropertiesMetadata[key] = paramOrPropertyMetadata;
-      // 再把整个大对象放到全局Map中
+      // 再把整个大对象放到全局cachemap中
       defineMetadata(metadataKey, paramsOrPropertiesMetadata, Ctor);
     };
   };
@@ -103,7 +100,7 @@ function createMetaDecorator<
   };
 }
 
-// 可以使用在类构造函数的参数中和类的实例属性中
+// 可以在类构造函数的参数中和类的实例属性中使用
 export const Inject: InjectFunction<ReturnType<typeof createDecorator>> =
   createDecorator(KEYS.INJECT);
 

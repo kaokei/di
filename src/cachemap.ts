@@ -22,7 +22,6 @@ function hasParentClass(cls: CommonToken) {
   );
 }
 
-// 注意重复调用会覆盖之前的结果
 export function defineMetadata(
   metadataKey: META_KEY_INJECTED_PARAMS,
   metadataValue: META_VALUE_INJECTED_PARAMS,
@@ -86,12 +85,12 @@ export function getOwnMetadata<T extends META_KEYS>(
   return found[metadataKey];
 }
 
-// 使用hasParentClass判断当前target有没有父类
-// 如果没有父类直接使用getOwnMetadata获取数据
-// 如果有父类，那么需要合并getOwnMetadata(target)和getMetadata(target的父类)
-// getMetadata只支持获取属性装饰器数据或者没有父类的构造函数参数装饰器数据
-// 因为getMetadata默认写死返回对象而不是数组，这只能满足属性装饰器数据合并，不满足构造函数参数装饰数据合并
-// 所以本库只支持继承父类的属性注入，不支持父类的构造函数参数注入
+/**
+ * 使用hasParentClass判断当前target有没有父类
+ * 如果没有父类直接使用getOwnMetadata获取数据
+ * 如果有父类，那么需要合并getOwnMetadata(target)和getMetadata(target的父类)
+ * 不支持META_KEY_INJECTED_PARAMS作为metadataKey
+ */
 export function getMetadata(
   metadataKey: META_KEY_INJECTED_PROPS,
   target: CommonToken

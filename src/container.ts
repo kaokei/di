@@ -62,16 +62,12 @@ export class Container {
         options.skipSelf = false;
         return this.parent.get(token, options);
       }
-    } else if (options.self) {
+    } else if (options.self || binding) {
       if (binding) {
         options.token = token;
         options.binding = binding;
         return binding.get(options);
       }
-    } else if (binding) {
-      options.token = token;
-      options.binding = binding;
-      return binding.get(options);
     } else if (this.parent) {
       return this.parent.get(token, options);
     }

@@ -36,7 +36,7 @@ export class Binding<T = unknown> {
 
   public cache!: T;
 
-  public postConstructResult: Promise<void> | Symbol = DEFAULT_VALUE;
+  public postConstructResult?: Promise<void> | Symbol = DEFAULT_VALUE;
 
   public onActivationHandler?: ActivationHandler<T>;
 
@@ -95,12 +95,14 @@ export class Binding<T = unknown> {
     );
   }
 
-  // 优先从缓存中获取
-  // 如果是DynamicValue类型的绑定，执行绑定的函数，缓存并返回函数结果
-  // 如果是Instance类型的绑定，本质上是执行了new Constructor()，缓存并返回实例
-  // 关键在于new Constructor()可能需要提供参数，这些参数也需要从容器中获取，当然构造函数的参数需要通过@Inject来绑定对应的服务
-  // 另外new Constructor()所在的类可能还有注入的实例属性，这些实例属性也需要从容器中获取
-  // 需要把这些实例性通过赋值的方式合并到实例对象上。最终在返回实例对象之前，执行onActivationHandler
+  /**
+   * 首先判断是否存在循环依赖
+   * 接着判断缓存中是否已经存在数据，如果存在则直接返回数据
+   * 如果是Instance类型的绑定，本质上是执行了new Constructor()，缓存并返回实例
+   * 如果是ConstantValue类型的绑定，直接缓存并返回数据
+   * 如果是DynamicValue类型的绑定，执行绑定的函数，缓存并返回函数结果
+   * 最终抛出异常，原因是binding没有绑定对应的服务
+   */
   public get(options: Options<T>) {
     if (STATUS.INITING === this.status) {
       throw new CircularDependencyError(options as Options);
@@ -140,14 +142,19 @@ export class Binding<T = unknown> {
     if (BINDING.Instance === this.type) {
       const { key, value } = getMetadata(KEYS.POST_CONSTRUCT, this.token) || {};
       if (key) {
+        // 使用了@PostConstruct装饰器
         if (value) {
+          // @PostConstruct(指定了参数)，说明需要等待前置服务初始化完成之后再初始化本服务
+          // bindings是本服务依赖的所有构造函数参数和注入的实例属性，并且Binding类型是Instance
           const bindings = [...binding1, ...binding2].filter(
             item => BINDING.Instance === item?.type
           );
+          // 通过@PostConstruct(指定的参数)，也就是value来过滤指定的需要等待的binding
           const awaitBindings = this.getAwaitBindings(bindings, value);
           for (const binding of awaitBindings) {
             if (binding) {
               if (binding.postConstructResult === DEFAULT_VALUE) {
+                // @PostConstruct导致循环依赖
                 throw new PostConstructError({
                   token: binding.token,
                   parent: options,
@@ -160,8 +167,12 @@ export class Binding<T = unknown> {
             this.postConstructResult = this.execute(key);
           });
         } else {
+          // @PostConstruct()没有指定参数
           this.postConstructResult = this.execute(key);
         }
+      } else {
+        // 没有使用@PostConstruct装饰器
+        this.postConstructResult = void 0;
       }
     }
   }
@@ -180,36 +191,21 @@ export class Binding<T = unknown> {
     return value?.call(this.cache);
   }
 
-  /**
-   * activate逻辑有两种处理时机
-   * 第1种是在CONSTRUCTED之前，此方案的缺点是activate对象还不是完整的对象，缺少注入属性。
-   * 第2种是在ACTIVATED之前，此方案的优点是activate对象是完整的对象，
-   * 但缺点是CONSTRUCTED阶段的this.cache并不是最终的对象，有可能在ACTIVATED被修改和替换。
-   * 权衡之后还是选择方案1，相对来说方案1的缺点是稳定可控的，只要保证在activate方法中不依赖注入属性即可。
-   * 但是方案2可能导致系统表面上可以正常运行，但是隐藏了未知的异常风险。
-   */
   private resolveInstanceValue(options: Options<T>) {
     this.status = STATUS.INITING;
     const ClassName = this.classValue;
-    // @notice 这里可能会有循环引用
+    // 构造函数的参数可能会导致循环依赖
     const [params, paramBindings] = this.getContructorParameters(options);
     const inst = new ClassName(...params);
-    // @notice 这里可能会有循环引用
+    // ActivationHandler可能会导致循环依赖
+    // 需要注意ActivationHandler只能访问构造函数参数，并不能访问注入的实例属性
     this.cache = this.activate(inst);
-    // 实例化成功，并存入缓存，此时不会再有循环引用问题
+    // 实例化成功，并存入缓存，此时不会再有循环依赖的问题
     this.status = STATUS.ACTIVATED;
-    // 所以属性注入不会导致循环引用问题
+    // 属性注入不会导致循环依赖问题
     const [properties, propertyBindings] = this.getInjectProperties(options);
     Object.assign(this.cache as RecordObject, properties);
-    // 本库postConstruct特意放在了getInjectProperties之后
-    // 这样postConstruct就能访问注入的属性了
-    // 1. 检查是否有循环依赖
-    // 2. 检查是否需要等待前置异步任务
-    // 2.1 获取依赖列表【token列表】【binding列表】【cache列表】
-    // 2.2 判断依赖依赖是否是构造函数参数以及属性注入的子集
-    // 2.3 token列表转为实例对象的列表
-    // 2.4 获取实例对象的[[symbol]]属性，也就是postConstruct的promise返回值
-    // 2.5 有前置异步任务：Promise.all([promise列表]).then(() => this.postConstruct())
+    // postConstruct特意放在了getInjectProperties之后，这样postConstruct就能访问注入的属性了
     this.postConstruct(options, paramBindings, propertyBindings);
     return this.cache;
   }
