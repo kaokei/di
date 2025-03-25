@@ -27,9 +27,7 @@ import type {
   META_KEY_INJECTED_PROPS,
   CacheMapValue,
   Newable,
-  DecoratorTarget,
   InjectFunction,
-  Prototype,
 } from './interfaces';
 
 /**
@@ -48,11 +46,7 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
     // target可能是构造函数或者类的原型
     // 如果target是构造函数，targetKey是undefined，index是参数的位置下标
     // 如果target是原型，targetKey是属姓名，index是undefined
-    return function (
-      target: DecoratorTarget,
-      targetKey?: string,
-      index?: number
-    ) {
+    return function (target: any, targetKey?: string, index?: number) {
       // 如果index是number，那么代表是构造函数的参数的装饰器
       const isParameterDecorator = typeof index === 'number';
       // 统一把装饰器数据绑定到构造函数上，后续获取数据比较方便
@@ -96,7 +90,7 @@ function createMetaDecorator<
   T extends META_KEY_POST_CONSTRUCT | META_KEY_PRE_DESTROY
 >(metaKey: T, errorMessage: string) {
   return (metaValue: ExtractKV<T>) => {
-    return (target: Prototype, propertyKey: string) => {
+    return (target: any, propertyKey: string) => {
       if (getOwnMetadata(metaKey, target.constructor)) {
         throw new Error(errorMessage);
       }

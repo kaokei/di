@@ -8,16 +8,6 @@ export type Newable<
   TArgs extends unknown[] = any[]
 > = new (...args: TArgs) => TInstance;
 
-export interface Prototype<T = unknown> {
-  constructor: Newable<T>;
-}
-
-export type DecoratorTarget<T = unknown> = Prototype<T> | Newable<T>;
-
-export type RequiredParameters<T extends (...args: any) => any> = (
-  ...args: Required<Parameters<T>>
-) => ReturnType<T>;
-
 export type InjectFunction<R extends (...args: any) => any> = (
   token: GenericToken
 ) => ReturnType<R>;
