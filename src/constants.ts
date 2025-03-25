@@ -35,6 +35,7 @@ export const ERRORS = {
     'Cannot apply @PostConstruct decorator multiple times in the same class',
   PRE_DESTROY:
     'Cannot apply @PreDestroy decorator multiple times in the same class',
+  MISS_INJECT: 'Expected a @Inject decorator to explicitly specify the token',
 } as const;
 
 export const DEFAULT_VALUE = Symbol();

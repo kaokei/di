@@ -72,12 +72,12 @@ export class Container {
       if (binding) {
         options.token = token;
         options.binding = binding;
-        return binding.get(options) as T;
+        return binding.get(options);
       }
     } else if (binding) {
       options.token = token;
       options.binding = binding;
-      return binding.get(options) as T;
+      return binding.get(options);
     } else if (this.parent) {
       return this.parent.get(token, options);
     }

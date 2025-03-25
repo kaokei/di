@@ -1,4 +1,3 @@
-// key是token或者class
 import type {
   CommonToken,
   CacheMapValue,
@@ -7,11 +6,11 @@ import type {
   META_KEY_INJECTED_PROPS,
   META_KEY_POST_CONSTRUCT,
   META_KEY_PRE_DESTROY,
+  META_VALUES,
   META_VALUE_INJECTED_PARAMS,
   META_VALUE_INJECTED_PROPS,
   META_VALUE_POST_CONSTRUCT,
   META_VALUE_PRE_DESTROY,
-  META_VALUES,
 } from './interfaces';
 
 const map = new WeakMap<CommonToken, CacheMapValue>();
@@ -59,9 +58,6 @@ export function defineMetadata<T extends META_KEYS>(
   map.set(target, found);
 }
 
-// 可能返回undefined
-// 可能返回object，因为是属性装饰器数据
-// 可能返回array，因为时构造函数参数装饰器数据
 export function getOwnMetadata(
   metadataKey: META_KEY_INJECTED_PARAMS,
   target: CommonToken
@@ -115,13 +111,7 @@ export function getMetadata(
 export function getMetadata<
   T extends Exclude<META_KEYS, META_KEY_INJECTED_PARAMS>
 >(metadataKey: T, target: CommonToken): CacheMapValue[T] | undefined {
-  const ownMetadata = getOwnMetadata(
-    // https://yuanbao.tencent.com/bot/app/share/chat/h4kXqG2CsxJL
-    // 重载函数的类型推导限制
-    // 递归调用时的类型丢失
-    metadataKey,
-    target
-  ) as CacheMapValue[T];
+  const ownMetadata = getOwnMetadata(metadataKey, target) as CacheMapValue[T];
 
   if (!hasParentClass(target)) {
     return ownMetadata;
@@ -136,6 +126,6 @@ export function getMetadata<
     return {
       ...(parentMetadata || {}),
       ...(ownMetadata || {}),
-    } as CacheMapValue[T];
+    };
   }
 }

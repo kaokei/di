@@ -14,7 +14,6 @@ import type {
   Context,
   Options,
   RecordObject,
-  GenericToken,
   PostConstructParam,
 } from './interfaces';
 
@@ -232,10 +231,7 @@ export class Binding<T = unknown> {
       const meta = params[i];
       const { inject, ...rest } = meta;
       rest.parent = options;
-      const ret = this.container.get(
-        resolveToken(inject as GenericToken),
-        rest
-      );
+      const ret = this.container.get(resolveToken(inject), rest);
       result.push(ret);
       binding.push(rest.binding as Binding);
     }
@@ -252,10 +248,7 @@ export class Binding<T = unknown> {
       const meta = props[prop];
       const { inject, ...rest } = meta;
       rest.parent = options;
-      const ret = this.container.get(
-        resolveToken(inject as GenericToken),
-        rest
-      );
+      const ret = this.container.get(resolveToken(inject), rest);
       if (!(ret === void 0 && meta.optional)) {
         result[prop] = ret;
       }

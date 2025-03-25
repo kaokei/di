@@ -6,7 +6,7 @@ export class CircularDependencyError extends BaseError {
     super('');
 
     const tokenArr = [];
-    let parent = options as Options | undefined;
+    let parent: Options | undefined = options;
     while (parent && parent.token) {
       tokenArr.push(parent.token);
       parent = parent.parent;
