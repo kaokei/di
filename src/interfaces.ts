@@ -90,7 +90,7 @@ export interface KV<T> {
 
 export type ExtractKV<T> = T extends META_KEY_POST_CONSTRUCT
   ? PostConstructParam
-  : T extends META_VALUE_PRE_DESTROY
+  : T extends META_KEY_PRE_DESTROY
   ? KV<void>
   : never;
 
