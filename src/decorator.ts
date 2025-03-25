@@ -21,13 +21,13 @@
 import { getMetadata, getOwnMetadata, defineMetadata } from './cachemap';
 import { KEYS, ERRORS } from './constants';
 import type {
+  Newable,
+  ExtractKV,
+  CacheMapValue,
+  InjectFunction,
   META_KEY_POST_CONSTRUCT,
   META_KEY_PRE_DESTROY,
-  ExtractKV,
   META_KEY_INJECTED_PROPS,
-  CacheMapValue,
-  Newable,
-  InjectFunction,
 } from './interfaces';
 
 /**
@@ -100,7 +100,7 @@ function createMetaDecorator<
   };
 }
 
-// 可以在类构造函数的参数中和类的实例属性中使用
+// 可以在类的构造函数参数中和类的实例属性中使用
 export const Inject: InjectFunction<ReturnType<typeof createDecorator>> =
   createDecorator(KEYS.INJECT);
 

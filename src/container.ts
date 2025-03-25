@@ -2,10 +2,10 @@ import { Binding } from './binding';
 import { BindingNotFoundError } from './errors/BindingNotFoundError';
 import { DuplicateBindingError } from './errors/DuplicateBindingError';
 import type {
+  Options,
   CommonToken,
   ActivationHandler,
   DeactivationHandler,
-  Options,
 } from './interfaces';
 
 export class Container {

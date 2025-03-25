@@ -6,15 +6,15 @@ import { CircularDependencyError } from './errors/CircularDependencyError';
 import { BindingNotValidError } from './errors/BindingNotValidError';
 import { PostConstructError } from './errors/PostConstructError';
 import type {
-  ActivationHandler,
-  CommonToken,
-  DeactivationHandler,
   Newable,
-  DynamicValue,
   Context,
   Options,
+  CommonToken,
   RecordObject,
+  DynamicValue,
   PostConstructParam,
+  ActivationHandler,
+  DeactivationHandler,
 } from './interfaces';
 
 export class Binding<T = unknown> {
@@ -95,26 +95,24 @@ export class Binding<T = unknown> {
     );
   }
 
-  /**
-   * 首先判断是否存在循环依赖
-   * 接着判断缓存中是否已经存在数据，如果存在则直接返回数据
-   * 如果是Instance类型的绑定，本质上是执行了new Constructor()，缓存并返回实例
-   * 如果是ConstantValue类型的绑定，直接缓存并返回数据
-   * 如果是DynamicValue类型的绑定，执行绑定的函数，缓存并返回函数结果
-   * 最终抛出异常，原因是binding没有绑定对应的服务
-   */
   public get(options: Options<T>) {
     if (STATUS.INITING === this.status) {
+      // 首先判断是否存在循环依赖
       throw new CircularDependencyError(options as Options);
     } else if (STATUS.ACTIVATED === this.status) {
+      // 接着判断缓存中是否已经存在数据，如果存在则直接返回数据
       return this.cache;
     } else if (BINDING.Instance === this.type) {
+      // 如果是Instance类型的绑定，本质上是执行了new Constructor()，缓存并返回实例
       return this.resolveInstanceValue(options);
     } else if (BINDING.ConstantValue === this.type) {
+      // 如果是ConstantValue类型的绑定，直接缓存并返回数据
       return this.resolveConstantValue();
     } else if (BINDING.DynamicValue === this.type) {
+      // 如果是DynamicValue类型的绑定，执行绑定的函数，缓存并返回函数结果
       return this.resolveDynamicValue();
     } else {
+      // 最终抛出异常，原因是binding没有绑定对应的服务
       throw new BindingNotValidError(this.token);
     }
   }
