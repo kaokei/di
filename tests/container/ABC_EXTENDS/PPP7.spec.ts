@@ -1,4 +1,6 @@
 // A extends B
+// 父类和子类都有 PostConstruct
+// 可以通过super调用父类的方法
 import { PostConstruct, Container } from '@/index';
 
 class B {

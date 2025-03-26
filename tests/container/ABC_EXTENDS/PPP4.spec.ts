@@ -5,6 +5,7 @@
 // B has property di of b1
 // C has property di of c1
 // D has property di of d1
+// 自动继承所有父类的注入属性
 import { Inject, Container, LazyToken, Token } from '@/index';
 
 const tokenA1 = new Token<number>('a1');

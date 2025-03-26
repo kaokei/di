@@ -1,4 +1,6 @@
 // A extends B
+// 父类和子类都有 PostConstruct
+// 默认情况父类的PostConstruct不会自动执行
 import { PostConstruct, Container } from '@/index';
 
 class B {

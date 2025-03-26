@@ -1,6 +1,8 @@
 // A extends B
 // A has property of sameProp
 // B has property of sameProp
+// 正常应该是子类覆盖父类的同名属性，但是如果存在注入属性，则后续注入的数据优先级更高
+// 也就是注入的数据会覆盖子类的默认数据
 import { Inject, Container, LazyToken, Token } from '@/index';
 
 describe('PPP5', () => {
