@@ -7,9 +7,9 @@ class D {
   public name = 'D';
   public id = 4;
 
-  @PostConstruct()
+  @PostConstruct(true)
   public async initD() {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 300));
     this.id *= 100;
   }
 }
@@ -36,7 +36,7 @@ class B {
 
   @PostConstruct(true)
   public async initB() {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise(resolve => setTimeout(resolve, 300));
     this.id += this.c.id;
   }
 }

@@ -161,9 +161,9 @@ export class Binding<T = unknown> {
             }
           }
           const list = awaitBindings.map(item => item.postConstructResult);
-          return Promise.all(list).then(() => {
-            this.postConstructResult = this.execute(key);
-          });
+          this.postConstructResult = Promise.all(list).then(() =>
+            this.execute(key)
+          );
         } else {
           // @PostConstruct()没有指定参数
           this.postConstructResult = this.execute(key);
