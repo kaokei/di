@@ -53,7 +53,7 @@ class A extends B {
   public declare c: IC;
 }
 
-describe('PPP', () => {
+describe('PPP3', () => {
   let container: Container;
 
   beforeEach(() => {

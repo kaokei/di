@@ -81,7 +81,7 @@ export interface KV<T> {
 export type ExtractKV<T> = T extends META_KEY_POST_CONSTRUCT
   ? PostConstructParam
   : T extends META_KEY_PRE_DESTROY
-  ? KV<void>
+  ? void
   : never;
 
 export interface CacheMapValue {

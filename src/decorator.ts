@@ -93,7 +93,7 @@ function createMetaDecorator<
       }
       defineMetadata(
         metaKey,
-        { key: propertyKey, value: metaValue } as CacheMapValue[T],
+        { key: propertyKey, value: metaValue },
         target.constructor
       );
     };
