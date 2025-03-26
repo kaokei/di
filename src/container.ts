@@ -2,6 +2,7 @@ import { Binding } from './binding';
 import { BindingNotFoundError } from './errors/BindingNotFoundError';
 import { DuplicateBindingError } from './errors/DuplicateBindingError';
 import type {
+  Newable,
   Options,
   CommonToken,
   ActivationHandler,
@@ -111,3 +112,8 @@ export class Container {
     }
   }
 }
+
+export const CONTAINER_MAP = new WeakMap<
+  InstanceType<Newable<any>>,
+  Container
+>();

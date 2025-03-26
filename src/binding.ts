@@ -1,5 +1,5 @@
 import { BINDING, KEYS, STATUS, DEFAULT_VALUE } from './constants';
-import { Container } from './container';
+import { Container, CONTAINER_MAP } from './container';
 import { getMetadata, getOwnMetadata } from './cachemap';
 import { resolveToken } from './token';
 import { CircularDependencyError } from './errors/CircularDependencyError';
@@ -182,6 +182,8 @@ export class Binding<T = unknown> {
         return this.execute(key);
       }
     }
+    this.container = null as unknown as Container;
+    this.context = null as unknown as Context;
   }
 
   private execute(key: string) {
@@ -200,6 +202,8 @@ export class Binding<T = unknown> {
     this.cache = this.activate(inst);
     // 实例化成功，并存入缓存，此时不会再有循环依赖的问题
     this.status = STATUS.ACTIVATED;
+    // 维护实例和容器之间的关系，方便@LazyInject获取容器
+    CONTAINER_MAP.set(this.cache, this.container);
     // 属性注入不会导致循环依赖问题
     const [properties, propertyBindings] = this.getInjectProperties(options);
     Object.assign(this.cache as RecordObject, properties);

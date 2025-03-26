@@ -23,7 +23,6 @@ import { KEYS, ERRORS } from './constants';
 import type {
   Newable,
   ExtractKV,
-  CacheMapValue,
   InjectFunction,
   META_KEY_POST_CONSTRUCT,
   META_KEY_PRE_DESTROY,
@@ -125,3 +124,36 @@ export const PreDestroy = createMetaDecorator(
   KEYS.PRE_DESTROY,
   ERRORS.PRE_DESTROY
 );
+
+/**
+ * 需要注意这里并没有考虑所有装饰器特性
+ * 没有处理属性描述符
+ * 不支持类装饰器
+ * 不支持静态属性装饰器和静态方法装饰器
+ * 不支持普通方法的参数装饰器
+ *
+ * 实际上只考虑了构造函数参数装饰器+实例属性装饰器+实例方法装饰器
+ */
+function applyDecorators(
+  decorators: any,
+  target: any,
+  key?: string,
+  index?: number
+) {
+  for (let i = decorators.length - 1; i >= 0; i--) {
+    decorators[i](target, key, index);
+  }
+}
+
+export function decorate(
+  decorator: any,
+  target: any,
+  key: number | string
+): void {
+  decorator = Array.isArray(decorator) ? decorator : [decorator];;
+  if (typeof key === 'number') {
+    applyDecorators(decorator, target, void 0, key);
+  } else if (typeof key === 'string') {
+    applyDecorators(decorator, target.prototype, key);
+  }
+}

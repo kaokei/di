@@ -28,4 +28,12 @@
    关键是怎么实现 container 和 class 的绑定
    正常 inject 时，是可以通过 container.get 获取上下文的，但是 lazyInject 拿不到这个上下文
 
+1. 直接使用javascript，不依赖typescript
+
+1. getter支持缓存，使用computed支持缓存
+
+应该在use-vue-service中实现
+
+https://yuanbao.tencent.com/bot/app/share/chat/tUbGmhHdY1Ta
+
 2. 优化 https://github.com/kaokei/utils/blob/main/src/index.ts 的文档
