@@ -18,13 +18,17 @@ describe('container activation', () => {
       .mockImplementation((_: any, inst: any) => {
         const a = new A();
         a.id = inst.id + 10;
-        a.name = inst.name + '_activated_by_binding';
+        a.name = inst.name + '_activated_by_bindingA';
         return a;
       });
 
-    const mockBindingActivationB = vi.fn().mockImplementation((_: any) => {
-      return 'mock_activated_by_binding';
-    });
+    const mockBindingActivationB = vi
+      .fn()
+      .mockImplementation((_: any, inst: any) => {
+        inst.id += 100;
+        inst.name += '_activated_by_bindingB';
+        return inst;
+      });
 
     const container = new Container();
 
@@ -41,9 +45,11 @@ describe('container activation', () => {
 
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(11);
-    expect(a.name).toBe('A_activated_by_binding');
+    expect(a.name).toBe('A_activated_by_bindingA');
 
-    expect(b).toBe('mock_activated_by_binding');
+    expect(b).toBeInstanceOf(B);
+    expect(b.id).toBe(102);
+    expect(b.name).toBe('B_activated_by_bindingB');
 
     expect(container.parent).toBeUndefined();
 

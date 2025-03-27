@@ -23,22 +23,29 @@ describe('container activation', () => {
       .mockImplementation((_: any, inst: any) => {
         const a = new A();
         a.id = inst.id + 10;
-        a.name = inst.name + '_activated_by_binding';
+        a.name = inst.name + '_activated_by_bindingA';
         return a;
       });
 
-    const mockBindingActivationB = vi.fn().mockImplementation((_: any) => {
-      return 'B_activated_by_binding';
-    });
+    const mockBindingActivationB = vi
+      .fn()
+      .mockImplementation((_: any, inst: any) => {
+        inst.id += 100;
+        inst.name += '_activated_by_bindingB';
+        return inst;
+      });
 
     const mockContainerActivation = vi
       .fn()
       .mockImplementation((_: any, inst: any, token: any) => {
         if (token === A) {
-          inst.name += '_activated_by_container';
-          return inst;
+          const a = new A();
+          a.id = inst.id + 200;
+          a.name = inst.name + '_activated_by_containerA';
+          return a;
         } else {
-          return inst + '_activated_by_container';
+          inst.name += '_activated_by_containerB';
+          return inst;
         }
       });
 
@@ -65,18 +72,26 @@ describe('container activation', () => {
 
     expect(mockContainerActivation).toHaveBeenCalledTimes(2);
 
-    expect(mockContainerActivation).toHaveLastReturnedWith(
-      'B_activated_by_binding_activated_by_container'
-    );
-    expect(mockBindingActivationB).toHaveLastReturnedWith(
-      'B_activated_by_binding'
-    );
+    expect(mockContainerActivation).toHaveLastReturnedWith({
+      id: 102,
+      name: 'B_activated_by_bindingB_activated_by_containerB',
+    });
+    expect(mockBindingActivationB).toHaveLastReturnedWith({
+      id: 102,
+      name: 'B_activated_by_bindingB_activated_by_containerB',
+    });
+    expect(mockBindingActivationA).toHaveLastReturnedWith({
+      id: 11,
+      name: 'A_activated_by_bindingA',
+    });
 
     expect(a).toBeInstanceOf(A);
-    expect(a.id).toBe(11);
-    expect(a.name).toBe('A_activated_by_binding_activated_by_container');
+    expect(a.id).toBe(211);
+    expect(a.name).toBe('A_activated_by_bindingA_activated_by_containerA');
 
-    expect(b).toBe('B_activated_by_binding_activated_by_container');
+    expect(b).toBeInstanceOf(B);
+    expect(b.id).toBe(102);
+    expect(b.name).toBe('B_activated_by_bindingB_activated_by_containerB');
 
     expect(container.parent).toBeUndefined();
 
