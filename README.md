@@ -28,6 +28,10 @@
    关键是怎么实现 container 和 class 的绑定
    正常 inject 时，是可以通过 container.get 获取上下文的，但是 lazyInject 拿不到这个上下文
 
+   LazyInject是否需要@Self/@Optional/@SkipSelf来配合？
+   需要协调@LazyInject/@Inject，因为现在是两条并行的路线，也就是@Self/@Optional/@SkipSelf默认是和@Inject配合的，现在如果和@LazyInject就会报找不到@Inject的异常
+   可以作为低优先级的需求，后续有需要再考虑。
+
 1. 直接使用javascript，不依赖typescript
 
 1. getter支持缓存，使用computed支持缓存

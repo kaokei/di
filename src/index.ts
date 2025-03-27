@@ -9,4 +9,4 @@ export {
   PreDestroy,
   decorate,
 } from './decorator';
-export { LazyInject } from './lazyinject';
+export { LazyInject, createLazyInject } from './lazyinject';
