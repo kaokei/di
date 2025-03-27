@@ -1,17 +1,18 @@
 import type { GenericToken } from './interfaces';
-import { CONTAINER_MAP } from './container';
+import { CONTAINER_MAP, type Container } from './container';
 import { resolveToken } from './token';
 import { ERRORS } from './constants';
 
 function defineLazyProperty<T>(
   proto: any,
   key: string,
-  token: GenericToken<T>
+  token: GenericToken<T>,
+  container?: Container
 ) {
   function getter(this: any) {
     const cacheKey = Symbol.for(key);
     if (!this.hasOwnProperty(cacheKey)) {
-      const con = CONTAINER_MAP.get(this);
+      const con = container || CONTAINER_MAP.get(this);
       const Ctor = this.constructor;
       if (!con) {
         throw new Error(`${ERRORS.MISS_CONTAINER} ${Ctor.name}`);
@@ -36,8 +37,14 @@ function defineLazyProperty<T>(
   });
 }
 
-export function LazyInject<T>(token: GenericToken<T>) {
+export function LazyInject<T>(token: GenericToken<T>, container?: Container) {
   return function (proto: any, key: string) {
-    defineLazyProperty(proto, key, token);
+    defineLazyProperty(proto, key, token, container);
+  };
+}
+
+export function createLazyInject(container: Container) {
+  return function <T>(token: GenericToken<T>) {
+    return LazyInject(token, container);
   };
 }
