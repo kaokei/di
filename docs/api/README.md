@@ -1,19 +1,5 @@
 # API 文档
 
-以下为本库对外导出的可用 API。
-
-- [Container](#container)
-- [Token](#token)
-- [LazyToken](#lazytoken)
-- [@Inject](#inject)
-- [@Self + @SkipSelf + @Optional](#self--skipself--optional)
-- [@PostConstruct](#postconstruct)
-- [@PreDestroy](#predestroy)
-- [@LazyInject](#lazyinject)
-- [decorate](#decorate)
-
-<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
-
 ## Container
 
 ```ts
@@ -116,7 +102,7 @@ class CountService {
   }
 }
 
-export class DemoService {
+class DemoService {
   // 使用场景1: 指定注入属性的token
   @Inject(LoggerService)
   public loggerService!: LoggerService;
@@ -145,7 +131,7 @@ class LoggerService {
   }
 }
 
-export class DemoService {
+class DemoService {
   @Self()
   @Inject(LoggerService)
   public loggerService1!: LoggerService;

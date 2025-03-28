@@ -1,17 +1,5 @@
 # Container 文档
 
-- [Container#parent](#containerparent)
-- [Container#get](#containerget)
-- [Container#bind](#containerbind)
-- [Container#unbind](#containerunbind)
-- [Container#unbindAll](#containerunbindall)
-- [Container#isCurrentBound](#containeriscurrentbound)
-- [Container#isBound](#containerisbound)
-- [Container#createChild](#containercreatechild)
-- [Container#onActivation](#containeronactivation)
-- [Container#onDeactivation](#containerondeactivation)
-- [CONTAINER_MAP](#container_map)
-
 ## Container#parent
 
 ```ts
@@ -27,7 +15,15 @@ parent 是公开可访问的实例属性，用于指向父级容器，从而可�
 ## Container#get
 
 ```ts
-function get<T>(token: CommonToken<T>, options: Options<T> = {}): T;
+function get<T>(
+  token: CommonToken<T>,
+  options: Options<T> & { optional: true }
+): T | void;
+function get<T>(
+  token: CommonToken<T>,
+  options?: Options<T> & { optional?: false }
+): T;
+function get<T>(token: CommonToken<T>, options?: Options<T>): T | void;
 ```
 
 get 方法是 Container 最核心的方法，用于获取指定 token 对应的服务对象。当然前提是需要 Container 已经提前绑定了对应的 token。
@@ -42,13 +38,19 @@ options.optional; // 当没有找到指定token时，默认时抛出异常，如
 
 `container.get` 方法可以自动根据 token 的类型自动推导出类型 T，所以不需要手动指定类型 T。
 
-需要注意如果指定了 options.optional=true，则 get 方法有可能返回 undefined，但是 get 方法仍然会自动推导返回类型为 T。所以需要自行在运行时做判空处理。
+需要注意如果指定了 options.optional=true，则 get 方法有可能返回 undefined，所以需要自行在运行时做判空处理。
 
 get 方法在实例化过程中会触发如下声明周期方法，顺序如下：
 
 1. Binding#onActivationHandler
 2. Container#onActivationHandler
 3. Class#PostConstruct
+
+对比 inversify 中的生命周期方法，[顺序如下：](https://inversify.io/docs/fundamentals/lifecycle/activation/)
+
+1. Class#PostConstruct
+2. Binding#onActivationHandler
+3. Container#onActivationHandler
 
 ## Container#bind
 
@@ -71,6 +73,8 @@ function unbind<T>(token: CommonToken<T>): void;
 1. Container#onDeactivationHandler
 2. Binding#onDeactivationHandler
 3. Class#PreDestroy
+
+这里的顺序是和[inversify 的执行顺序](https://inversify.io/docs/fundamentals/lifecycle/deactivation/)保持一致的。
 
 ## Container#unbindAll
 
@@ -116,7 +120,7 @@ return childContainer;
 function onActivation(handler: ActivationHandler): void;
 ```
 
-注册一个 Activation 函数，会在 get 方法执行过程中被执行。
+注册一个 Activation 函数，会在 get 方法首次执行过程中被执行。
 
 注意只能注册一个 Activation 函数，重复注册，只会覆盖前一个函数。
 

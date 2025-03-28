@@ -1,8 +1,8 @@
-# 重要细节差异
+# 对比 inversify 的实现差异
 
 ## API 对比
 
-[参考这个文档](./COMPARE-API.md)
+[对比 inversify 的 API 差异](./COMPARE-API.md)
 
 ## inSingletonScope 模式
 
@@ -23,7 +23,8 @@ inversify 中支持 3 种不同的 scope 模式，但是本库只支持 inSingle
 首先是 inversify 可以设置多个 Activation 和 Deactivation 方法，而本库只支持设置一个回调方法。
 
 第二点不同在于 inversify 的方法需要提前指定 token 的名称，为具体的 token 设置回调方法。
-本库则不需要指定 token，而是所有 token 共享的回调方法，当然可以在回调方法中知道当前执行回调方法的是哪一个 token。
+本库则不需要指定 token，而是所有 token 共享的回调方法。
+当然在回调方法中是可以知道当前执行回调方法的是哪一个 token，从而可以为不同的 token 实现不同的业务逻辑。
 
 但是一般情况是不需要的，因为理论上 container 的 Activation 回调 和 Deactivation 回调应该是所有 token 共享的。
 如果确实需要有差异化的逻辑，那么应该采用 binding 级别的 onActivation 方法 和 onDeactivation 方法。
@@ -99,7 +100,7 @@ parent.bind(A).toSelf();
 child.bind(B).toSelf();
 ```
 
-#### 在 inversify 中的处理逻辑
+#### inversify 的处理逻辑
 
 首先 child 容器没有 A，所有从 parent 容器中去找 A，在实例化 A 时，发现又依赖 B。此时需要寻找 B。
 inversify 的处理逻辑是又重新开始从 child 容器开始寻找，因为 child 中存在 B 的绑定，所以就使用 child 容器中的 B。
@@ -117,7 +118,7 @@ inversify 的处理逻辑是又重新开始从 child 容器开始寻找，因为
 
 尤其是 inversify 的实现会导致 parent 容器中的实例对象会依赖 child 容器中的实例对象，但是从生命周期角度考虑，应该是 child 容器可以依赖 parent 容器才是合理的。
 
-另一点原因是上面的例子中，如果是先调用`child.get(A)`，再调用`parent.get(A)`，此时是没有问题的，但是如果是反过来，是先调用的`parent.get(A)`，那么 inversify 也是会抛出异常，同样的 container 绑定关系，就因为调用顺序不一样，从而导致不同的结果，这也是本库不能接受的。
+另一点原因是上面的例子中，如果是先调用`child.get(A)`，再调用`parent.get(A)`，此时是没有问题的，但是如果是反过来，是先调用的`parent.get(A)`，那么 inversify 也是会抛出异常，同样的 container 绑定关系，只是因为调用顺序不一样，从而导致不同的结果，这也是本库不能接受的。
 
 相关单元测试[请关注这里](../../tests/special/DI_HIERARCHY_1.spec.ts)
 
@@ -125,9 +126,9 @@ inversify 的处理逻辑是又重新开始从 child 容器开始寻找，因为
 
 下面是[inversify 特性列表](https://github.com/inversify/InversifyJS/tree/develop/v6?tab=readme-ov-file#-the-inversifyjs-features-and-api)，其中绿色 ✅ 代表本库支持的特性，红色 ❌ 代表本库不支持的特性。
 
-✅ Support for classes
+✅ Support for classes as Token
 
-✅ Support for Token instance
+✅ Support for Token instance as Token
 
 ✅ Container API
 
@@ -135,13 +136,11 @@ inversify 的处理逻辑是又重新开始从 child 容器开始寻找，因为
 
 ✅ Injecting a constant or dynamic value
 
-✅ Injecting a class constructor
-
 ✅ Activation handler
 
 ✅ Deactivation handler
 
-✅ Post Construct decorator
+✅ PostConstruct decorator and PreDestroy decorator
 
 ✅ Support for hierarchical DI systems
 
@@ -150,6 +149,8 @@ inversify 的处理逻辑是又重新开始从 child 容器开始寻找，因为
 ✅ Circular dependencies
 
 ✅ Inheritance
+
+❌ Injecting a class constructor
 
 ❌ ~~Injecting a Factory~~ 类似 toDynamicValue，但是返回一个工厂函数。正常的 toDynamicValue 应该返回一个对象，这里返回一个工厂函数
 
@@ -165,7 +166,7 @@ inversify 的处理逻辑是又重新开始从 child 容器开始寻找，因为
 
 ❌ ~~Container snapshots~~
 
-❌ ~~Controlling the scope of the dependencies~~ 只支持单例模式
+❌ ~~Controlling the scope of the dependencies~~ 本库只支持单例模式
 
 ❌ ~~Middleware~~
 

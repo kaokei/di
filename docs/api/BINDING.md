@@ -1,21 +1,12 @@
 # Binding 文档
 
-- [Binding#onActivation](#bindingonactivation)
-- [Binding#onDeactivation](#bindingondeactivation)
-- [Binding#to](#bindingto)
-- [Binding#toSelf](#bindingtoself)
-- [Binding#toConstantValue](#bindingtoconstantvalue)
-- [Binding#toDynamicValue](#bindingtodynamicvalue)
-- [Binding#toService](#bindingtoservice)
-- [对比 inversify 的 Binding](#对比-inversify-的-binding)
-
 ## Binding#onActivation
 
 ```ts
 function onActivation(handler: ActivationHandler): void;
 ```
 
-注册一个 Activation 函数，会在 get 方法执行过程中被执行。
+注册一个 Activation 函数，会在 get 方法首次执行过程中被执行。
 
 注意只能注册一个 Activation 函数，重复注册，只会覆盖前一个函数。
 

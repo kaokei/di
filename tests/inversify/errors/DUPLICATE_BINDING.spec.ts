@@ -15,7 +15,7 @@ interface IB {
   id: number;
 }
 
-export class A {
+class A {
   public name = 'A';
   public id = 1;
 
@@ -23,11 +23,11 @@ export class A {
   public b!: IB;
 }
 
-export class B {
+class B {
   public name = 'B';
   public id = 2;
 }
-export class B2 extends B {
+class B2 extends B {
   public name = 'B2';
   public id = 22;
 }

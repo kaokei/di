@@ -11,14 +11,14 @@ interface IB {
   id: number;
 }
 
-export class A {
+class A {
   public name = 'A';
   public id = 1;
 
   public constructor(public b: IB) {}
 }
 
-export class B {
+class B {
   public name = 'B';
   public id = 2;
 }

@@ -4,7 +4,7 @@
 
 本库是利用 typescript 的 decorator 实现了依赖注入能力的小型工具库。
 
-实现过程参考了 [Spring](https://spring.io/), [Angular](https://angular.io/), [typedi](https://github.com/typestack/typedi), [InversifyJS](https://github.com/inversify/InversifyJS)等类似的开源实现。
+实现过程参考了 [Spring](https://spring.io/), [Angular](https://angular.dev/), [typedi](https://github.com/typestack/typedi), [InversifyJS](https://github.com/inversify/InversifyJS)等类似的开源实现。
 
 整体上可以将本库看作 InversifyJS 的 tiny 版本。[详细对比参考这里](./COMPARE.md)。
 

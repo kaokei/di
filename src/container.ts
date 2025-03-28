@@ -56,7 +56,16 @@ export class Container {
     return child;
   }
 
-  public get<T>(token: CommonToken<T>, options: Options<T> = {}): T {
+  public get<T>(
+    token: CommonToken<T>,
+    options: Options<T> & { optional: true }
+  ): T | void;
+  public get<T>(
+    token: CommonToken<T>,
+    options?: Options<T> & { optional?: false }
+  ): T;
+  public get<T>(token: CommonToken<T>, options?: Options<T>): T | void;
+  public get<T>(token: CommonToken<T>, options: Options<T> = {}): T | void {
     const binding = this.getBinding(token);
     if (options.skipSelf) {
       if (this.parent) {
@@ -72,7 +81,7 @@ export class Container {
     } else if (this.parent) {
       return this.parent.get(token, options);
     }
-    return this.checkBindingNotFoundError(token, options) as T;
+    return this.checkBindingNotFoundError(token, options);
   }
 
   public onActivation(handler: ActivationHandler) {

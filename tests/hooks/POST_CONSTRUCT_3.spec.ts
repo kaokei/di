@@ -11,7 +11,7 @@ interface IB {
   id: number;
 }
 
-export class A {
+class A {
   public name = 'A';
   public id = 1;
   public inited = false;
@@ -29,7 +29,7 @@ export class A {
   }
 }
 
-export class B {
+class B {
   public name = 'B';
   public id = 2;
   public inited = false;
