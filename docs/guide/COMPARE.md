@@ -12,15 +12,15 @@ inversify 中支持 3 种不同的 scope 模式，但是本库只支持 inSingle
 
 ## Container 的部分 API 集合
 
-本库的 Container 只实现了 inversify 的部分基础 API。
+本库 Container 只实现了 inversify Container 的部分基础 API。
 
-本库没有实现 inversify 中异步相关方法，name 相关方法，tag 相关方法，applyMiddleware 方法，resolve 方法等其他方法。
+本库没有实现 inversify Container 中异步相关方法，name 相关方法，tag 相关方法，applyMiddleware 方法，resolve 方法等其他方法。
 
 ## onActivation 和 onDeactivation
 
-本库的 container 虽然具有 onActivation 和 onDeactivation 方法，但是 API 定义和 inversify 不一致。
+本库的 Container 虽然具有 onActivation 和 onDeactivation 方法，但是 API 定义和 inversify 不一致。
 
-首先是 inversify 可以设置多个 Activation 和 Deactivation 方法，而本库只支持设置一个回调方法，多次调用也只能覆盖上一个回调方法。
+首先是 inversify 可以设置多个 Activation 和 Deactivation 方法，而本库只支持设置一个回调方法。
 
 第二点不同在于 inversify 的方法需要提前指定 token 的名称，为具体的 token 设置回调方法。
 本库则不需要指定 token，而是所有 token 共享的回调方法，当然可以在回调方法中知道当前执行回调方法的是哪一个 token。
@@ -87,9 +87,14 @@ inversify 是支持在同一个 token 上绑定多个服务的，最终可以实
 假设有如下示例，现在我们开始获取`const a = child.get(A)`。
 
 ```ts
+// A和B都是class，并且A依赖B
+class B {}
+class A {
+  @Inject(B)
+  public b!: B;
+}
 const parent = new Container();
 const child = parent.createChild();
-// A和B都是class，并且A依赖B
 parent.bind(A).toSelf();
 child.bind(B).toSelf();
 ```
@@ -114,11 +119,11 @@ inversify 的处理逻辑是又重新开始从 child 容器开始寻找，因为
 
 另一点原因是上面的例子中，如果是先调用`child.get(A)`，再调用`parent.get(A)`，此时是没有问题的，但是如果是反过来，是先调用的`parent.get(A)`，那么 inversify 也是会抛出异常，同样的 container 绑定关系，就因为调用顺序不一样，从而导致不同的结果，这也是本库不能接受的。
 
-相关单元测试请关注 special/DI_HIERARCHY
+相关单元测试[请关注这里](../../tests/special/DI_HIERARCHY_1.spec.ts)
 
 ## 本库对比 inversify 的特性差异
 
-[inversify 特性列表](https://github.com/inversify/InversifyJS/tree/develop/v6?tab=readme-ov-file#-the-inversifyjs-features-and-api)
+下面是[inversify 特性列表](https://github.com/inversify/InversifyJS/tree/develop/v6?tab=readme-ov-file#-the-inversifyjs-features-and-api)，其中绿色 ✅ 代表本库支持的特性，红色 ❌ 代表本库不支持的特性。
 
 ✅ Support for classes
 

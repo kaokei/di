@@ -9,6 +9,8 @@
 - [@Self + @SkipSelf + @Optional](#self--skipself--optional)
 - [@PostConstruct](#postconstruct)
 - [@PreDestroy](#predestroy)
+- [@LazyInject](#lazyinject)
+- [decorate](#decorate)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
@@ -57,7 +59,7 @@ const logger2 = container.get(LoggerService);
 
 这个例子中虽然 loggerToken 和 LoggerService 都作为 token 绑定了 LoggerService，但是 logger1 和 logger2 并不相等。
 
-@guide 注意到这里 bind 和 get 的过程非常像，map 中的 set 和 get 过程，只不过这里 get 时会有实例化的过程。
+注意这里 container.bind 和 container.get 的过程非常像 map 中的 map.set 和 map.get 过程，只不过这里 container.get 时会有实例化的过程。
 
 ## LazyToken
 
@@ -89,7 +91,7 @@ export class B {
 
 但是 LazyToken 本身只能解决`@Inject`导致的循环依赖，并不能解决所有循环依赖。比如类 A 和类 B 如果在实例化过程中互相依赖，则仍然会抛出异常。
 
-@guide 具体哪些场景的循环依赖是被支持的可以参考这里。
+具体哪些场景的循环依赖是被支持的可以[参考这里](../note/05.循环依赖.md)。
 
 ## @Inject
 
@@ -218,7 +220,7 @@ class StudentService {
 
 只有通过 container 获取实例对象时，此时会在实例对象创建完成之后，自动调用`init`方法，从而自动完成 student 信息的获取。
 
-@guide 更多高级功能参考这里，比如等待异步服务初始化完成之后，再执行自己的初始化服务。
+更多高级功能[参考这里](../note/06.异步初始化服务.md)，比如等待异步服务初始化完成之后，再执行自己的初始化服务。
 
 ## @PreDestroy
 
@@ -241,3 +243,13 @@ class DatabaseService {
 ```
 
 `@PreDestroy` 是和 `@PostConstruct`对应的装饰器，被装饰的方法，这里是 close 方法会在`container.unbind(DatabaseService对应的token)`时自动调用，在这个例子中可以自动完成数据库连接的断开。
+
+## @LazyInject
+
+同时还导出了 createLazyInject 高阶函数，可以返回一个绑定指定 container 的 LazyInject 装饰器。
+
+[具体文档参考这里。](./LAZY_INJECT.md)
+
+## decorate
+
+[具体文档参考这里。](./DECORATE.md)

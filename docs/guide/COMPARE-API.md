@@ -56,3 +56,23 @@ inversify 的 preDestroy
 但是这里借鉴了 Angular 中的命名风格，采用首字母大写。
 
 主要还是个人偏好。
+
+## decorate
+
+inversify 的 decorate
+
+主要用于在非 typescript 的项目中手动使用装饰器函数。
+
+## LazyInject 和 createLazyInject
+
+inversify 本身没有提供相应的方法，但是[第三方库](https://github.com/inversify/inversify-inject-decorators) 提供了类似的方法。实际上本库也是参考的这个开源库的实现。
+
+但是该三方库只提供了`getDecorators`方法，类似本库的`createLazyInject`方法。
+
+相关细节参考这里。@todo
+
+## CONTAINER_MAP
+
+inversify 没有对应的导出
+
+这实际上是本库的一个内部导出，维护了实例对象和容器的映射关系，也就是方便获取当前实例对象是通过哪个容器获取的，主要方便其他工具库封装出好用的功能。
