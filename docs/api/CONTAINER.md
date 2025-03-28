@@ -41,6 +41,7 @@ options.optional; // 当没有找到指定token时，默认时抛出异常，如
 ```
 
 `container.get` 方法可以自动根据 token 的类型自动推导出类型 T，所以不需要手动指定类型 T。
+
 需要注意如果指定了 options.optional=true，则 get 方法有可能返回 undefined，但是 get 方法仍然会自动推导返回类型为 T。所以需要自行在运行时做判空处理。
 
 get 方法在实例化过程中会触发如下声明周期方法，顺序如下：
@@ -119,6 +120,8 @@ function onActivation(handler: ActivationHandler): void;
 
 注意只能注册一个 Activation 函数，重复注册，只会覆盖前一个函数。
 
+这个 Activation 函数是当前 Container 的，当前 Container 的所有 token 都会使用这个 Activation 函数。
+
 ## Container#onDeactivation
 
 ```ts
@@ -128,6 +131,8 @@ function onDeactivation(handler: DeactivationHandler): void;
 注册一个 Deactivation 函数，会在 unbind 方法执行过程中被执行。
 
 注意只能注册一个 Deactivation 函数，重复注册，只会覆盖前一个函数。
+
+这个 Deactivation 函数是当前 Container 的，当前 Container 的所有 token 都会使用这个 Deactivation 函数。
 
 ## CONTAINER_MAP
 
