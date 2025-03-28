@@ -1,16 +1,16 @@
 # Container 文档
 
-- [Container#parent](#container-parent)
-- [Container#get](#container-get)
-- [Container#bind](#container-bind)
-- [Container#unbind](#container-unbind)
-- [Container#unbindAll](#container-unbindall)
-- [Container#isCurrentBound](#container-iscurrentbound)
-- [Container#isBound](#container-isbound)
-- [Container#createChild](#container-createchild)
-- [Container#onActivation](#container-onactivation)
-- [Container#onDeactivation](#container-ondeactivation)
-- [CONTAINER_MAP](#container-map)
+- [Container#parent](#containerparent)
+- [Container#get](#containerget)
+- [Container#bind](#containerbind)
+- [Container#unbind](#containerunbind)
+- [Container#unbindAll](#containerunbindall)
+- [Container#isCurrentBound](#containeriscurrentbound)
+- [Container#isBound](#containerisbound)
+- [Container#createChild](#containercreatechild)
+- [Container#onActivation](#containeronactivation)
+- [Container#onDeactivation](#containerondeactivation)
+- [CONTAINER_MAP](#container_map)
 
 ## Container#parent
 
