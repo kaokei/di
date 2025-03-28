@@ -7,7 +7,7 @@
 - [Binding#toConstantValue](#bindingtoconstantvalue)
 - [Binding#toDynamicValue](#bindingtodynamicvalue)
 - [Binding#toService](#bindingtoservice)
-- [对比 inversify 的 Binding](#inversifybinding)
+- [对比 inversify 的 Binding](#对比-inversify-的-binding)
 
 ## Binding#onActivation
 
