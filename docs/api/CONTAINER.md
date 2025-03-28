@@ -40,10 +40,10 @@ options.skipSelf; // 用于控制跳过当前container，从父级container中�
 options.optional; // 当没有找到指定token时，默认时抛出异常，如果指定了options.optional=true，那么返回undefined
 ```
 
-观察 get 方法的类型定义可以发现可以自动根据 token 的类型自动推导出类型 T，所以不需要手动指定类型 T。
+`container.get` 方法可以自动根据 token 的类型自动推导出类型 T，所以不需要手动指定类型 T。
 需要注意如果指定了 options.optional=true，则 get 方法有可能返回 undefined，但是 get 方法仍然会自动推导返回类型为 T。所以需要自行在运行时做判空处理。
 
-get 方法在实例化过程中会触发如下声明周期钩子，顺序如下：
+get 方法在实例化过程中会触发如下声明周期方法，顺序如下：
 
 1. Binding#onActivationHandler
 2. Container#onActivationHandler
@@ -65,7 +65,7 @@ function bind<T>(token: CommonToken<T>): Binding<T>;
 function unbind<T>(token: CommonToken<T>): void;
 ```
 
-解绑指定的 token，会触发相应的生命周期钩子。执行顺序如下：
+解绑指定的 token，会触发相应的生命周期方法。执行顺序如下：
 
 1. Container#onDeactivationHandler
 2. Binding#onDeactivationHandler
@@ -77,7 +77,7 @@ function unbind<T>(token: CommonToken<T>): void;
 function unbindAll(): void;
 ```
 
-会解绑容器内所有的 token，并触发对应的生命周期钩子。
+会解绑容器内所有的 token，并触发对应的生命周期方法。
 
 ## Container#isCurrentBound
 
@@ -125,9 +125,9 @@ function onActivation(handler: ActivationHandler): void;
 function onDeactivation(handler: DeactivationHandler): void;
 ```
 
-注册一个 Deactivation 钩子，会在 unbind 方法执行过程中被执行。
+注册一个 Deactivation 函数，会在 unbind 方法执行过程中被执行。
 
-注意只能注册一个 Activation 函数，重复注册，只会覆盖前一个函数。
+注意只能注册一个 Deactivation 函数，重复注册，只会覆盖前一个函数。
 
 ## CONTAINER_MAP
 
