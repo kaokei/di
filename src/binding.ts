@@ -195,7 +195,7 @@ export class Binding<T = unknown> {
     this.status = STATUS.INITING;
     const ClassName = this.classValue;
     // 构造函数的参数可能会导致循环依赖
-    const [params, paramBindings] = this.getContructorParameters(options);
+    const [params, paramBindings] = this.getConstructorParameters(options);
     const inst = new ClassName(...params);
     // ActivationHandler可能会导致循环依赖
     // 需要注意ActivationHandler只能访问构造函数参数，并不能访问注入的实例属性
@@ -227,7 +227,7 @@ export class Binding<T = unknown> {
     return this.cache;
   }
 
-  private getContructorParameters(options: Options<T>) {
+  private getConstructorParameters(options: Options<T>) {
     const params = getOwnMetadata(KEYS.INJECTED_PARAMS, this.classValue) || [];
     const result = [];
     const binding: Binding[] = [];
