@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/kaokei/di/compare/v2.0.9...v3.0.0) (2025-03-31)
+
 ### [2.0.9](https://github.com/kaokei/di/compare/v2.0.8...v2.0.9) (2024-04-12)
 
 ### [2.0.8](https://github.com/kaokei/di/compare/v2.0.7...v2.0.8) (2024-04-12)
