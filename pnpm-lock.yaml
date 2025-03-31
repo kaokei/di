@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      inversify:
-        specifier: '6'
-        version: 6.2.2(reflect-metadata@0.2.2)
     devDependencies:
       '@types/fs-extra':
         specifier: ^11.0.4
@@ -30,6 +26,9 @@ importers:
       fs-extra:
         specifier: ^11.3.0
         version: 11.3.0
+      inversify:
+        specifier: ^6.2.2
+        version: 6.2.2(reflect-metadata@0.2.2)
       jsdom:
         specifier: ^25.0.1
         version: 25.0.1
