@@ -41,3 +41,10 @@
 https://yuanbao.tencent.com/bot/app/share/chat/tUbGmhHdY1Ta
 
 2. 优化 https://github.com/kaokei/utils/blob/main/src/index.ts 的文档
+
+
+```ts
+function useAppService<T>(token: interfaces.ServiceIdentifier<T>, app: any) {
+  return app.runWithContext(() => useService(token));
+}
+```
