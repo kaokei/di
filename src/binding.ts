@@ -138,7 +138,8 @@ export class Binding<T = unknown> {
     binding2: Binding[]
   ) {
     if (BINDING.Instance === this.type) {
-      const { key, value } = getMetadata(KEYS.POST_CONSTRUCT, this.token) || {};
+      const { key, value } =
+        getMetadata(KEYS.POST_CONSTRUCT, this.classValue) || {};
       if (key) {
         // 使用了@PostConstruct装饰器
         if (value) {
@@ -177,7 +178,7 @@ export class Binding<T = unknown> {
 
   public preDestroy() {
     if (BINDING.Instance === this.type) {
-      const { key } = getMetadata(KEYS.PRE_DESTROY, this.token) || {};
+      const { key } = getMetadata(KEYS.PRE_DESTROY, this.classValue) || {};
       if (key) {
         return this.execute(key);
       }
