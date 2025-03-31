@@ -1,3 +1,4 @@
+export * from './interfaces';
 export { Container, CONTAINER_MAP } from './container';
 export { Token, LazyToken } from './token';
 export {
