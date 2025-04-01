@@ -1,4 +1,9 @@
-import { Container, Inject, LazyToken, PostConstruct } from '@/index';
+import {
+  Container,
+  inject as Inject,
+  LazyServiceIdentifier as LazyToken,
+  postConstruct as PostConstruct,
+} from 'inversify';
 
 interface IA {
   name: string;
@@ -32,11 +37,11 @@ class A {
   @Inject(new LazyToken(() => B))
   public b!: IB;
 
-  @PostConstruct(99999999999)
+  @PostConstruct(false)
   public init() {
     // 如果b.id = 2，那么this.id = 102
     // 如果b.id = 22，那么this.id = 122
-    // 预期结果应该是102，因为PostConstruct的参数123不起任何作用
+    // 预期结果应该是122，因为PostConstruct的参数false不起任何作用
     this.id = this.b.id + 100;
     this.inited = true;
   }
@@ -52,22 +57,16 @@ describe('errors -> INJECT_FAILED: Property miss @Inject and use interface', () 
   });
 
   test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
-    const a = container.get(A);
+    const a = await container.getAsync(A);
     expect(a).toBeInstanceOf(A);
     expect(a.name).toBe('A');
-    expect(a.id).toBe(1);
-
-    await vi.waitUntil(() => a.inited);
-    expect(a.id).toBe(102);
+    expect(a.id).toBe(122);
   });
 
   test('container.get(B) should work correctly', async () => {
-    const b = container.get(B);
+    const b = await container.getAsync(B);
     expect(b).toBeInstanceOf(B);
     expect(b.name).toBe('B');
-    expect(b.id).toBe(2);
-
-    await vi.waitUntil(() => b.inited);
     expect(b.id).toBe(22);
   });
 });

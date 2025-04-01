@@ -1,4 +1,8 @@
-import { Container, PostConstruct, PreDestroy, Token } from '@/index';
+import {
+  Container,
+  postConstruct as PostConstruct,
+  preDestroy as PreDestroy,
+} from 'inversify';
 
 class A {
   public name = 'A';
@@ -15,24 +19,23 @@ class A {
   }
 }
 
-const token = new Token<A>('a');
+const token = 'a';
 
 describe('errors -> INJECT_FAILED: Property miss @Inject and use interface', () => {
   let container: Container;
 
   beforeEach(() => {
-    container = new Container();
+    container = new Container({ defaultScope: 'Singleton' });
     container.bind(token).to(A);
   });
 
   test('container.get(A) should work correctly', async () => {
-    const a = container.get(token);
+    const a: A = container.get(token);
     expect(a).toBeInstanceOf(A);
     expect(a.name).toBe('A');
     expect(a.id).toBe(201);
 
     container.unbind(token);
-
     expect(a.id).toBe(101);
   });
 });

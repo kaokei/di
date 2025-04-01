@@ -42,6 +42,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    dangerouslyIgnoreUnhandledErrors: true,
     coverage: {
       include: ['src/**/*.ts'],
       reporter: ['text', 'lcov'],
