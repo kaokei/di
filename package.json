@@ -1,6 +1,6 @@
 {
   "name": "@kaokei/di",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "type": "module",
   "description": "Tiny di library depends on typescript decorator.",
   "main": "./dist/index.cjs",
