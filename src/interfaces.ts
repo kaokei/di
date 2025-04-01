@@ -14,6 +14,8 @@ export type InjectFunction<R extends (...args: any) => any> = (
 
 export type CommonToken<T = unknown> = Token<T> | Newable<T>;
 
+export type TokenType<T> = T extends CommonToken<infer U> ? U : never;
+
 export type GenericToken<T = unknown> = Token<T> | Newable<T> | LazyToken<T>;
 
 export type LazyTokenCallback<T = unknown> = () => CommonToken<T>;
