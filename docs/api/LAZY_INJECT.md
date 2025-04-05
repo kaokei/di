@@ -106,3 +106,29 @@ console.log(a.c);
 
 - [inversify-inject-decorators](https://github.com/inversify/inversify-inject-decorators/blob/master/src/decorators.ts)
 - [Dependency injection in React using InversifyJS](https://itnext.io/dependency-injection-in-react-using-inversifyjs-a38ff0c6601)
+
+## todo
+
+正常 Inject 时，后续是通过 container.get 进行实例化的，显然这个过程中是可以获取到当前的 container 的。也可以从这个 container 中获取 @Inject 指定的依赖。
+
+但是 LazyInject 只是标记这个属性会在后续访问的时候进行初始化。也就是访问`this.someProperty`时进行初始化，关键问题是此时完全不知道任何 container 的信息。
+也就是当前 this 到底是哪个 container 实例化的，只有知道这个 container 之后，才能从这个 container 中获取 LazyInject 指定的依赖。
+访问`this.someProperty`时只能拿到 this 这个对象，所以目前能想到的方案就是在 this 初始化完成时，将 this 和 container 的关联关系存储在 WeakMap 中。
+这样才能在访问`this.someProperty`时，可以通过 this 查询到对应的 container，然后再从 container 中获取其他依赖。
+
+注意到 @Inject 是可以和这些装饰器@Self/@Optional/@SkipSelf 进行配合的。
+
+现在的问题是 @LazyInject 是否需要和这些装饰器@Self/@Optional/@SkipSelf 进行配合？
+
+关键在于 @Inject/@Self/@Optional/@SkipSelf 这些装饰器是利用 defineMetadata/getMetadata 保存和获取相关元数据的。
+
+但是 @LazyInject 装饰器是直接改写`Object.defineProperty(proto, key, descriptor`的，并没有通过 defineMetadata/getMetadata 保存和获取相关元数据。
+
+getMetadata 目前只能获取 INJECTED_PARAMS 和 INJECTED_PROPS 对应的装饰器属性。
+也就是 getMetadata 只能获取整个类的装饰器的数据，而不能获取指定某个类的属性的装饰器数据。
+
+所以需要修改整体的 defineMetadata/getMetadata 方案，以方便获取指定类属性的装饰器数据。
+这个修改稍微有点复杂。可以作为低优先级的需求，后续有需要再考虑。
+
+实际上目前的设计方案中就算没有使用@Inject装饰器，只是使用了@Self/@Optional/@SkipSelf装饰器也仍然会触发依赖注入的逻辑。
+这一点也是有问题的，因为这样的逻辑就相当于@Self/@Optional/@SkipSelf和@Inject绑定了，那么就不能和@LazyInject配合使用了。
