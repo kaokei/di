@@ -10,8 +10,6 @@
 
 </div>
 
-## 简介
-
 本库是一个轻量级的依赖注入库，类似的其他比较流行的库有`InversifyJS`和`typedi`。
 
 本库主要特点是参考借鉴了`InversifyJS`的优秀 API 设计，不依赖`reflect-metadata`，支持属性注入的循环依赖。
