@@ -26,7 +26,6 @@ import type {
   InjectFunction,
   META_KEY_POST_CONSTRUCT,
   META_KEY_PRE_DESTROY,
-  META_KEY_INJECTED_PROPS,
 } from './interfaces';
 
 /**
@@ -150,7 +149,7 @@ export function decorate(
   target: any,
   key: number | string
 ): void {
-  decorator = Array.isArray(decorator) ? decorator : [decorator];;
+  decorator = Array.isArray(decorator) ? decorator : [decorator];
   if (typeof key === 'number') {
     applyDecorators(decorator, target, void 0, key);
   } else if (typeof key === 'string') {
