@@ -102,10 +102,11 @@ console.log(a.c);
 
 ## 灵感来源
 
-在 inversify 中，因为 inversify 默认不支持循环依赖。所以必须通过第三方库提供的 lazyInject 才能解决循环依赖的问题。
+在 inversify 中，因为 inversify 默认[不支持循环依赖](https://github.com/inversify/InversifyJS/issues/1206)。所以必须通过第三方库提供的 lazyInject 才能解决循环依赖的问题。
 
 - [inversify-inject-decorators](https://github.com/inversify/inversify-inject-decorators/blob/master/src/decorators.ts)
 - [Dependency injection in React using InversifyJS](https://itnext.io/dependency-injection-in-react-using-inversifyjs-a38ff0c6601)
+- [Global activation hooks](https://github.com/inversify/InversifyJS/issues/471)
 
 ## todo
 
@@ -130,5 +131,5 @@ getMetadata 目前只能获取 INJECTED_PARAMS 和 INJECTED_PROPS 对应的装�
 所以需要修改整体的 defineMetadata/getMetadata 方案，以方便获取指定类属性的装饰器数据。
 这个修改稍微有点复杂。可以作为低优先级的需求，后续有需要再考虑。
 
-实际上目前的设计方案中就算没有使用@Inject装饰器，只是使用了@Self/@Optional/@SkipSelf装饰器也仍然会触发依赖注入的逻辑。
-这一点也是有问题的，因为这样的逻辑就相当于@Self/@Optional/@SkipSelf和@Inject绑定了，那么就不能和@LazyInject配合使用了。
+实际上目前的设计方案中就算没有使用@Inject 装饰器，只是使用了@Self/@Optional/@SkipSelf 装饰器也仍然会触发依赖注入的逻辑。
+这一点也是有问题的，因为这样的逻辑就相当于@Self/@Optional/@SkipSelf 和@Inject 绑定了，那么就不能和@LazyInject 配合使用了。

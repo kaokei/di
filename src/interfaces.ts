@@ -91,4 +91,5 @@ export interface CacheMapValue {
   [KEYS.INJECTED_PROPS]: Record<string, Options>;
   [KEYS.POST_CONSTRUCT]: KV<PostConstructParam>;
   [KEYS.PRE_DESTROY]: KV<void>;
+  [key: string]: any;
 }

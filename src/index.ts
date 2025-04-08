@@ -11,3 +11,5 @@ export {
   decorate,
 } from './decorator';
 export { LazyInject, createLazyInject } from './lazyinject';
+
+export { defineMetadata, getOwnMetadata, getMetadata } from './cachemap';

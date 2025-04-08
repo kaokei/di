@@ -57,7 +57,7 @@ inversify 比较强大，在处理继承时可以同时支持构造函数参数�
 
 ## 循环依赖注入
 
-inversify 默认是不支持循环依赖的，必须通过第三方的 [lazyInject](https://github.com/inversify/inversify-inject-decorators) 才能实现循环依赖。
+inversify 默认是[不支持循环依赖的](https://github.com/inversify/InversifyJS/issues/1206)，必须通过第三方的 [lazyInject](https://github.com/inversify/inversify-inject-decorators) 才能实现循环依赖。
 
 其中 LazyServiceIdentifier 只能解决 import 时的依赖问题，并不能解决 `container.get()` 在实例化对象时的循环依赖问题。
 
@@ -103,6 +103,10 @@ child.bind(B).toSelf();
 首先 child 容器没有 A，所有从 parent 容器中去找 A，在实例化 A 时，发现又依赖 B。此时需要寻找 B。
 inversify 的处理逻辑是又重新开始从 child 容器开始寻找，因为 child 中存在 B 的绑定，所以就使用 child 容器中的 B。
 最终 a 对象存储在 parent 容器中，b 对象存储在 child 容器中。
+
+- [Child-container-resolving problem within hierarchical DI](https://github.com/inversify/InversifyJS/issues/1156)
+
+可以看出这个 issue 中，inversify 的处理逻辑还是和本库保持一致的，但是似乎现在版本的 inversify 已经修改了处理逻辑。
 
 #### 本库的处理逻辑
 

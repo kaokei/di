@@ -64,7 +64,7 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
       // 如果是实例属性装饰器，这个数据是一个对象，使用getMetadata获取数据，支持继承
       const paramsOrPropertiesMetadata: any = isParameterDecorator
         ? getOwnMetadata(metadataKey, Ctor) || []
-        : getMetadata(metadataKey as META_KEY_INJECTED_PROPS, Ctor) || {};
+        : getMetadata(metadataKey, Ctor) || {};
 
       // 每个参数或者实例属性都可以有多个装饰器
       // 所以paramsOrPropertiesMetadata这个大对象的每个key(实例属性)对应的value都是一个对象

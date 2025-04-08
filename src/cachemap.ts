@@ -1,12 +1,10 @@
 import type {
   CommonToken,
   CacheMapValue,
-  META_KEYS,
   META_KEY_INJECTED_PARAMS,
   META_KEY_INJECTED_PROPS,
   META_KEY_POST_CONSTRUCT,
   META_KEY_PRE_DESTROY,
-  META_VALUES,
   META_VALUE_INJECTED_PARAMS,
   META_VALUE_INJECTED_PROPS,
   META_VALUE_POST_CONSTRUCT,
@@ -43,11 +41,11 @@ export function defineMetadata(
   target: CommonToken
 ): void;
 export function defineMetadata(
-  metadataKey: META_KEYS,
-  metadataValue: META_VALUES,
+  metadataKey: string,
+  metadataValue: any,
   target: CommonToken
 ): void;
-export function defineMetadata<T extends META_KEYS>(
+export function defineMetadata<T extends string>(
   metadataKey: T,
   metadataValue: CacheMapValue[T],
   target: CommonToken
@@ -74,10 +72,10 @@ export function getOwnMetadata(
   target: CommonToken
 ): META_VALUE_PRE_DESTROY | undefined;
 export function getOwnMetadata(
-  metadataKey: META_KEYS,
+  metadataKey: string,
   target: CommonToken
-): META_VALUES | undefined;
-export function getOwnMetadata<T extends META_KEYS>(
+): any | undefined;
+export function getOwnMetadata<T extends string>(
   metadataKey: T,
   target: CommonToken
 ): CacheMapValue[T] | undefined {
@@ -104,20 +102,24 @@ export function getMetadata(
   target: CommonToken
 ): META_VALUE_PRE_DESTROY | undefined;
 export function getMetadata(
-  metadataKey: Exclude<META_KEYS, META_KEY_INJECTED_PARAMS>,
+  metadataKey: string,
   target: CommonToken
-): Exclude<META_VALUES, META_VALUE_INJECTED_PARAMS> | undefined;
-export function getMetadata<
-  T extends Exclude<META_KEYS, META_KEY_INJECTED_PARAMS>
->(metadataKey: T, target: CommonToken): CacheMapValue[T] | undefined {
-  const ownMetadata = getOwnMetadata(metadataKey, target) as CacheMapValue[T];
+): any | undefined;
+export function getMetadata<T extends string>(
+  metadataKey: T,
+  target: CommonToken
+): CacheMapValue[T] | undefined {
+  const ownMetadata = getOwnMetadata(
+    metadataKey as META_KEY_INJECTED_PROPS,
+    target
+  );
 
   if (!hasParentClass(target)) {
     return ownMetadata;
   }
 
   const parentMetadata = getMetadata(
-    metadataKey,
+    metadataKey as META_KEY_INJECTED_PROPS,
     Object.getPrototypeOf(target)
   );
 
