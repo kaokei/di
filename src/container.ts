@@ -11,6 +11,7 @@ import type {
 
 export class Container {
   public parent?: Container;
+  public children?: Set<Container>;
   private bindings: Map<CommonToken, Binding> = new Map();
   private onActivationHandler?: ActivationHandler;
   private onDeactivationHandler?: DeactivationHandler;
@@ -53,7 +54,22 @@ export class Container {
   public createChild() {
     const child = new Container();
     child.parent = this;
+    if (!this.children) {
+      this.children = new Set();
+    }
+    this.children.add(child);
     return child;
+  }
+
+  public destroy() {
+    this.parent?.children?.delete(this);
+    this.unbindAll();
+    this.bindings.clear();
+    this.parent = void 0;
+    this.children?.clear();
+    this.children = void 0;
+    this.onActivationHandler = void 0;
+    this.onDeactivationHandler = void 0;
   }
 
   public get<T>(
