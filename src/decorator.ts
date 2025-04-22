@@ -20,13 +20,7 @@
 
 import { getMetadata, getOwnMetadata, defineMetadata } from './cachemap';
 import { KEYS, ERRORS } from './constants';
-import type {
-  Newable,
-  ExtractKV,
-  InjectFunction,
-  META_KEY_POST_CONSTRUCT,
-  META_KEY_PRE_DESTROY,
-} from './interfaces';
+import type { Newable, InjectFunction } from './interfaces';
 
 /**
  * 创建装饰器的高阶函数
@@ -81,10 +75,8 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
   };
 }
 
-function createMetaDecorator<
-  T extends META_KEY_POST_CONSTRUCT | META_KEY_PRE_DESTROY
->(metaKey: T, errorMessage: string) {
-  return (metaValue: ExtractKV<T>) => {
+function createMetaDecorator(metaKey: string, errorMessage: string) {
+  return (metaValue: any) => {
     return (target: any, propertyKey: string) => {
       if (getOwnMetadata(metaKey, target.constructor)) {
         throw new Error(errorMessage);

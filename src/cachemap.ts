@@ -1,17 +1,6 @@
-import type {
-  CommonToken,
-  CacheMapValue,
-  META_KEY_INJECTED_PARAMS,
-  META_KEY_INJECTED_PROPS,
-  META_KEY_POST_CONSTRUCT,
-  META_KEY_PRE_DESTROY,
-  META_VALUE_INJECTED_PARAMS,
-  META_VALUE_INJECTED_PROPS,
-  META_VALUE_POST_CONSTRUCT,
-  META_VALUE_PRE_DESTROY,
-} from './interfaces';
+import type { CommonToken } from './interfaces';
 
-const map = new WeakMap<CommonToken, CacheMapValue>();
+const map = new WeakMap<CommonToken, any>();
 
 function hasParentClass(cls: CommonToken) {
   return (
@@ -21,65 +10,20 @@ function hasParentClass(cls: CommonToken) {
 }
 
 export function defineMetadata(
-  metadataKey: META_KEY_INJECTED_PARAMS,
-  metadataValue: META_VALUE_INJECTED_PARAMS,
-  target: CommonToken
-): void;
-export function defineMetadata(
-  metadataKey: META_KEY_INJECTED_PROPS,
-  metadataValue: META_VALUE_INJECTED_PROPS,
-  target: CommonToken
-): void;
-export function defineMetadata(
-  metadataKey: META_KEY_POST_CONSTRUCT,
-  metadataValue: META_VALUE_POST_CONSTRUCT,
-  target: CommonToken
-): void;
-export function defineMetadata(
-  metadataKey: META_KEY_PRE_DESTROY,
-  metadataValue: META_VALUE_PRE_DESTROY,
-  target: CommonToken
-): void;
-export function defineMetadata(
   metadataKey: string,
   metadataValue: any,
   target: CommonToken
-): void;
-export function defineMetadata<T extends string>(
-  metadataKey: T,
-  metadataValue: CacheMapValue[T],
-  target: CommonToken
 ) {
-  const found = map.get(target) || ({} as CacheMapValue);
+  const found = map.get(target) || {};
   found[metadataKey] = metadataValue;
   map.set(target, found);
 }
 
 export function getOwnMetadata(
-  metadataKey: META_KEY_INJECTED_PARAMS,
-  target: CommonToken
-): META_VALUE_INJECTED_PARAMS | undefined;
-export function getOwnMetadata(
-  metadataKey: META_KEY_INJECTED_PROPS,
-  target: CommonToken
-): META_VALUE_INJECTED_PROPS | undefined;
-export function getOwnMetadata(
-  metadataKey: META_KEY_POST_CONSTRUCT,
-  target: CommonToken
-): META_VALUE_POST_CONSTRUCT | undefined;
-export function getOwnMetadata(
-  metadataKey: META_KEY_PRE_DESTROY,
-  target: CommonToken
-): META_VALUE_PRE_DESTROY | undefined;
-export function getOwnMetadata(
   metadataKey: string,
   target: CommonToken
-): any | undefined;
-export function getOwnMetadata<T extends string>(
-  metadataKey: T,
-  target: CommonToken
-): CacheMapValue[T] | undefined {
-  const found = map.get(target) || ({} as CacheMapValue);
+): any | undefined {
+  const found = map.get(target) || {};
   return found[metadataKey];
 }
 
@@ -90,36 +34,17 @@ export function getOwnMetadata<T extends string>(
  * 不支持META_KEY_INJECTED_PARAMS作为metadataKey
  */
 export function getMetadata(
-  metadataKey: META_KEY_INJECTED_PROPS,
-  target: CommonToken
-): META_VALUE_INJECTED_PROPS | undefined;
-export function getMetadata(
-  metadataKey: META_KEY_POST_CONSTRUCT,
-  target: CommonToken
-): META_VALUE_POST_CONSTRUCT | undefined;
-export function getMetadata(
-  metadataKey: META_KEY_PRE_DESTROY,
-  target: CommonToken
-): META_VALUE_PRE_DESTROY | undefined;
-export function getMetadata(
   metadataKey: string,
   target: CommonToken
-): any | undefined;
-export function getMetadata<T extends string>(
-  metadataKey: T,
-  target: CommonToken
-): CacheMapValue[T] | undefined {
-  const ownMetadata = getOwnMetadata(
-    metadataKey as META_KEY_INJECTED_PROPS,
-    target
-  );
+): any | undefined {
+  const ownMetadata = getOwnMetadata(metadataKey, target);
 
   if (!hasParentClass(target)) {
     return ownMetadata;
   }
 
   const parentMetadata = getMetadata(
-    metadataKey as META_KEY_INJECTED_PROPS,
+    metadataKey,
     Object.getPrototypeOf(target)
   );
 
