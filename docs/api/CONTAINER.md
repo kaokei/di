@@ -114,6 +114,25 @@ childContainer.parent = this;
 return childContainer;
 ```
 
+## Container#destroy
+
+```ts
+function destroy(): void;
+```
+
+相对于 createChild 方法是创建一个新的容器，destroy 方法则负责销毁自身。
+而且在 unbindAll 方法的基础上清除了所有自身的状态。
+
+注意`inversify`中并没有提供这个方法。
+
+```ts
+const parent = new Container();
+const child = parent.createChild();
+
+// 这里不仅仅销毁了自身容器的所有状态，而且将自己从parent容器的children属性中删除
+child.destroy();
+```
+
 ## Container#onActivation
 
 ```ts
