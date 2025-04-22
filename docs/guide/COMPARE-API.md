@@ -72,9 +72,3 @@ inversify 本身没有提供相应的方法，但是[第三方库](https://githu
 该三方库只提供了`getDecorators`方法，类似本库的`createLazyInject`方法。
 
 相关细节[参考这里](../api/LAZY_INJECT.md)
-
-## CONTAINER_MAP
-
-inversify 没有对应的导出
-
-这实际上是本库的一个内部导出，维护了实例对象和容器的映射关系，也就是方便获取当前实例对象是通过哪个容器创建的，主要方便其他工具库封装出好用的功能。

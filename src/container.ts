@@ -10,6 +10,8 @@ import type {
 } from './interfaces';
 
 export class Container {
+  public static map = new WeakMap<InstanceType<Newable<any>>, Container>();
+
   public parent?: Container;
   public children?: Set<Container>;
   private bindings: Map<CommonToken, Binding> = new Map();
@@ -29,6 +31,7 @@ export class Container {
     if (this.bindings.has(token)) {
       const binding = this.getBinding(token);
       this.deactivate(binding);
+      binding.deactivate();
       binding.preDestroy();
       this.bindings.delete(token);
     }
@@ -62,9 +65,9 @@ export class Container {
   }
 
   public destroy() {
-    this.parent?.children?.delete(this);
     this.unbindAll();
     this.bindings.clear();
+    this.parent?.children?.delete(this);
     this.parent = void 0;
     this.children?.clear();
     this.children = void 0;
@@ -117,7 +120,6 @@ export class Container {
   public deactivate<T>(binding: Binding<T>) {
     this.onDeactivationHandler &&
       this.onDeactivationHandler(binding.cache, binding.token);
-    binding.deactivate();
   }
 
   private buildBinding<T>(token: CommonToken<T>) {
@@ -137,8 +139,3 @@ export class Container {
     }
   }
 }
-
-export const CONTAINER_MAP = new WeakMap<
-  InstanceType<Newable<any>>,
-  Container
->();

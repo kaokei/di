@@ -1,5 +1,5 @@
 import type { GenericToken } from './interfaces';
-import { CONTAINER_MAP, type Container } from './container';
+import { Container } from './container';
 import { resolveToken } from './token';
 import { ERRORS } from './constants';
 
@@ -12,7 +12,7 @@ function defineLazyProperty<T>(
   function getter(this: any) {
     const cacheKey = Symbol.for(key);
     if (!this.hasOwnProperty(cacheKey)) {
-      const con = container || CONTAINER_MAP.get(this);
+      const con = container || Container.map.get(this);
       const Ctor = this.constructor;
       if (!con) {
         throw new Error(`${ERRORS.MISS_CONTAINER} ${Ctor.name}`);

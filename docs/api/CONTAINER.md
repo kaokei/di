@@ -137,9 +137,3 @@ function onDeactivation(handler: DeactivationHandler): void;
 注意只能注册一个 Deactivation 函数，重复注册，只会覆盖前一个函数。
 
 这个 Deactivation 函数是当前 Container 的，当前 Container 的所有 token 都会使用这个 Deactivation 函数。
-
-## CONTAINER_MAP
-
-本身是一个 WeakMap 实例，用于存储 Class 实例对象和对应容器之间的关系。从而可以方便的知道当前实例对象是由哪个容器创建的。
-
-主要用于上层工具库来使用。
