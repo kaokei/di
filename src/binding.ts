@@ -180,12 +180,15 @@ export class Binding<T = unknown> {
     if (BINDING.Instance === this.type) {
       const { key } = getMetadata(KEYS.PRE_DESTROY, this.classValue) || {};
       if (key) {
-        return this.execute(key);
+        this.execute(key);
       }
     }
     Container.map.delete(this.cache);
     this.container = null as unknown as Container;
     this.context = null as unknown as Context;
+    this.classValue = null as unknown as Newable<T>;
+    this.constantValue = null as unknown as T;
+    this.dynamicValue = null as unknown as DynamicValue<T>;
     this.cache = null as unknown as T;
     this.postConstructResult = DEFAULT_VALUE;
     this.onActivationHandler = void 0;

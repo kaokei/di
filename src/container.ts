@@ -2,7 +2,6 @@ import { Binding } from './binding';
 import { BindingNotFoundError } from './errors/BindingNotFoundError';
 import { DuplicateBindingError } from './errors/DuplicateBindingError';
 import type {
-  Newable,
   Options,
   CommonToken,
   ActivationHandler,
@@ -10,7 +9,7 @@ import type {
 } from './interfaces';
 
 export class Container {
-  public static map = new WeakMap<InstanceType<Newable<any>>, Container>();
+  public static map = new WeakMap<any, Container>();
 
   public parent?: Container;
   public children?: Set<Container>;
