@@ -133,7 +133,7 @@ describe('01', () => {
     expect(hasOwn(parent, B, a.b)).toBe(false);
   });
 
-  test('parent.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('parent.get(B) should throw BindingNotFoundError', async () => {
     expect(() => {
       parent.get(B);
     }).toThrowError(BindingNotFoundError);
@@ -230,7 +230,7 @@ describe('11', () => {
     }).toThrowError(BindingNotFoundError);
   });
 
-  test('parent.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('parent.get(B) should throw BindingNotFoundError', async () => {
     expect(() => {
       parent.get(B);
     }).toThrowError(BindingNotFoundError);
