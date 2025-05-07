@@ -21,8 +21,8 @@ class B {
   }
 }
 
-describe('container activation', () => {
-  test('container.get(A) and container.get(B) should work correctly', async () => {
+describe('container deactivation', () => {
+  test('container.unbind(A) and container.unbind(B) should trigger container onDeactivation', async () => {
     const mockContainerDeactivation = vi
       .fn()
       .mockImplementation((inst: any) => {
