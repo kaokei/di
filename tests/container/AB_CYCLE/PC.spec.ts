@@ -44,7 +44,7 @@ describe('PC', () => {
     expect(a.b).toBe(a.b.a.b);
   });
 
-  test('container.get(B) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
+  test('container.get(B) should throw CircularDependencyError', async () => {
     expect(() => {
       container.get(B);
     }).toThrowError(CircularDependencyError);
