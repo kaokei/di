@@ -62,13 +62,13 @@ describe('PCC', () => {
     expect(a.c).toBe(a.b.a.c);
   });
 
-  test('container.get(B) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
+  test('container.get(B) should throw CircularDependencyError', async () => {
     expect(() => {
       container.get(B);
     }).toThrowError(CircularDependencyError);
   });
 
-  test('container.get(C) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
+  test('container.get(C) should throw CircularDependencyError', async () => {
     expect(() => {
       container.get(C);
     }).toThrowError(CircularDependencyError);
