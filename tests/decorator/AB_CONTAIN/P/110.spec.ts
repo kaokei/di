@@ -40,7 +40,7 @@ describe('00', () => {
     parent.bind(B).toSelf();
   });
 
-  test('child.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('child.get(A) should throw BindingNotFoundError', async () => {
     expect(() => {
       child.get(A);
     }).toThrowError(BindingNotFoundError);
@@ -55,7 +55,7 @@ describe('00', () => {
     expect(hasOwn(parent, B, b)).toBe(true);
   });
 
-  test('parent.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('parent.get(A) should throw BindingNotFoundError', async () => {
     expect(() => {
       parent.get(A);
     }).toThrowError(BindingNotFoundError);
@@ -82,7 +82,7 @@ describe('01', () => {
     child.bind(B).toSelf();
   });
 
-  test('child.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('child.get(A) should throw BindingNotFoundError', async () => {
     expect(() => {
       child.get(A);
     }).toThrowError(BindingNotFoundError);
@@ -97,13 +97,13 @@ describe('01', () => {
     expect(hasOwn(parent, B, b)).toBe(false);
   });
 
-  test('parent.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('parent.get(A) should throw BindingNotFoundError', async () => {
     expect(() => {
       parent.get(A);
     }).toThrowError(BindingNotFoundError);
   });
 
-  test('parent.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('parent.get(B) should throw BindingNotFoundError', async () => {
     expect(() => {
       parent.get(B);
     }).toThrowError(BindingNotFoundError);
@@ -144,7 +144,7 @@ describe('10', () => {
     expect(hasOwn(parent, B, b)).toBe(true);
   });
 
-  test('parent.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('parent.get(A) should throw BindingNotFoundError', async () => {
     expect(() => {
       parent.get(A);
     }).toThrowError(BindingNotFoundError);
@@ -171,7 +171,7 @@ describe('11', () => {
     child.bind(B).toSelf();
   });
 
-  test('child.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('child.get(A) should throw BindingNotFoundError', async () => {
     expect(() => {
       child.get(A);
     }).toThrowError(BindingNotFoundError);
@@ -186,13 +186,13 @@ describe('11', () => {
     expect(hasOwn(parent, B, b)).toBe(false);
   });
 
-  test('parent.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('parent.get(A) should throw BindingNotFoundError', async () => {
     expect(() => {
       parent.get(A);
     }).toThrowError(BindingNotFoundError);
   });
 
-  test('parent.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('parent.get(B) should throw BindingNotFoundError', async () => {
     expect(() => {
       parent.get(B);
     }).toThrowError(BindingNotFoundError);
