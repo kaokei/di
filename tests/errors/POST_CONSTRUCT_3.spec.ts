@@ -1,6 +1,5 @@
 import { Inject, Container, LazyToken, PostConstruct } from '@/index';
 import { PostConstructError } from '@/errors/PostConstructError';
-import exp from 'constants';
 
 interface IA {
   name: string;

@@ -39,7 +39,7 @@ describe('TOKEN_NOT_FOUND', () => {
     container.bind(B).toSelf();
   });
 
-  test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('container.get(A) should throw BindingNotFoundError', async () => {
     expect(() => {
       container.get(A);
     }).toThrowError(BindingNotFoundError);
@@ -52,7 +52,7 @@ describe('TOKEN_NOT_FOUND', () => {
     expect(b.name).toBe('B');
   });
 
-  test('container.get(C) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('container.get(C) should throw BindingNotFoundError', async () => {
     expect(() => {
       container.get(C);
     }).toThrowError(BindingNotFoundError);
