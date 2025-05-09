@@ -20,13 +20,13 @@ describe('No bindings', () => {
     container = new Container();
   });
 
-  test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('container.get(A) should throw BindingNotFoundError', async () => {
     expect(() => {
       container.get(A);
     }).toThrowError(BindingNotFoundError);
   });
 
-  test('container.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('container.get(B) should throw BindingNotFoundError', async () => {
     expect(() => {
       container.get(B);
     }).toThrowError(BindingNotFoundError);
