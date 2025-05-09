@@ -37,13 +37,13 @@ describe('Unbind with hierarchical container', () => {
     child.bind(B).toSelf();
   });
 
-  test('child.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('child.get(A) should throw BindingNotFoundError', async () => {
     expect(() => {
       child.get(A);
     }).toThrowError(BindingNotFoundError);
   });
 
-  test('parent.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('parent.get(A) should throw BindingNotFoundError', async () => {
     expect(() => {
       parent.get(A);
     }).toThrowError(BindingNotFoundError);
