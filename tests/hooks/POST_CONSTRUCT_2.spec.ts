@@ -109,7 +109,7 @@ describe('PRE_DESTROY_2 A -> B', () => {
     child.bind(B).toSelf();
   });
 
-  test('container.get(A) should work correctly', async () => {
+  test('container.get(A) should throw BindingNotFoundError', async () => {
     expect(() => {
       child.get(A);
     }).toThrowError(BindingNotFoundError);
@@ -226,7 +226,7 @@ describe('PRE_DESTROY_4 A -> B', () => {
     child.bind(B).toSelf();
   });
 
-  test('container.get(A) should work correctly', async () => {
+  test('container.get(A) should throw BindingNotFoundError', async () => {
     expect(() => {
       child.get(A);
     }).toThrowError(BindingNotFoundError);
