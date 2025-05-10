@@ -48,13 +48,13 @@ describe('User depends on UserClass (no bindings)', () => {
     container = new Container();
   });
 
-  test('container.get(User) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('container.get(User) should throw BindingNotFoundError', async () => {
     expect(() => {
       container.get(User);
     }).toThrowError(BindingNotFoundError);
   });
 
-  test('container.get(UserClass) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('container.get(UserClass) should throw BindingNotFoundError', async () => {
     expect(() => {
       container.get(UserClass);
     }).toThrowError(BindingNotFoundError);

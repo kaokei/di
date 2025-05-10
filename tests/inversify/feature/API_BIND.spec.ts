@@ -49,13 +49,13 @@ describe('No bindings', () => {
     container = new Container();
   });
 
-  test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('container.get(A) should throw BindingNotFoundError', async () => {
     expect(() => {
       container.get(A);
     }).toThrowError(BindingNotFoundError);
   });
 
-  test('container.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('container.get(B) should throw BindingNotFoundError', async () => {
     expect(() => {
       container.get(B);
     }).toThrowError(BindingNotFoundError);
@@ -112,14 +112,14 @@ describe('Unbind', () => {
     expect(a).toBe(a2);
   });
 
-  test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('container.get(A) should throw BindingNotFoundError', async () => {
     container.unbind(B);
     expect(() => {
       container.get(A);
     }).toThrowError(BindingNotFoundError);
   });
 
-  test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('container.get(A) should throw BindingNotFoundError', async () => {
     container.unbind(A);
     expect(() => {
       container.get(A);
@@ -229,14 +229,14 @@ describe('Unbind all', () => {
     container.bind(B).toSelf();
   });
 
-  test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('container.get(A) should throw BindingNotFoundError', async () => {
     container.unbindAll();
     expect(() => {
       container.get(A);
     }).toThrowError(BindingNotFoundError);
   });
 
-  test('container.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('container.get(B) should throw BindingNotFoundError', async () => {
     container.unbindAll();
     expect(() => {
       container.get(B);
@@ -283,7 +283,7 @@ describe('Unbind all with hierarchical container', () => {
     expect(hasOwn(child, B, a.b)).toBe(true);
   });
 
-  test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('container.get(A) should throw BindingNotFoundError', async () => {
     parent.unbindAll();
     expect(() => {
       parent.get(A);
