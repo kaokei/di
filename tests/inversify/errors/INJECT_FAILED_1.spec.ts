@@ -34,7 +34,7 @@ describe('errors -> INJECT_FAILED: Property miss @Inject and use interface', () 
     container.bind(B).toSelf();
   });
 
-  test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('container.get(A) should throw missInjectError', async () => {
     expect(() => {
       container.get(A);
     }).toThrowError(missInjectError);

@@ -33,7 +33,7 @@ describe('errors -> INJECT_FAILED: Constructor @Inject use empty string', () => 
     container.bind(B).toSelf();
   });
 
-  test('container.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('container.get(A) should throw BindingNotFoundError', async () => {
     expect(() => {
       container.get(A);
     }).toThrowError(BindingNotFoundError);
