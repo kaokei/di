@@ -50,7 +50,7 @@ describe('CPP', () => {
     container.bind(C).toSelf();
   });
 
-  test('container.get(A) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
+  test('container.get(A) should throw CircularDependencyError', async () => {
     expect(() => {
       container.get(A);
     }).toThrowError(CircularDependencyError);

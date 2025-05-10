@@ -72,7 +72,7 @@ describe('PPC', () => {
     expect(b.a.b).toBe(b.a.b.a.b);
   });
 
-  test('container.get(C) should throw ERROR_CIRCULAR_DEPENDENCY', async () => {
+  test('container.get(C) should throw CircularDependencyError', async () => {
     expect(() => {
       container.get(C);
     }).toThrowError(CircularDependencyError);

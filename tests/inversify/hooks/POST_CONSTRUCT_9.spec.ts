@@ -86,7 +86,7 @@ describe('errors -> INJECT_FAILED: Property miss @Inject and use interface', () 
   });
 
   test('container.get(A) should throw error', async () => {
-    await expect(container.getAsync(A)).rejects.toThrow('test error');
+    await expect(container.getAsync(A)).rejects.toThrowError('test error');
   });
 });
 
@@ -159,7 +159,7 @@ describe('errors -> INJECT_FAILED: Property miss @Inject and use interface', () 
   });
 
   test('container.get(A) should throw error', async () => {
-    await expect(() => container.getAsync(A)).rejects.toThrow('test error');
+    await expect(() => container.getAsync(A)).rejects.toThrowError('test error');
 
     expect(initASpy).not.toHaveBeenCalled();
     expect(initBSpy).toHaveBeenCalledOnce();
