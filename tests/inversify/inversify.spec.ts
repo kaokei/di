@@ -45,13 +45,13 @@ describe('inversify activation', () => {
     expect(a2).toBe(a);
   });
 
-  test(`container.get(B) should throw error`, async () => {
+  test(`container.get(B) should throw BindingNotFoundError`, async () => {
     expect(() => {
       container.get(B);
     }).toThrowError(BindingNotFoundError);
   });
 
-  test(`container.get(B) should throw error`, async () => {
+  test(`container.get(B) should throw BindingNotValidError`, async () => {
     expect(() => {
       container.bind(B);
       container.get(B);

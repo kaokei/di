@@ -145,14 +145,14 @@ describe('Unbind with hierarchical container - 3 container', () => {
     expect(grandA).toBe(a);
   });
 
-  test('parent.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('parent.get(A) should throw BindingNotFoundError', async () => {
     // 这里证明了同样的容器绑定关系，只要调用顺序不一致，结果就是不一样的。
     expect(() => {
       parent.get(A);
     }).toThrowError(BindingNotFoundError);
   });
 
-  test('grand.get(A) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('grand.get(A) should throw BindingNotFoundError', async () => {
     // 这里证明了同样的容器绑定关系，只要调用顺序不一致，结果就是不一样的。
     expect(() => {
       grand.get(A);

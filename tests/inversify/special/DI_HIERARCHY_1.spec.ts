@@ -72,7 +72,7 @@ describe('Unbind with hierarchical container', () => {
     expect(hasOwn(child, B, parentA.b)).toBe(true);
   });
 
-  test('parent.get(B) should throw ERROR_TOKEN_NOT_FOUND', async () => {
+  test('parent.get(A) should throw BindingNotFoundError', async () => {
     // 这里证明了同样的容器绑定关系，只要调用顺序不一致，结果就是不一样的。
     expect(() => {
       parent.get(A);
