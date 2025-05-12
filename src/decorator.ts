@@ -76,7 +76,7 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
 }
 
 function createMetaDecorator(metaKey: string, errorMessage: string) {
-  return (metaValue: any) => {
+  return (metaValue?: any) => {
     return (target: any, propertyKey: string) => {
       if (getOwnMetadata(metaKey, target.constructor)) {
         throw new Error(errorMessage);
