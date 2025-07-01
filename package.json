@@ -44,7 +44,10 @@
     "postpublish": "git push origin --follow-tags",
     "prepublishOnly": "npm run clean && npm run build",
     "release": "standard-version -r",
-    "release:first": "standard-version --first-release"
+    "release:first": "standard-version --first-release",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
@@ -60,6 +63,7 @@
     "typescript": "~5.6.3",
     "vite": "^5.4.14",
     "vite-plugin-dts": "^4.5.0",
+    "vitepress": "^1.6.3",
     "vitest": "^3.1.1",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
