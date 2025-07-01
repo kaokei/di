@@ -14,7 +14,7 @@
 
 本库主要特点是参考借鉴了`InversifyJS`和`Angular`的优秀 API 设计，不依赖`reflect-metadata`，支持属性注入的循环依赖。
 
-- [入门指南](./docs/guide/README.md)
-- [API 文档](./docs/api/README.md)
+- [入门指南](./docs/guide/index.md)
+- [API 文档](./docs/api/index.md)
 - [博客文章](./docs/note/01.什么是Token.md)
 - [codesandbox example](https://codesandbox.io/s/di-playground-zjnyv)
