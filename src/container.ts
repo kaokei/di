@@ -9,51 +9,51 @@ import type {
 } from './interfaces';
 
 export class Container {
-  public static map = new WeakMap<any, Container>();
+  static map = new WeakMap<any, Container>();
 
-  public parent?: Container;
-  public children?: Set<Container>;
-  private bindings: Map<CommonToken, Binding> = new Map();
-  private onActivationHandler?: ActivationHandler;
-  private onDeactivationHandler?: DeactivationHandler;
+  parent?: Container;
+  children?: Set<Container>;
+  _bindings: Map<CommonToken, Binding> = new Map();
+  _onActivationHandler?: ActivationHandler;
+  _onDeactivationHandler?: DeactivationHandler;
 
-  public bind<T>(token: CommonToken<T>) {
-    if (this.bindings.has(token)) {
+  bind<T>(token: CommonToken<T>) {
+    if (this._bindings.has(token)) {
       throw new DuplicateBindingError(token);
     }
-    const binding = this.buildBinding(token);
-    this.bindings.set(token, binding as Binding);
+    const binding = this._buildBinding(token);
+    this._bindings.set(token, binding as Binding);
     return binding;
   }
 
-  public unbind<T>(token: CommonToken<T>) {
-    if (this.bindings.has(token)) {
-      const binding = this.getBinding(token);
+  unbind<T>(token: CommonToken<T>) {
+    if (this._bindings.has(token)) {
+      const binding = this._getBinding(token);
       this.deactivate(binding);
       binding.deactivate();
       binding.preDestroy();
-      this.bindings.delete(token);
+      this._bindings.delete(token);
     }
   }
 
-  public unbindAll() {
-    this.bindings.forEach(binding => {
+  unbindAll() {
+    this._bindings.forEach(binding => {
       this.unbind(binding.token);
     });
   }
 
-  public isCurrentBound<T>(token: CommonToken<T>) {
-    return this.bindings.has(token);
+  isCurrentBound<T>(token: CommonToken<T>) {
+    return this._bindings.has(token);
   }
 
-  public isBound<T>(token: CommonToken<T>): boolean {
+  isBound<T>(token: CommonToken<T>): boolean {
     return (
       this.isCurrentBound(token) ||
       (!!this.parent && this.parent.isBound(token))
     );
   }
 
-  public createChild() {
+  createChild() {
     const child = new Container();
     child.parent = this;
     if (!this.children) {
@@ -63,28 +63,28 @@ export class Container {
     return child;
   }
 
-  public destroy() {
+  destroy() {
     this.unbindAll();
-    this.bindings.clear();
+    this._bindings.clear();
     this.parent?.children?.delete(this);
     this.parent = void 0;
     this.children?.clear();
     this.children = void 0;
-    this.onActivationHandler = void 0;
-    this.onDeactivationHandler = void 0;
+    this._onActivationHandler = void 0;
+    this._onDeactivationHandler = void 0;
   }
 
-  public get<T>(
+  get<T>(
     token: CommonToken<T>,
     options: Options<T> & { optional: true }
   ): T | void;
-  public get<T>(
+  get<T>(
     token: CommonToken<T>,
     options?: Options<T> & { optional?: false }
   ): T;
-  public get<T>(token: CommonToken<T>, options?: Options<T>): T | void;
-  public get<T>(token: CommonToken<T>, options: Options<T> = {}): T | void {
-    const binding = this.getBinding(token);
+  get<T>(token: CommonToken<T>, options?: Options<T>): T | void;
+  get<T>(token: CommonToken<T>, options: Options<T> = {}): T | void {
+    const binding = this._getBinding(token);
     if (options.skipSelf) {
       if (this.parent) {
         options.skipSelf = false;
@@ -99,37 +99,37 @@ export class Container {
     } else if (this.parent) {
       return this.parent.get(token, options);
     }
-    return this.checkBindingNotFoundError(token, options);
+    return this._checkBindingNotFoundError(token, options);
   }
 
-  public onActivation(handler: ActivationHandler) {
-    this.onActivationHandler = handler;
+  onActivation(handler: ActivationHandler) {
+    this._onActivationHandler = handler;
   }
 
-  public onDeactivation(handler: DeactivationHandler) {
-    this.onDeactivationHandler = handler;
+  onDeactivation(handler: DeactivationHandler) {
+    this._onDeactivationHandler = handler;
   }
 
-  public activate<T>(input: T, token: CommonToken<T>) {
-    return this.onActivationHandler
-      ? (this.onActivationHandler({ container: this }, input, token) as T)
+  activate<T>(input: T, token: CommonToken<T>) {
+    return this._onActivationHandler
+      ? (this._onActivationHandler({ container: this }, input, token) as T)
       : input;
   }
 
-  public deactivate<T>(binding: Binding<T>) {
-    this.onDeactivationHandler &&
-      this.onDeactivationHandler(binding.cache, binding.token);
+  deactivate<T>(binding: Binding<T>) {
+    this._onDeactivationHandler &&
+      this._onDeactivationHandler(binding.cache, binding.token);
   }
 
-  private buildBinding<T>(token: CommonToken<T>) {
+  _buildBinding<T>(token: CommonToken<T>) {
     return new Binding<T>(token, this);
   }
 
-  private getBinding<T>(token: CommonToken<T>) {
-    return this.bindings.get(token) as Binding<T>;
+  _getBinding<T>(token: CommonToken<T>) {
+    return this._bindings.get(token) as Binding<T>;
   }
 
-  private checkBindingNotFoundError<T>(
+  _checkBindingNotFoundError<T>(
     token: CommonToken,
     options: Options<T>
   ) {

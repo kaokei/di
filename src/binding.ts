@@ -18,29 +18,29 @@ import type {
 } from './interfaces';
 
 export class Binding<T = unknown> {
-  public container!: Container;
+  container!: Container;
 
-  public context!: Context;
+  context!: Context;
 
-  public token!: CommonToken<T>;
+  token!: CommonToken<T>;
 
-  public type: string = BINDING.Invalid;
+  type: string = BINDING.Invalid;
 
-  public status: string = STATUS.DEFAULT;
+  status: string = STATUS.DEFAULT;
 
-  public classValue!: Newable<T>;
+  classValue!: Newable<T>;
 
-  public constantValue!: T;
+  constantValue!: T;
 
-  public dynamicValue!: DynamicValue<T>;
+  dynamicValue!: DynamicValue<T>;
 
-  public cache!: T;
+  cache!: T;
 
-  public postConstructResult?: Promise<void> | Symbol = DEFAULT_VALUE;
+  postConstructResult?: Promise<void> | Symbol = DEFAULT_VALUE;
 
-  public onActivationHandler?: ActivationHandler<T>;
+  onActivationHandler?: ActivationHandler<T>;
 
-  public onDeactivationHandler?: DeactivationHandler<T>;
+  onDeactivationHandler?: DeactivationHandler<T>;
 
   constructor(token: CommonToken<T>, container: Container) {
     this.container = container;
@@ -48,54 +48,54 @@ export class Binding<T = unknown> {
     this.token = token;
   }
 
-  public onActivation(handler: ActivationHandler<T>) {
+  onActivation(handler: ActivationHandler<T>) {
     this.onActivationHandler = handler;
   }
 
-  public onDeactivation(handler: DeactivationHandler<T>) {
+  onDeactivation(handler: DeactivationHandler<T>) {
     this.onDeactivationHandler = handler;
   }
 
-  public activate(input: T) {
+  activate(input: T) {
     const output = this.onActivationHandler
       ? this.onActivationHandler(this.context, input)
       : input;
     return this.container.activate(output, this.token);
   }
 
-  public deactivate() {
+  deactivate() {
     this.onDeactivationHandler && this.onDeactivationHandler(this.cache);
   }
 
-  public to(constructor: Newable<T>) {
+  to(constructor: Newable<T>) {
     this.type = BINDING.Instance;
     this.classValue = constructor;
     return this;
   }
 
-  public toSelf() {
+  toSelf() {
     return this.to(this.token as Newable<T>);
   }
 
-  public toConstantValue(value: T) {
+  toConstantValue(value: T) {
     this.type = BINDING.ConstantValue;
     this.constantValue = value;
     return this;
   }
 
-  public toDynamicValue(func: DynamicValue<T>) {
+  toDynamicValue(func: DynamicValue<T>) {
     this.type = BINDING.DynamicValue;
     this.dynamicValue = func;
     return this;
   }
 
-  public toService(token: CommonToken<T>) {
+  toService(token: CommonToken<T>) {
     return this.toDynamicValue((context: Context) =>
       context.container.get(token, { parent: { token: this.token } })
     );
   }
 
-  public get(options: Options<T>) {
+  get(options: Options<T>) {
     if (STATUS.INITING === this.status) {
       // 首先判断是否存在循环依赖
       throw new CircularDependencyError(options as Options);
@@ -104,20 +104,20 @@ export class Binding<T = unknown> {
       return this.cache;
     } else if (BINDING.Instance === this.type) {
       // 如果是Instance类型的绑定，本质上是执行了new Constructor()，缓存并返回实例
-      return this.resolveInstanceValue(options);
+      return this._resolveInstanceValue(options);
     } else if (BINDING.ConstantValue === this.type) {
       // 如果是ConstantValue类型的绑定，直接缓存并返回数据
-      return this.resolveConstantValue();
+      return this._resolveConstantValue();
     } else if (BINDING.DynamicValue === this.type) {
       // 如果是DynamicValue类型的绑定，执行绑定的函数，缓存并返回函数结果
-      return this.resolveDynamicValue();
+      return this._resolveDynamicValue();
     } else {
       // 最终抛出异常，原因是binding没有绑定对应的服务
       throw new BindingNotValidError(this.token);
     }
   }
 
-  private getAwaitBindings(
+  _getAwaitBindings(
     bindings: Binding[],
     filter: PostConstructParam
   ): Binding[] {
@@ -132,7 +132,7 @@ export class Binding<T = unknown> {
     }
   }
 
-  private postConstruct(
+  _postConstruct(
     options: Options<T>,
     propertyBindings: Binding[]
   ) {
@@ -148,7 +148,7 @@ export class Binding<T = unknown> {
             item => BINDING.Instance === item?.type
           );
           // 通过@PostConstruct(指定的参数)，也就是value来过滤指定的需要等待的binding
-          const awaitBindings = this.getAwaitBindings(bindings, value);
+          const awaitBindings = this._getAwaitBindings(bindings, value);
           for (const binding of awaitBindings) {
             if (binding) {
               if (binding.postConstructResult === DEFAULT_VALUE) {
@@ -162,11 +162,11 @@ export class Binding<T = unknown> {
           }
           const list = awaitBindings.map(item => item.postConstructResult);
           this.postConstructResult = Promise.all(list).then(() =>
-            this.execute(key)
+            this._execute(key)
           );
         } else {
           // @PostConstruct()没有指定参数
-          this.postConstructResult = this.execute(key);
+          this.postConstructResult = this._execute(key);
         }
       } else {
         // 没有使用@PostConstruct装饰器
@@ -175,11 +175,11 @@ export class Binding<T = unknown> {
     }
   }
 
-  public preDestroy() {
+  preDestroy() {
     if (BINDING.Instance === this.type) {
       const { key } = getMetadata(KEYS.PRE_DESTROY, this.classValue) || {};
       if (key) {
-        this.execute(key);
+        this._execute(key);
       }
     }
     Container.map.delete(this.cache);
@@ -194,12 +194,12 @@ export class Binding<T = unknown> {
     this.onDeactivationHandler = void 0;
   }
 
-  private execute(key: string) {
+  _execute(key: string) {
     const value = (this.cache as any)[key];
     return value?.call(this.cache);
   }
 
-  private resolveInstanceValue(options: Options<T>) {
+  _resolveInstanceValue(options: Options<T>) {
     this.status = STATUS.INITING;
     const ClassName = this.classValue;
     // 无参构造实例化
@@ -211,22 +211,22 @@ export class Binding<T = unknown> {
     // 维护实例和容器之间的关系，方便@LazyInject获取容器
     Container.map.set(this.cache, this.container);
     // 属性注入不会导致循环依赖问题
-    const [properties, propertyBindings] = this.getInjectProperties(options);
+    const [properties, propertyBindings] = this._getInjectProperties(options);
     Object.assign(this.cache as RecordObject, properties);
     // postConstruct特意放在了getInjectProperties之后，这样postConstruct就能访问注入的属性了
     // 仅传 propertyBindings
-    this.postConstruct(options, propertyBindings);
+    this._postConstruct(options, propertyBindings);
     return this.cache;
   }
 
-  private resolveConstantValue() {
+  _resolveConstantValue() {
     this.status = STATUS.INITING;
     this.cache = this.activate(this.constantValue);
     this.status = STATUS.ACTIVATED;
     return this.cache;
   }
 
-  private resolveDynamicValue() {
+  _resolveDynamicValue() {
     this.status = STATUS.INITING;
     const dynamicValue = this.dynamicValue!.call(this, this.context);
     this.cache = this.activate(dynamicValue);
@@ -234,7 +234,7 @@ export class Binding<T = unknown> {
     return this.cache;
   }
 
-  private getInjectProperties(options: Options<T>) {
+  _getInjectProperties(options: Options<T>) {
     const props = getMetadata(KEYS.INJECTED_PROPS, this.classValue) || {};
     const propKeys = Object.keys(props);
     const result = Object.create(null) as RecordObject;

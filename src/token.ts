@@ -2,8 +2,8 @@ import type { GenericToken, LazyTokenCallback } from './interfaces';
 import { ERRORS } from './constants';
 
 export class Token<T> {
-  public _ = '' as T;
-  public name: string;
+  _ = '' as T;
+  name: string;
 
   constructor(name: string) {
     this.name = name;
@@ -11,14 +11,14 @@ export class Token<T> {
 }
 
 export class LazyToken<T> {
-  private callback: LazyTokenCallback<T>;
+  _callback: LazyTokenCallback<T>;
 
   constructor(callback: LazyTokenCallback<T>) {
-    this.callback = callback;
+    this._callback = callback;
   }
 
-  public resolve() {
-    return this.callback();
+  resolve() {
+    return this._callback();
   }
 }
 
