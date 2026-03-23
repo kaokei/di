@@ -9,5 +9,6 @@ export {
   PostConstruct,
   PreDestroy,
   decorate,
+  LazyInject,
+  createLazyInject,
 } from './decorator';
-export { LazyInject, createLazyInject } from './lazyinject';
