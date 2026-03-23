@@ -1,11 +1,5 @@
 import { Inject, Container, LazyToken } from '@/index';
-import { CircularDependencyError } from '@/errors/CircularDependencyError';
 
-interface IA {
-  name: string;
-  id: number;
-  b: IB;
-}
 interface IB {
   name: string;
   id: number;
@@ -42,63 +36,57 @@ interface IH {
   c: IC;
 }
 
+// 使用属性装饰器声明依赖（属性注入可以打破循环依赖）
 class A {
   public name = 'A';
   public id = 1;
-
-  constructor(@Inject(new LazyToken(() => B)) private b: IB) {}
+  @Inject(new LazyToken(() => B)) b!: IB;
 }
 
 class B {
   public name = 'B';
   public id = 2;
-
-  constructor(@Inject(new LazyToken(() => C)) private c: IC) {}
+  @Inject(new LazyToken(() => C)) c!: IC;
 }
 
 class C {
   public name = 'C';
   public id = 3;
-
-  constructor(@Inject(new LazyToken(() => D)) private d: ID) {}
+  @Inject(new LazyToken(() => D)) d!: ID;
 }
 
 class D {
   public name = 'D';
   public id = 4;
-
-  constructor(@Inject(new LazyToken(() => E)) private e: IE) {}
+  @Inject(new LazyToken(() => E)) e!: IE;
 }
 
 class E {
   public name = 'E';
   public id = 5;
-
-  constructor(@Inject(new LazyToken(() => F)) private f: IF) {}
+  @Inject(new LazyToken(() => F)) f!: IF;
 }
 
 class F {
   public name = 'F';
   public id = 6;
-
-  constructor(@Inject(new LazyToken(() => G)) private g: IG) {}
+  @Inject(new LazyToken(() => G)) g!: IG;
 }
 
 class G {
   public name = 'G';
   public id = 7;
-
-  constructor(@Inject(new LazyToken(() => H)) private h: IH) {}
+  @Inject(new LazyToken(() => H)) h!: IH;
 }
 
 class H {
   public name = 'H';
   public id = 8;
-
-  constructor(@Inject(new LazyToken(() => C)) private c: IC) {}
+  @Inject(new LazyToken(() => C)) c!: IC;
 }
 
-describe('CircularDependencyError', () => {
+// 属性注入模式下，循环依赖不再抛错，而是通过缓存机制正确解析
+describe('CircularDependency — 属性注入可以打破循环依赖', () => {
   let container: Container;
 
   beforeEach(() => {
@@ -113,15 +101,29 @@ describe('CircularDependencyError', () => {
     container.bind(H).toSelf();
   });
 
-  test('container.get(A) should throw CircularDependencyError', async () => {
-    expect(() => {
-      container.get(A);
-    }).toThrowError(CircularDependencyError);
+  test('container.get(A) 应该成功解析，不再抛出 CircularDependencyError', () => {
+    const a = container.get(A);
+    expect(a).toBeInstanceOf(A);
+    expect(a.name).toBe('A');
+    expect(a.id).toBe(1);
   });
 
-  test('container.get(A) should throw CircularDependencyError with detail', async () => {
-    expect(() => {
-      container.get(A);
-    }).toThrowError(/A --> B --> C --> D --> E --> F --> G --> H --> C/);
+  test('循环依赖链中的所有实例都应该被正确创建', () => {
+    const a = container.get(A);
+    expect(a.b).toBeInstanceOf(B);
+    expect(a.b.c).toBeInstanceOf(C);
+    expect(a.b.c.d).toBeInstanceOf(D);
+    expect(a.b.c.d.e).toBeInstanceOf(E);
+    expect(a.b.c.d.e.f).toBeInstanceOf(F);
+    expect(a.b.c.d.e.f.g).toBeInstanceOf(G);
+    expect(a.b.c.d.e.f.g.h).toBeInstanceOf(H);
+  });
+
+  test('循环引用的实例应该是同一个对象（缓存命中）', () => {
+    const a = container.get(A);
+    // H.c 和 B.c 应该是同一个 C 实例（通过缓存解析）
+    const cFromB = a.b.c;
+    const cFromH = a.b.c.d.e.f.g.h.c;
+    expect(cFromB).toBe(cFromH);
   });
 });

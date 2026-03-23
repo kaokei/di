@@ -15,10 +15,8 @@ class A {
   public name = 'A';
   public id = 1;
 
-  public constructor(
-    @Inject(new LazyToken(() => B))
-    public b: IB
-  ) {}
+  // 迁移：构造函数参数装饰器 → Stage 3 属性装饰器
+  @Inject(new LazyToken(() => B)) b!: IB;
 }
 
 class B {
@@ -36,7 +34,10 @@ describe('toDynamicValue without context', () => {
     container.bind(A).toSelf();
     container.bind(B).toSelf();
     container.bind(ANOTHER_A_CLASS_KEY).toDynamicValue(() => {
-      return new A({ id: 22, name: 'BB' });
+      // 迁移：Stage 3 无参构造，手动赋值属性
+      const a = new A();
+      a.b = { id: 22, name: 'BB' };
+      return a;
     });
   });
 
@@ -81,7 +82,10 @@ describe('toDynamicValue with context', () => {
       .bind(ANOTHER_A_CLASS_KEY)
       .toDynamicValue(({ container }: { container: Container }) => {
         const b = container.get(B);
-        return new A(b);
+        // 迁移：Stage 3 无参构造，手动赋值属性
+        const a = new A();
+        a.b = b;
+        return a;
       });
   });
 
@@ -136,7 +140,10 @@ describe('toDynamicValue with context, return function', () => {
         return (id: number) => {
           const b = container.get(B);
           b.id = id;
-          return new A(b);
+          // 迁移：Stage 3 无参构造，手动赋值属性
+          const a = new A();
+          a.b = b;
+          return a;
         };
       });
   });

@@ -11,7 +11,8 @@ class B {
 
 @Injectable()
 class A {
-  constructor(@Inject(B) public b: B) {}
+  // 迁移：构造函数参数 @Inject 改为属性装饰器
+  @Inject(B) b!: B;
 }
 
 describe('inversify activation binding + container', () => {

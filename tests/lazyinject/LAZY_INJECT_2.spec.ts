@@ -10,7 +10,7 @@ class A {
   public id = 1;
 
   @LazyInject(new LazyToken(() => B))
-  public declare b: B; // 必须使用declare关键字，否则@LazyInject不生效
+  public b!: B;
 }
 
 const container = new Container();

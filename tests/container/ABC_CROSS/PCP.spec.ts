@@ -1,5 +1,5 @@
+// ABC_CROSS: PCP = A,C 已使用属性注入，B 使用构造函数参数注入 → 迁移为属性注入
 import { Inject, Container, LazyToken } from '@/index';
-import { CircularDependencyError } from '@/errors/CircularDependencyError';
 
 interface IA {
   name: string;
@@ -35,10 +35,11 @@ class B {
   public name = 'B';
   public id = 2;
 
-  constructor(
-    @Inject(new LazyToken(() => A)) private a: IA,
-    @Inject(new LazyToken(() => C)) private c: IC
-  ) {}
+  @Inject(new LazyToken(() => A))
+  public a!: IA;
+
+  @Inject(new LazyToken(() => C))
+  public c!: IC;
 }
 
 class C {
@@ -62,16 +63,22 @@ describe('PCP', () => {
     container.bind(C).toSelf();
   });
 
-  test('container.get(A) should throw CircularDependencyError', async () => {
-    expect(() => {
-      container.get(A);
-    }).toThrowError(CircularDependencyError);
+  test('container.get(A) should work correctly (all property injection)', async () => {
+    const a = container.get(A);
+    expect(a).toBeInstanceOf(A);
+    expect(a).toBe(a.b.a);
+    expect(a).toBe(a.c.a);
+    expect(a.b).toBe(a.c.b);
+    expect(a.c).toBe(a.b.c);
   });
 
-  test('container.get(B) should throw CircularDependencyError', async () => {
-    expect(() => {
-      container.get(B);
-    }).toThrowError(CircularDependencyError);
+  test('container.get(B) should work correctly', async () => {
+    const b = container.get(B);
+    expect(b).toBeInstanceOf(B);
+    expect(b).toBe(b.a.b);
+    expect(b).toBe(b.c.b);
+    expect(b.a).toBe(b.c.a);
+    expect(b.c).toBe(b.a.c);
   });
 
   test('container.get(C) should work correctly', async () => {
@@ -79,8 +86,6 @@ describe('PCP', () => {
     expect(c).toBeInstanceOf(C);
     expect(c).toBe(c.a.c);
     expect(c).toBe(c.b.c);
-    expect(c).toBe(c.a.b.c);
-    expect(c).toBe(c.b.a.c);
     expect(c.a).toBe(c.b.a);
     expect(c.b).toBe(c.a.b);
   });

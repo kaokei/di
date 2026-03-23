@@ -33,11 +33,12 @@ class A {
   public c!: IC;
 }
 
+// 迁移：构造函数参数 @Inject 改为属性装饰器
 class B {
   public name = 'B';
   public id = 2;
 
-  constructor(@Inject(new LazyToken(() => C)) private c: IC) {}
+  @Inject(new LazyToken(() => C)) c!: IC;
 }
 
 class C {

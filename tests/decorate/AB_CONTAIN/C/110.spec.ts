@@ -1,3 +1,6 @@
+// Stage 3 迁移：以下测试使用 decorate 函数的数字索引（构造函数参数装饰器），
+// Stage 3 不支持参数装饰器，暂时跳过保留以便将来可能重新支持。
+
 import { SkipSelf, Self, Optional, Inject, Container, decorate } from '@/index';
 import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
 import { hasOwn } from '@tests/utils';
@@ -29,7 +32,7 @@ class A {
 
 decorate([Inject(B), SkipSelf(true), Self(true), Optional(false)], A, 0);
 
-describe('00', () => {
+describe.skip('00', () => {
   let parent: Container;
   let child: Container;
 
@@ -71,7 +74,7 @@ describe('00', () => {
   });
 });
 
-describe('01', () => {
+describe.skip('01', () => {
   let parent: Container;
   let child: Container;
 
@@ -110,7 +113,7 @@ describe('01', () => {
   });
 });
 
-describe('10', () => {
+describe.skip('10', () => {
   let parent: Container;
   let child: Container;
 
@@ -160,7 +163,7 @@ describe('10', () => {
   });
 });
 
-describe('11', () => {
+describe.skip('11', () => {
   let parent: Container;
   let child: Container;
 

@@ -46,60 +46,61 @@ interface IH {
   c: IC;
 }
 
+// 迁移：构造函数参数 @Inject 改为属性装饰器
 class A {
   public name = 'A';
   public id = 1;
 
-  constructor(@Inject(new LazyToken(() => B)) private b: IB) {}
+  @Inject(new LazyToken(() => B)) b!: IB;
 }
 
 class B {
   public name = 'B';
   public id = 2;
 
-  constructor(@Inject(new LazyToken(() => C)) private c: IC) {}
+  @Inject(new LazyToken(() => C)) c!: IC;
 }
 
 class C {
   public name = 'C';
   public id = 3;
 
-  constructor(@Inject(new LazyToken(() => D)) private d: ID) {}
+  @Inject(new LazyToken(() => D)) d!: ID;
 }
 
 class D {
   public name = 'D';
   public id = 4;
 
-  constructor(@Inject(new LazyToken(() => E)) private e: IE) {}
+  @Inject(new LazyToken(() => E)) e!: IE;
 }
 
 class E {
   public name = 'E';
   public id = 5;
 
-  constructor(@Inject(new LazyToken(() => F)) private f: IF) {}
+  @Inject(new LazyToken(() => F)) f!: IF;
 }
 
 class F {
   public name = 'F';
   public id = 6;
 
-  constructor(@Inject(new LazyToken(() => G)) private g: IG) {}
+  @Inject(new LazyToken(() => G)) g!: IG;
 }
 
 class G {
   public name = 'G';
   public id = 7;
 
-  constructor(@Inject(new LazyToken(() => H)) private h: IH) {}
+  @Inject(new LazyToken(() => H)) h!: IH;
 }
 
 class H {
   public name = 'H';
   public id = 8;
 
-  constructor(@Inject(new LazyToken(() => C)) private c: IC) {}
+  @Inject(new LazyToken(() => C)) c!: IC;
 }
 
 describe('CIRCULAR_DEPENDENCY', () => {

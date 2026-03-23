@@ -17,7 +17,8 @@ class User {
   private name = 'zhangsan';
   private age = 12;
 
-  constructor(@Inject(UserClass) private userClass: UserClass) {}
+  // 迁移：构造函数参数装饰器 → Stage 3 属性装饰器
+  @Inject(UserClass) userClass!: UserClass;
 
   public getName() {
     return this.name;

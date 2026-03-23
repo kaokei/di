@@ -24,7 +24,8 @@ describe('POST_CONSTRUCT_1 A -> B', () => {
   class A {
     public inited = false;
 
-    constructor(@Inject(B) public b: B) {}
+    // 迁移：构造函数参数 @Inject 改为属性装饰器
+    @Inject(B) b!: B;
 
     @PostConstruct(true)
     async init() {
@@ -87,7 +88,8 @@ describe('POST_CONSTRUCT_2 B -> A', () => {
   class A {
     public inited = false;
 
-    constructor(@Inject(B) public b: B) {}
+    // 迁移：构造函数参数 @Inject 改为属性装饰器
+    @Inject(B) b!: B;
 
     @PostConstruct(true)
     async init() {

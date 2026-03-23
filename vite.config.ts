@@ -43,6 +43,8 @@ export default defineConfig({
   test: {
     globals: true,
     dangerouslyIgnoreUnhandledErrors: true,
+    // 排除 inversify 测试目录：inversify v6.2.2 的 @Inject 属性装饰器不支持 Stage 3 装饰器
+    exclude: ['tests/inversify/**', 'node_modules/**'],
     coverage: {
       include: ['src/**/*.ts'],
       reporter: ['text', 'lcov'],

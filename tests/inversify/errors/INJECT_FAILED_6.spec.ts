@@ -16,7 +16,8 @@ class A {
   public name = 'A';
   public id = 1;
 
-  public constructor(@Inject('') public b: IB) {}
+  // 迁移：构造函数参数 @Inject 改为属性装饰器
+  @Inject('') b!: IB;
 }
 
 class B {

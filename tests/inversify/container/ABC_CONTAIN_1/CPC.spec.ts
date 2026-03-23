@@ -22,14 +22,13 @@ interface IC {
   b: IB;
 }
 
+// 迁移：构造函数参数 @Inject 改为属性装饰器
 class A {
   public name = 'A';
   public id = 1;
 
-  constructor(
-    @Inject(new LazyToken(() => B)) public b: IB,
-    @Inject(new LazyToken(() => C)) public c: IC
-  ) {}
+  @Inject(new LazyToken(() => B)) b!: IB;
+  @Inject(new LazyToken(() => C)) c!: IC;
 }
 
 class B {
@@ -44,7 +43,7 @@ class C {
   public name = 'C';
   public id = 3;
 
-  constructor(@Inject(new LazyToken(() => B)) public b: IB) {}
+  @Inject(new LazyToken(() => B)) b!: IB;
 }
 
 describe('CPC', () => {

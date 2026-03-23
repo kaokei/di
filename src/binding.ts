@@ -1,6 +1,6 @@
 import { BINDING, KEYS, STATUS, DEFAULT_VALUE } from './constants';
 import { Container } from './container';
-import { getMetadata, getOwnMetadata } from './cachemap';
+import { getMetadata } from './cachemap';
 import { resolveToken } from './token';
 import { CircularDependencyError } from './errors/CircularDependencyError';
 import { BindingNotValidError } from './errors/BindingNotValidError';
@@ -134,8 +134,7 @@ export class Binding<T = unknown> {
 
   private postConstruct(
     options: Options<T>,
-    binding1: Binding[],
-    binding2: Binding[]
+    propertyBindings: Binding[]
   ) {
     if (BINDING.Instance === this.type) {
       const { key, value } =
@@ -144,8 +143,8 @@ export class Binding<T = unknown> {
         // 使用了@PostConstruct装饰器
         if (value) {
           // @PostConstruct(指定了参数)，说明需要等待前置服务初始化完成之后再初始化本服务
-          // bindings是本服务依赖的所有构造函数参数和注入的实例属性，并且Binding类型是Instance
-          const bindings = [...binding1, ...binding2].filter(
+          // bindings是本服务依赖的所有注入的实例属性，并且Binding类型是Instance
+          const bindings = propertyBindings.filter(
             item => BINDING.Instance === item?.type
           );
           // 通过@PostConstruct(指定的参数)，也就是value来过滤指定的需要等待的binding
@@ -203,11 +202,9 @@ export class Binding<T = unknown> {
   private resolveInstanceValue(options: Options<T>) {
     this.status = STATUS.INITING;
     const ClassName = this.classValue;
-    // 构造函数的参数可能会导致循环依赖
-    const [params, paramBindings] = this.getConstructorParameters(options);
-    const inst = new ClassName(...params);
+    // 无参构造实例化
+    const inst = new ClassName();
     // ActivationHandler可能会导致循环依赖
-    // 需要注意ActivationHandler只能访问构造函数参数，并不能访问注入的实例属性
     this.cache = this.activate(inst);
     // 实例化成功，并存入缓存，此时不会再有循环依赖的问题
     this.status = STATUS.ACTIVATED;
@@ -217,7 +214,8 @@ export class Binding<T = unknown> {
     const [properties, propertyBindings] = this.getInjectProperties(options);
     Object.assign(this.cache as RecordObject, properties);
     // postConstruct特意放在了getInjectProperties之后，这样postConstruct就能访问注入的属性了
-    this.postConstruct(options, paramBindings, propertyBindings);
+    // 仅传 propertyBindings
+    this.postConstruct(options, propertyBindings);
     return this.cache;
   }
 
@@ -234,21 +232,6 @@ export class Binding<T = unknown> {
     this.cache = this.activate(dynamicValue);
     this.status = STATUS.ACTIVATED;
     return this.cache;
-  }
-
-  private getConstructorParameters(options: Options<T>) {
-    const params = getOwnMetadata(KEYS.INJECTED_PARAMS, this.classValue) || [];
-    const result = [];
-    const binding: Binding[] = [];
-    for (let i = 0; i < params.length; i++) {
-      const meta = params[i];
-      const { inject, ...rest } = meta;
-      rest.parent = options;
-      const ret = this.container.get(resolveToken(inject), rest);
-      result.push(ret);
-      binding.push(rest.binding as Binding);
-    }
-    return [result, binding] as const;
   }
 
   private getInjectProperties(options: Options<T>) {

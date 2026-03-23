@@ -13,7 +13,7 @@ class A {
   public id = 1;
 
   @LazyInject(B)
-  public declare b: B;
+  public b!: B;
 }
 
 container.bind(B).toSelf();

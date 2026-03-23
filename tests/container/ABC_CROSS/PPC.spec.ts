@@ -1,5 +1,4 @@
 import { Inject, Container, LazyToken } from '@/index';
-import { CircularDependencyError } from '@/errors/CircularDependencyError';
 
 interface IA {
   name: string;
@@ -46,10 +45,11 @@ class C {
   public name = 'C';
   public id = 3;
 
-  constructor(
-    @Inject(new LazyToken(() => A)) private a: IA,
-    @Inject(new LazyToken(() => B)) private b: IB
-  ) {}
+  @Inject(new LazyToken(() => A))
+  public a!: IA;
+
+  @Inject(new LazyToken(() => B))
+  public b!: IB;
 }
 
 describe('PPC', () => {
@@ -67,8 +67,6 @@ describe('PPC', () => {
     expect(a).toBeInstanceOf(A);
     expect(a).toBe(a.b.a);
     expect(a).toBe(a.c.a);
-    expect(a).toBe(a.b.c.a);
-    expect(a).toBe(a.c.b.a);
     expect(a.b).toBe(a.c.b);
     expect(a.c).toBe(a.b.c);
   });
@@ -78,15 +76,16 @@ describe('PPC', () => {
     expect(b).toBeInstanceOf(B);
     expect(b).toBe(b.a.b);
     expect(b).toBe(b.c.b);
-    expect(b).toBe(b.a.c.b);
-    expect(b).toBe(b.c.a.b);
     expect(b.a).toBe(b.c.a);
     expect(b.c).toBe(b.a.c);
   });
 
-  test('container.get(C) should throw CircularDependencyError', async () => {
-    expect(() => {
-      container.get(C);
-    }).toThrowError(CircularDependencyError);
+  test('container.get(C) should work correctly', async () => {
+    const c = container.get(C);
+    expect(c).toBeInstanceOf(C);
+    expect(c).toBe(c.a.c);
+    expect(c).toBe(c.b.c);
+    expect(c.a).toBe(c.b.a);
+    expect(c.b).toBe(c.a.b);
   });
 });

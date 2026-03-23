@@ -2,10 +2,8 @@ import type { Token, LazyToken } from './token';
 import type { Container } from './container';
 import type { Binding } from './binding';
 
-export type Newable<
-  TInstance = unknown,
-  TArgs extends unknown[] = any[]
-> = new (...args: TArgs) => TInstance;
+// 可实例化的类类型，Stage 3 装饰器迁移后仅支持无参构造
+export type Newable<TInstance = unknown> = new () => TInstance;
 
 export type InjectFunction<R extends (...args: any) => any> = (
   token: GenericToken

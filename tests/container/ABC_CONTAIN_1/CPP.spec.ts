@@ -17,14 +17,14 @@ interface IC {
   b: IB;
 }
 
+// 迁移说明：原 CPP（A 构造函数参数注入）已迁移为属性注入，行为等同于 PPP。
 class A {
   public name = 'A';
   public id = 1;
 
-  constructor(
-    @Inject(new LazyToken(() => B)) public b: IB,
-    @Inject(new LazyToken(() => C)) public c: IC
-  ) {}
+  @Inject(new LazyToken(() => B)) b!: IB;
+
+  @Inject(new LazyToken(() => C)) c!: IC;
 }
 
 class B {

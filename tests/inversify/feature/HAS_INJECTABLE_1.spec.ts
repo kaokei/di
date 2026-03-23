@@ -22,7 +22,8 @@ class A {
   public name = 'A';
   public id = 1;
 
-  public constructor(@Inject(new LazyToken(() => B)) public b: IB) {}
+  // 迁移：构造函数参数 @Inject 改为属性装饰器
+  @Inject(new LazyToken(() => B)) b!: IB;
 }
 
 @injectable()

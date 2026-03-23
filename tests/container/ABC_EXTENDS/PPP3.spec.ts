@@ -50,7 +50,7 @@ class A extends B {
   public id = 1;
 
   @Inject(new LazyToken(() => C))
-  public declare c: IC;
+  public c!: IC;
 }
 
 describe('PPP3', () => {
