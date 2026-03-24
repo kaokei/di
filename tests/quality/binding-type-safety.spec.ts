@@ -1,0 +1,124 @@
+/**
+ * 常量模块与 Binding 类型安全测试
+ *
+ * 覆盖范围：
+ * - BindingType 和 StatusType 联合类型是否正确约束 type 和 status 字段
+ * - UNINITIALIZED Symbol 具有描述字符串
+ * - Binding 实例的 type 默认值为 BINDING.Invalid，status 默认值为 STATUS.DEFAULT
+ *
+ * 需求：1.1、1.2、1.3、1.4、18.1、18.2
+ */
+
+import { Container, Token } from '@/index';
+import { Binding } from '@/binding';
+import { BINDING, STATUS, UNINITIALIZED } from '@/constants';
+import type { BindingType, StatusType } from '@/constants';
+
+// ==================== UNINITIALIZED 哨兵值（需求 18.1、18.2） ====================
+
+describe('UNINITIALIZED 哨兵值', () => {
+  test('UNINITIALIZED 是一个 Symbol', () => {
+    expect(typeof UNINITIALIZED).toBe('symbol');
+  });
+
+  test('UNINITIALIZED Symbol 具有描述字符串 "UNINITIALIZED"', () => {
+    expect(UNINITIALIZED.description).toBe('UNINITIALIZED');
+  });
+
+  test('UNINITIALIZED 与普通 Symbol() 不相等', () => {
+    expect(UNINITIALIZED).not.toBe(Symbol());
+    expect(UNINITIALIZED).not.toBe(Symbol('UNINITIALIZED'));
+  });
+});
+
+// ==================== BindingType 和 StatusType 联合类型（需求 1.4） ====================
+
+describe('BindingType 和 StatusType 联合类型', () => {
+  test('BINDING 对象包含所有预期的绑定类型值', () => {
+    expect(BINDING.Invalid).toBe('Invalid');
+    expect(BINDING.Instance).toBe('Instance');
+    expect(BINDING.ConstantValue).toBe('ConstantValue');
+    expect(BINDING.DynamicValue).toBe('DynamicValue');
+  });
+
+  test('STATUS 对象包含所有预期的状态值', () => {
+    expect(STATUS.DEFAULT).toBe('default');
+    expect(STATUS.INITING).toBe('initing');
+    expect(STATUS.ACTIVATED).toBe('activated');
+  });
+
+  test('BindingType 联合类型可以赋值为 BINDING 中的任意值', () => {
+    // 编译期类型检查：以下赋值应通过 TypeScript 编译
+    const t1: BindingType = BINDING.Invalid;
+    const t2: BindingType = BINDING.Instance;
+    const t3: BindingType = BINDING.ConstantValue;
+    const t4: BindingType = BINDING.DynamicValue;
+    expect([t1, t2, t3, t4]).toEqual([
+      'Invalid',
+      'Instance',
+      'ConstantValue',
+      'DynamicValue',
+    ]);
+  });
+
+  test('StatusType 联合类型可以赋值为 STATUS 中的任意值', () => {
+    // 编译期类型检查：以下赋值应通过 TypeScript 编译
+    const s1: StatusType = STATUS.DEFAULT;
+    const s2: StatusType = STATUS.INITING;
+    const s3: StatusType = STATUS.ACTIVATED;
+    expect([s1, s2, s3]).toEqual(['default', 'initing', 'activated']);
+  });
+});
+
+// ==================== Binding 实例默认值（需求 1.1、1.2） ====================
+
+describe('Binding 实例默认值', () => {
+  let container: Container;
+
+  beforeEach(() => {
+    container = new Container();
+  });
+
+  afterEach(() => {
+    container.destroy();
+  });
+
+  test('新建 Binding 的 type 默认值为 BINDING.Invalid', () => {
+    const token = new Token<string>('test');
+    const binding = new Binding(token, container);
+    expect(binding.type).toBe(BINDING.Invalid);
+  });
+
+  test('新建 Binding 的 status 默认值为 STATUS.DEFAULT', () => {
+    const token = new Token<string>('test');
+    const binding = new Binding(token, container);
+    expect(binding.status).toBe(STATUS.DEFAULT);
+  });
+
+  test('Binding.type 在调用 to() 后变为 BINDING.Instance', () => {
+    class MyService {}
+    const binding = new Binding(MyService, container);
+    binding.to(MyService);
+    expect(binding.type).toBe(BINDING.Instance);
+  });
+
+  test('Binding.type 在调用 toConstantValue() 后变为 BINDING.ConstantValue', () => {
+    const token = new Token<string>('test');
+    const binding = new Binding(token, container);
+    binding.toConstantValue('value');
+    expect(binding.type).toBe(BINDING.ConstantValue);
+  });
+
+  test('Binding.type 在调用 toDynamicValue() 后变为 BINDING.DynamicValue', () => {
+    const token = new Token<string>('test');
+    const binding = new Binding(token, container);
+    binding.toDynamicValue(() => 'dynamic');
+    expect(binding.type).toBe(BINDING.DynamicValue);
+  });
+
+  test('Binding.postConstructResult 初始值为 UNINITIALIZED', () => {
+    const token = new Token<string>('test');
+    const binding = new Binding(token, container);
+    expect(binding.postConstructResult).toBe(UNINITIALIZED);
+  });
+});

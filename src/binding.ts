@@ -1,4 +1,5 @@
-import { BINDING, KEYS, STATUS, DEFAULT_VALUE } from './constants';
+import { BINDING, KEYS, STATUS, UNINITIALIZED } from './constants';
+import type { BindingType, StatusType } from './constants';
 import { Container } from './container';
 import { getMetadata } from './cachemap';
 import { resolveToken } from './token';
@@ -24,9 +25,9 @@ export class Binding<T = unknown> {
 
   token!: CommonToken<T>;
 
-  type: string = BINDING.Invalid;
+  type: BindingType = BINDING.Invalid;
 
-  status: string = STATUS.DEFAULT;
+  status: StatusType = STATUS.DEFAULT;
 
   classValue!: Newable<T>;
 
@@ -36,7 +37,7 @@ export class Binding<T = unknown> {
 
   cache!: T;
 
-  postConstructResult?: Promise<void> | Symbol = DEFAULT_VALUE;
+  postConstructResult?: Promise<void> | Symbol = UNINITIALIZED;
 
   onActivationHandler?: ActivationHandler<T>;
 
@@ -151,7 +152,7 @@ export class Binding<T = unknown> {
           const awaitBindings = this._getAwaitBindings(bindings, value);
           for (const binding of awaitBindings) {
             if (binding) {
-              if (binding.postConstructResult === DEFAULT_VALUE) {
+              if (binding.postConstructResult === UNINITIALIZED) {
                 // @PostConstruct导致循环依赖
                 throw new PostConstructError({
                   token: binding.token,
@@ -189,7 +190,7 @@ export class Binding<T = unknown> {
     this.constantValue = null as unknown as T;
     this.dynamicValue = null as unknown as DynamicValue<T>;
     this.cache = null as unknown as T;
-    this.postConstructResult = DEFAULT_VALUE;
+    this.postConstructResult = UNINITIALIZED;
     this.onActivationHandler = void 0;
     this.onDeactivationHandler = void 0;
   }

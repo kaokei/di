@@ -21,24 +21,24 @@
     - 覆盖父子容器的 isBound/createChild/get 查找链
     - _需求：21.3_
 
-- [ ] 2. 检查点 - 确保回归测试全部通过
+- [x] 2. 检查点 - 确保回归测试全部通过
   - 确保所有测试通过，如有问题请向用户确认。
 
-- [ ] 3. 常量模块与类型系统优化（需求 1、18）
-  - [ ] 3.1 编写常量模块和 Binding 类型安全的测试
+- [x] 3. 常量模块与类型系统优化（需求 1、18）
+  - [x] 3.1 编写常量模块和 Binding 类型安全的测试
     - 创建 `tests/quality/binding-type-safety.spec.ts`
     - 测试 `BindingType` 和 `StatusType` 联合类型是否正确约束 `type` 和 `status` 字段
     - 测试 `UNINITIALIZED` Symbol 具有描述字符串
     - 测试 Binding 实例的 `type` 默认值为 `BINDING.Invalid`，`status` 默认值为 `STATUS.DEFAULT`
     - _需求：1.1、1.2、1.3、1.4、18.1、18.2_
 
-  - [ ] 3.2 实施常量模块优化
+  - [x] 3.2 实施常量模块优化
     - 在 `src/constants.ts` 中将 `DEFAULT_VALUE` 重命名为 `UNINITIALIZED`，添加 Symbol 描述字符串 `Symbol('UNINITIALIZED')`
     - 导出 `BindingType` 和 `StatusType` 联合类型
     - 更新所有引用 `DEFAULT_VALUE` 的文件（`src/binding.ts`）
     - _需求：1.4、18.1、18.2_
 
-  - [ ] 3.3 实施 Binding 类型字段的联合类型化
+  - [x] 3.3 实施 Binding 类型字段的联合类型化
     - 在 `src/binding.ts` 中将 `type: string` 改为 `type: BindingType`，`status: string` 改为 `status: StatusType`
     - 在 `src/interfaces.ts` 中更新相关类型（如需要）
     - _需求：1.1、1.2、1.3_

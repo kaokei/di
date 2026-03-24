@@ -38,4 +38,9 @@ export const ERRORS = {
     '@LazyInject requires a registered container but none was found.',
 } as const;
 
-export const DEFAULT_VALUE = Symbol();
+// 未初始化哨兵值，用于标记 PostConstruct 尚未执行
+export const UNINITIALIZED = Symbol('UNINITIALIZED');
+
+// 从 as const 对象中提取联合类型
+export type BindingType = (typeof BINDING)[keyof typeof BINDING];
+export type StatusType = (typeof STATUS)[keyof typeof STATUS];
