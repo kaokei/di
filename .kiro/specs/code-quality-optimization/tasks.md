@@ -48,25 +48,25 @@
     - **属性 1：Binding 可选属性初始值为 undefined**
     - **验证：需求 2.1**
 
-- [ ] 4. Binding 类属性空安全与返回类型改进（需求 2、15）
-  - [ ] 4.1 编写 Binding 属性空安全和返回类型的测试
+- [x] 4. Binding 类属性空安全与返回类型改进（需求 2、15）
+  - [x] 4.1 编写 Binding 属性空安全和返回类型的测试
     - 在 `tests/quality/binding-type-safety.spec.ts` 中追加测试
     - 测试新建 Binding 实例的 `classValue`、`constantValue`、`dynamicValue`、`cache` 初始值为 `undefined`
     - 测试 `preDestroy` 后上述属性严格等于 `undefined`（非 `null`）
     - 测试 `_getInjectProperties` 返回具名对象 `{ properties, bindings }`
     - _需求：2.1、2.2、2.3、15.1、15.2_
 
-  - [ ]* 4.2 编写 preDestroy 清理的属性测试
+  - [x] 4.2 编写 preDestroy 清理的属性测试
     - **属性 2：preDestroy 后属性为 undefined**
     - **验证：需求 2.3**
 
-  - [ ] 4.3 实施 Binding 属性空安全改造
+  - [x] 4.3 实施 Binding 属性空安全改造
     - 在 `src/binding.ts` 中将 `classValue!`、`constantValue!`、`dynamicValue!`、`cache!` 改为可选类型
     - 将 `preDestroy` 中的 `null as unknown as T` 改为 `undefined`
     - 在 `_resolveInstanceValue`、`_resolveConstantValue`、`_resolveDynamicValue` 中添加必要的空值检查
     - _需求：2.1、2.2、2.3_
 
-  - [ ] 4.4 实施 _getInjectProperties 返回类型改进
+  - [x] 4.4 实施 _getInjectProperties 返回类型改进
     - 在 `src/binding.ts` 中定义 `InjectPropertiesResult` 接口
     - 将 `_getInjectProperties` 返回值从元组改为 `{ properties, bindings }`
     - 更新 `_resolveInstanceValue` 中的调用处使用解构赋值

@@ -18,6 +18,11 @@ import type {
   DeactivationHandler,
 } from './interfaces';
 
+export interface InjectPropertiesResult {
+  properties: RecordObject;
+  bindings: Binding[];
+}
+
 export class Binding<T = unknown> {
   container!: Container;
 
@@ -29,13 +34,13 @@ export class Binding<T = unknown> {
 
   status: StatusType = STATUS.DEFAULT;
 
-  classValue!: Newable<T>;
+  classValue?: Newable<T>;
 
-  constantValue!: T;
+  constantValue?: T;
 
-  dynamicValue!: DynamicValue<T>;
+  dynamicValue?: DynamicValue<T>;
 
-  cache!: T;
+  cache?: T;
 
   postConstructResult?: Promise<void> | Symbol = UNINITIALIZED;
 
@@ -65,7 +70,7 @@ export class Binding<T = unknown> {
   }
 
   deactivate() {
-    this.onDeactivationHandler && this.onDeactivationHandler(this.cache);
+    this.onDeactivationHandler && this.onDeactivationHandler(this.cache as T);
   }
 
   to(constructor: Newable<T>) {
@@ -139,7 +144,7 @@ export class Binding<T = unknown> {
   ) {
     if (BINDING.Instance === this.type) {
       const { key, value } =
-        getMetadata(KEYS.POST_CONSTRUCT, this.classValue) || {};
+        getMetadata(KEYS.POST_CONSTRUCT, this.classValue!) || {};
       if (key) {
         // 使用了@PostConstruct装饰器
         if (value) {
@@ -178,7 +183,7 @@ export class Binding<T = unknown> {
 
   preDestroy() {
     if (BINDING.Instance === this.type) {
-      const { key } = getMetadata(KEYS.PRE_DESTROY, this.classValue) || {};
+      const { key } = getMetadata(KEYS.PRE_DESTROY, this.classValue!) || {};
       if (key) {
         this._execute(key);
       }
@@ -186,10 +191,10 @@ export class Binding<T = unknown> {
     Container.map.delete(this.cache);
     this.container = null as unknown as Container;
     this.context = null as unknown as Context;
-    this.classValue = null as unknown as Newable<T>;
-    this.constantValue = null as unknown as T;
-    this.dynamicValue = null as unknown as DynamicValue<T>;
-    this.cache = null as unknown as T;
+    this.classValue = undefined;
+    this.constantValue = undefined;
+    this.dynamicValue = undefined;
+    this.cache = undefined;
     this.postConstructResult = UNINITIALIZED;
     this.onActivationHandler = void 0;
     this.onDeactivationHandler = void 0;
@@ -202,7 +207,7 @@ export class Binding<T = unknown> {
 
   _resolveInstanceValue(options: Options<T>) {
     this.status = STATUS.INITING;
-    const ClassName = this.classValue;
+    const ClassName = this.classValue!;
     // 无参构造实例化
     const inst = new ClassName();
     // ActivationHandler可能会导致循环依赖
@@ -212,7 +217,7 @@ export class Binding<T = unknown> {
     // 维护实例和容器之间的关系，方便@LazyInject获取容器
     Container.map.set(this.cache, this.container);
     // 属性注入不会导致循环依赖问题
-    const [properties, propertyBindings] = this._getInjectProperties(options);
+    const { properties, bindings: propertyBindings } = this._getInjectProperties(options);
     Object.assign(this.cache as RecordObject, properties);
     // postConstruct特意放在了getInjectProperties之后，这样postConstruct就能访问注入的属性了
     // 仅传 propertyBindings
@@ -222,21 +227,21 @@ export class Binding<T = unknown> {
 
   _resolveConstantValue() {
     this.status = STATUS.INITING;
-    this.cache = this.activate(this.constantValue);
+    this.cache = this.activate(this.constantValue as T);
     this.status = STATUS.ACTIVATED;
     return this.cache;
   }
 
   _resolveDynamicValue() {
     this.status = STATUS.INITING;
-    const dynamicValue = this.dynamicValue!.call(this, this.context);
+    const dynamicValue = this.dynamicValue!(this.context);
     this.cache = this.activate(dynamicValue);
     this.status = STATUS.ACTIVATED;
     return this.cache;
   }
 
   _getInjectProperties(options: Options<T>) {
-    const props = getMetadata(KEYS.INJECTED_PROPS, this.classValue) || {};
+    const props = getMetadata(KEYS.INJECTED_PROPS, this.classValue!) || {};
     const propKeys = Object.keys(props);
     const result = Object.create(null) as RecordObject;
     const binding: Binding[] = [];
@@ -251,6 +256,6 @@ export class Binding<T = unknown> {
       }
       binding.push(rest.binding as Binding);
     }
-    return [result, binding] as const;
+    return { properties: result, bindings: binding };
   }
 }

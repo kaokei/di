@@ -150,3 +150,194 @@ describe('属性 1：Binding 可选属性初始值为 undefined', () => {
     );
   });
 });
+
+
+// Feature: code-quality-optimization, Property 2: preDestroy 后属性为 undefined
+describe('属性 2：preDestroy 后属性为 undefined', () => {
+  test('对于任意常量值绑定，preDestroy 后 constantValue、cache 严格等于 undefined（非 null）', () => {
+    fc.assert(
+      fc.property(fc.string(), (value) => {
+        const container = new Container();
+        try {
+          const token = new Token<string>('prop2-cv');
+          container.bind(token).toConstantValue(value);
+          container.get(token);
+          const binding = container._bindings.get(token) as Binding;
+
+          binding.preDestroy();
+
+          // 验证需求 2.3：preDestroy 后属性为 undefined 而非 null
+          expect(binding.constantValue).toBeUndefined();
+          expect(binding.constantValue).not.toBeNull();
+          expect(binding.cache).toBeUndefined();
+          expect(binding.cache).not.toBeNull();
+          expect(binding.classValue).toBeUndefined();
+          expect(binding.dynamicValue).toBeUndefined();
+        } finally {
+          container.destroy();
+        }
+      }),
+      { numRuns: 100 },
+    );
+  });
+
+  test('对于任意动态值绑定，preDestroy 后 dynamicValue、cache 严格等于 undefined（非 null）', () => {
+    fc.assert(
+      fc.property(fc.string(), (value) => {
+        const container = new Container();
+        try {
+          const token = new Token<string>('prop2-dv');
+          container.bind(token).toDynamicValue(() => value);
+          container.get(token);
+          const binding = container._bindings.get(token) as Binding;
+
+          binding.preDestroy();
+
+          expect(binding.dynamicValue).toBeUndefined();
+          expect(binding.dynamicValue).not.toBeNull();
+          expect(binding.cache).toBeUndefined();
+          expect(binding.cache).not.toBeNull();
+          expect(binding.classValue).toBeUndefined();
+          expect(binding.constantValue).toBeUndefined();
+        } finally {
+          container.destroy();
+        }
+      }),
+      { numRuns: 100 },
+    );
+  });
+
+  test('对于 Instance 类型绑定，preDestroy 后 classValue、cache 严格等于 undefined（非 null）', () => {
+    const container = new Container();
+    try {
+      class TestService {}
+      container.bind(TestService).toSelf();
+      container.get(TestService);
+      const binding = container._bindings.get(TestService) as Binding;
+
+      binding.preDestroy();
+
+      expect(binding.classValue).toBeUndefined();
+      expect(binding.classValue).not.toBeNull();
+      expect(binding.cache).toBeUndefined();
+      expect(binding.cache).not.toBeNull();
+      expect(binding.constantValue).toBeUndefined();
+      expect(binding.dynamicValue).toBeUndefined();
+    } finally {
+      container.destroy();
+    }
+  });
+});
+
+// ==================== Binding 属性空安全（需求 2.1、2.2、2.3） ====================
+
+describe('Binding 属性空安全', () => {
+  let container: Container;
+
+  beforeEach(() => {
+    container = new Container();
+  });
+
+  afterEach(() => {
+    container.destroy();
+  });
+
+  test('新建 Binding 的 classValue 初始值为 undefined', () => {
+    const token = new Token<string>('test');
+    const binding = new Binding(token, container);
+    expect(binding.classValue).toBeUndefined();
+  });
+
+  test('新建 Binding 的 constantValue 初始值为 undefined', () => {
+    const token = new Token<string>('test');
+    const binding = new Binding(token, container);
+    expect(binding.constantValue).toBeUndefined();
+  });
+
+  test('新建 Binding 的 dynamicValue 初始值为 undefined', () => {
+    const token = new Token<string>('test');
+    const binding = new Binding(token, container);
+    expect(binding.dynamicValue).toBeUndefined();
+  });
+
+  test('新建 Binding 的 cache 初始值为 undefined', () => {
+    const token = new Token<string>('test');
+    const binding = new Binding(token, container);
+    expect(binding.cache).toBeUndefined();
+  });
+
+  test('preDestroy 后 classValue 严格等于 undefined（非 null）', () => {
+    class MyService {}
+    container.bind(MyService).toSelf();
+    container.get(MyService); // 触发实例化
+    const binding = container._bindings.get(MyService) as Binding;
+    binding.preDestroy();
+    expect(binding.classValue).toBeUndefined();
+    expect(binding.classValue).not.toBeNull();
+  });
+
+  test('preDestroy 后 constantValue 严格等于 undefined（非 null）', () => {
+    const token = new Token<string>('cv');
+    container.bind(token).toConstantValue('hello');
+    container.get(token);
+    const binding = container._bindings.get(token) as Binding;
+    binding.preDestroy();
+    expect(binding.constantValue).toBeUndefined();
+    expect(binding.constantValue).not.toBeNull();
+  });
+
+  test('preDestroy 后 dynamicValue 严格等于 undefined（非 null）', () => {
+    const token = new Token<string>('dv');
+    container.bind(token).toDynamicValue(() => 'dynamic');
+    container.get(token);
+    const binding = container._bindings.get(token) as Binding;
+    binding.preDestroy();
+    expect(binding.dynamicValue).toBeUndefined();
+    expect(binding.dynamicValue).not.toBeNull();
+  });
+
+  test('preDestroy 后 cache 严格等于 undefined（非 null）', () => {
+    const token = new Token<string>('c');
+    container.bind(token).toConstantValue('cached');
+    container.get(token);
+    const binding = container._bindings.get(token) as Binding;
+    binding.preDestroy();
+    expect(binding.cache).toBeUndefined();
+    expect(binding.cache).not.toBeNull();
+  });
+});
+
+// ==================== _getInjectProperties 返回具名对象（需求 15.1、15.2） ====================
+
+describe('_getInjectProperties 返回具名对象', () => {
+  let container: Container;
+
+  beforeEach(() => {
+    container = new Container();
+  });
+
+  afterEach(() => {
+    container.destroy();
+  });
+
+  test('_getInjectProperties 返回值包含 properties 和 bindings 属性', () => {
+    class MyService {}
+    const binding = new Binding(MyService, container);
+    binding.to(MyService);
+    const options = { parent: { token: MyService } } as any;
+    const result = binding._getInjectProperties(options);
+    // 返回值应为具名对象
+    expect(result).toHaveProperty('properties');
+    expect(result).toHaveProperty('bindings');
+  });
+
+  test('无注入属性时 properties 为空对象，bindings 为空数组', () => {
+    class EmptyService {}
+    const binding = new Binding(EmptyService, container);
+    binding.to(EmptyService);
+    const options = { parent: { token: EmptyService } } as any;
+    const result = binding._getInjectProperties(options);
+    expect(Object.keys(result.properties)).toHaveLength(0);
+    expect(result.bindings).toHaveLength(0);
+  });
+});
