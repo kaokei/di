@@ -6,14 +6,14 @@
 
 ## 任务
 
-- [ ] 1. 基础设施准备
-  - [ ] 1.1 安装 fast-check 依赖并创建测试目录结构
+- [x] 1. 基础设施准备
+  - [x] 1.1 安装 fast-check 依赖并创建测试目录结构
     - 执行 `pnpm add -D fast-check`
     - 创建 `tests/quality/` 目录
     - 创建测试工具文件 `tests/quality/helpers.ts`（如需要）
     - _需求：21.5_
 
-  - [ ] 1.2 编写现有公共 API 的回归测试
+  - [x] 1.2 编写现有公共 API 的回归测试
     - 创建 `tests/quality/regression.spec.ts`
     - 覆盖 Container 的 bind/get/unbind/destroy 基本流程
     - 覆盖 Binding 的 to/toSelf/toConstantValue/toDynamicValue/toService 链式调用
