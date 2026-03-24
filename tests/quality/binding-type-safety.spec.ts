@@ -9,6 +9,7 @@
  * 需求：1.1、1.2、1.3、1.4、18.1、18.2
  */
 
+import fc from 'fast-check';
 import { Container, Token } from '@/index';
 import { Binding } from '@/binding';
 import { BINDING, STATUS, UNINITIALIZED } from '@/constants';
@@ -120,5 +121,32 @@ describe('Binding 实例默认值', () => {
     const token = new Token<string>('test');
     const binding = new Binding(token, container);
     expect(binding.postConstructResult).toBe(UNINITIALIZED);
+  });
+});
+
+
+// ==================== 属性测试（fast-check） ====================
+
+// Feature: code-quality-optimization, Property 1: Binding 可选属性初始值为 undefined
+describe('属性 1：Binding 可选属性初始值为 undefined', () => {
+  test('对于任意 token 名称，新建 Binding 的 classValue、constantValue、dynamicValue、cache 初始值均为 undefined', () => {
+    fc.assert(
+      fc.property(fc.string({ minLength: 1 }), (name) => {
+        const container = new Container();
+        try {
+          const token = new Token(name);
+          const binding = new Binding(token, container);
+
+          // 验证需求 2.1：可选属性初始值为 undefined
+          expect(binding.classValue).toBeUndefined();
+          expect(binding.constantValue).toBeUndefined();
+          expect(binding.dynamicValue).toBeUndefined();
+          expect(binding.cache).toBeUndefined();
+        } finally {
+          container.destroy();
+        }
+      }),
+      { numRuns: 100 },
+    );
   });
 });
