@@ -30,12 +30,12 @@ export const BINDING = {
 
 export const ERRORS = {
   POST_CONSTRUCT:
-    'Cannot apply @PostConstruct decorator multiple times in the same class.',
+    'Multiple @PostConstruct decorators are not allowed in a single class.',
   PRE_DESTROY:
-    'Cannot apply @PreDestroy decorator multiple times in the same class.',
-  MISS_INJECT: 'Expected a @Inject decorator to explicitly specify the token.',
+    'Multiple @PreDestroy decorators are not allowed in a single class.',
+  MISS_INJECT: 'Missing @Inject decorator for explicit token specification.',
   MISS_CONTAINER:
-    '@LazyInject decorator cannot find the corresponding container.',
+    '@LazyInject requires a registered container but none was found.',
 } as const;
 
 export const DEFAULT_VALUE = Symbol();
