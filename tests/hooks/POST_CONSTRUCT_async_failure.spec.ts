@@ -1,13 +1,13 @@
-import { Container, PostConstruct, Inject, PostConstructError } from '@/index';
+import { Container, PostConstruct, Inject } from '@/index';
 import { delay } from '@tests/utils';
 
 /**
  * PostConstruct 异步失败行为测试
  *
- * 验证 Property 2（设计文档）：前置服务的 @PostConstruct 返回 rejected promise 时，
- * 当前服务的 PostConstruct 不执行（静默失败），postConstructResult 为 rejected promise。
+ * 验证前置服务的 @PostConstruct 返回 rejected promise 时，
+ * 当前服务的 PostConstruct 不执行，rejected promise 自然传播（原始错误）。
  *
- * Validates: Requirements 2.3
+ * Validates: Requirements 4.1, 4.2, 4.3
  */
 
 describe('PostConstruct 异步失败 - 场景 1：前置服务 PostConstruct 异步失败', () => {
@@ -79,10 +79,8 @@ describe('PostConstruct 异步失败 - 场景 1：前置服务 PostConstruct 异
     // postConstructResult 应该是一个 Promise
     expect(bindingA!.postConstructResult).toBeInstanceOf(Promise);
 
-    // 该 Promise 应该被 reject，且错误类型为 PostConstructError
-    await expect(bindingA!.postConstructResult).rejects.toBeInstanceOf(
-      PostConstructError
-    );
+    // 该 Promise 应该被 reject，错误为原始错误自然传播（不再包装为 PostConstructError）
+    await expect(bindingA!.postConstructResult).rejects.toThrow('B 初始化失败');
   });
 });
 

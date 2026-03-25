@@ -155,8 +155,7 @@ export class Binding<T = unknown> {
    * @PostConstruct() 无参数时：同步执行，不等待任何前置服务
    * @PostConstruct(value) 有参数时：等待指定的前置服务初始化完成后再执行
    *   - 如果前置服务初始化成功，执行当前服务的 PostConstruct 方法
-   *   - 如果前置服务初始化失败，当前服务的 PostConstruct 不执行（静默失败），
-   *     postConstructResult 为 rejected promise
+   *   - 如果前置服务初始化失败，rejected promise 自然传播，当前服务的 PostConstruct 不执行
    */
   _postConstruct(
     options: Options<T>,
@@ -187,23 +186,10 @@ export class Binding<T = unknown> {
             }
           }
           const list = awaitBindings.map(item => item.postConstructResult);
+          // 前置服务全部成功后执行当前服务的 PostConstruct
+          // 如果前置服务失败，rejected promise 自然传播，当前服务的 PostConstruct 不执行
           this.postConstructResult = Promise.all(list)
-            .then(() => this._execute(key))
-            .catch((_err) => {
-              // 设计决策：前置服务初始化失败时，当前服务的 PostConstruct 不执行（静默失败）。
-              // 这是有意的设计——避免在前置依赖不可用时执行可能失败的初始化逻辑。
-              //
-              // 此处将 postConstructResult 置为 rejected promise（PostConstructError），
-              // 调用方可以通过检查 postConstructResult 来感知前置服务的失败状态。
-              return Promise.reject(
-                new PostConstructError({
-                  token: this.token as CommonToken,
-                  parent: options,
-                })
-              );
-            });
-          // 防止未处理的 rejection 警告（postConstructResult 可能不会被 await）
-          this.postConstructResult.catch(() => {});
+            .then(() => this._execute(key));
         } else {
           // @PostConstruct()没有指定参数
           this.postConstructResult = this._execute(key);

@@ -141,6 +141,12 @@ export const PreDestroy = createMetaDecorator(
 /**
  * 在实例上定义延迟注入的 getter/setter。
  * 首次访问属性时通过容器解析服务实例并缓存，后续访问直接返回缓存值。
+ *
+ * 注意：未传入 container 参数时，通过 Container.getContainerOf(instance) 查找容器。
+ * 该映射仅对 Instance 类型（toSelf() / to()）的绑定有效。
+ * toConstantValue / toDynamicValue 绑定的实例不会注册到 _instanceContainerMap，
+ * 因为同一对象可能被绑定到多个容器，WeakMap 只能保留最后一次映射，会导致从错误的容器解析依赖。
+ * 如需在 toConstantValue / toDynamicValue 场景下使用延迟注入，请显式传入 container 参数。
  */
 function defineLazyProperty<T>(
   instance: any,
@@ -178,6 +184,10 @@ function defineLazyProperty<T>(
  * 延迟注入装饰器，Stage 3 Field Decorator 签名。
  * 通过 context.addInitializer 在实例上定义 getter/setter，
  * 首次访问属性时才从容器中解析依赖。
+ *
+ * @param token 要解析的服务 Token
+ * @param container 可选，显式指定容器。未传入时通过 Container.getContainerOf 查找，
+ *                  仅支持 Instance 类型绑定。toConstantValue / toDynamicValue 场景需显式传入。
  */
 export function LazyInject<T>(token: GenericToken<T>, container?: Container) {
   return function (_value: undefined, context: ClassFieldDecoratorContext) {
@@ -199,10 +209,9 @@ export function createLazyInject(container: Container) {
 
 // ==================== 辅助函数 ====================
 
-// 为 decorate() 函数维护每个类的共享 metadata 对象
-// 确保同一个类的多次 decorate 调用共享同一个 metadata，
-// 使 createMetaDecorator 的重复检测在 decorate 场景下也能正确工作
-const decorateMetadataMap = new WeakMap<object, Record<string, unknown>>();
+// 用于在目标类上存储 decorate() 的共享 metadata 对象
+// 与 TC39 规范中 Symbol.metadata 的设计保持一致
+const DECORATE_METADATA = Symbol('decorate.metadata');
 
 export function decorate(
   decorator: any,
@@ -236,12 +245,12 @@ export function decorate(
   //       set(obj: any, value: any) { obj[key] = value; },
   //       has(obj: any) { return key in obj; },
   //     },
-  // 获取或创建当前类的共享 metadata 对象
-  // 确保同一个类的多次 decorate 调用共享同一个 metadata
-  if (!decorateMetadataMap.has(target)) {
-    decorateMetadataMap.set(target, {});
+  // 从目标类的 Symbol 属性获取或创建共享 metadata 对象
+  // 使用 Object.hasOwn 确保只读取 target 自身的属性，不读取原型链上父类的
+  if (!Object.hasOwn(target, DECORATE_METADATA)) {
+    (target as any)[DECORATE_METADATA] = {};
   }
-  const metadata = decorateMetadataMap.get(target)!;
+  const metadata = (target as any)[DECORATE_METADATA];
 
   const context = {
     kind: isMethod ? 'method' : 'field',
