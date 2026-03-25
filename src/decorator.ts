@@ -12,7 +12,7 @@
  */
 
 import { getOwnMetadata, defineMetadata } from './cachemap';
-import { KEYS, ERRORS } from './constants';
+import { KEYS, ERRORS, hasOwn } from './constants';
 import { resolveToken } from './token';
 import { Container } from './container';
 import type { Newable, InjectFunction, GenericToken } from './interfaces';
@@ -67,7 +67,7 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
  *
  * 检测原理：Stage 3 规范中，同一个类定义中的所有方法装饰器共享同一个
  * context.metadata 对象。在装饰器应用时，检查 metadata 上是否已有当前
- * metaKey 的标记（使用 Object.hasOwn 仅检查当前类自身，不检查继承链）。
+ * metaKey 的标记（使用 hasOwn 仅检查当前类自身，不检查继承链）。
  * 如果已存在，说明同一个类上应用了多个相同装饰器，抛出错误。
  *
  * 对于 decorate() 辅助函数场景，通过 decorateMetadataMap 确保同一个类的
@@ -85,9 +85,9 @@ function createMetaDecorator(metaKey: string, errorMessage: string) {
       const methodName = context.name as string;
 
       // 在装饰器应用阶段（类定义时）通过 context.metadata 检测重复
-      // 使用 Object.hasOwn 仅检查当前类自身是否已标记，不检查继承链
+      // 使用 hasOwn 仅检查当前类自身是否已标记，不检查继承链
       const meta = context.metadata as Record<string, boolean>;
-      if (Object.hasOwn(meta, metaKey)) {
+      if (hasOwn(meta, metaKey)) {
         throw new Error(errorMessage);
       }
       meta[metaKey] = true;
@@ -162,7 +162,7 @@ function defineLazyProperty<T>(
     configurable: true,
     enumerable: true,
     get() {
-      if (!Object.hasOwn(instance, cacheKey)) {
+      if (!hasOwn(instance, cacheKey)) {
         const con = container || Container.getContainerOf(instance);
         const Ctor = instance.constructor;
         if (!con) {
@@ -246,8 +246,8 @@ export function decorate(
   //       has(obj: any) { return key in obj; },
   //     },
   // 从目标类的 Symbol 属性获取或创建共享 metadata 对象
-  // 使用 Object.hasOwn 确保只读取 target 自身的属性，不读取原型链上父类的
-  if (!Object.hasOwn(target, DECORATE_METADATA)) {
+  // 使用 hasOwn 确保只读取 target 自身的属性，不读取原型链上父类的
+  if (!hasOwn(target, DECORATE_METADATA)) {
     (target as any)[DECORATE_METADATA] = {};
   }
   const metadata = (target as any)[DECORATE_METADATA];

@@ -53,6 +53,15 @@ export const ERRORS = {
     'LazyInject requires a valid token, but received null or undefined.',
 } as const;
 
+/**
+ * Object.hasOwn 的兼容性替代函数
+ * Object.hasOwn 在部分旧版浏览器和运行时中不可用（ES2022+），
+ * 此函数使用 Object.prototype.hasOwnProperty.call 实现相同语义。
+ */
+export function hasOwn(obj: object, key: PropertyKey): boolean {
+  return Object.prototype.hasOwnProperty.call(obj, key);
+}
+
 // 未初始化哨兵值，用于标记 PostConstruct 尚未执行
 export const UNINITIALIZED = Symbol('UNINITIALIZED');
 
