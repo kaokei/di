@@ -14,7 +14,7 @@
     - 更新 `createMetaDecorator` 的 JSDoc 注释，移除对 `decorateMetadataMap` 的引用，改为描述 Symbol 属性方案
     - _需求：1.1, 1.2, 1.3_
 
-  - [ ]* 1.2 验证 `tests/decorator/createMetaDecorator-cachemap.spec.ts` 现有测试通过
+  - [x] 1.2 验证 `tests/decorator/createMetaDecorator-cachemap.spec.ts` 现有测试通过
     - 确认 Bug 探索测试（同一类两个 @PostConstruct 通过 decorate() 应抛错）通过
     - 确认保持性测试（单个 decorate、不同类、父子类）通过
     - _需求：1.4, 1.5_
@@ -75,23 +75,23 @@
     - 记录 InversifyJS 在相同场景下的行为
     - _需求：5.7_
 
-- [ ] 9. 补充属性测试
-  - [ ]* 9.1 创建 `tests/quality/decorator-enhancement.spec.ts` 属性测试
+- [x] 9. 补充属性测试
+  - [x] 9.1 创建 `tests/quality/decorator-enhancement.spec.ts` 属性测试
     - **属性 1：decorate() metadata 共享一致性** — 对任意类的多次 decorate() 调用共享同一个 metadata 对象（引用相等）
     - **验证需求：1.1, 1.2**
-  - [ ]* 9.2 在 `tests/quality/decorator-enhancement.spec.ts` 中添加属性 2
+  - [x] 9.2 在 `tests/quality/decorator-enhancement.spec.ts` 中添加属性 2
     - **属性 2：decorate() 同类重复生命周期装饰器检测** — 同一类上通过 decorate() 应用两个 @PostConstruct 应抛错
     - **验证需求：1.4**
-  - [ ]* 9.3 在 `tests/quality/decorator-enhancement.spec.ts` 中添加属性 3
+  - [x] 9.3 在 `tests/quality/decorator-enhancement.spec.ts` 中添加属性 3
     - **属性 3：decorate() 父子类生命周期装饰器隔离** — 父子类分别通过 decorate() 各自应用 @PostConstruct 不应抛错
     - **验证需求：1.5**
-  - [ ]* 9.4 在 `tests/quality/decorator-enhancement.spec.ts` 中添加属性 4
+  - [x] 9.4 在 `tests/quality/decorator-enhancement.spec.ts` 中添加属性 4
     - **属性 4：同一类重复生命周期装饰器抛错** — 原生装饰器语法标记两个 @PostConstruct 时类定义阶段抛错
     - **验证需求：3.1, 3.2**
-  - [ ]* 9.5 在 `tests/quality/decorator-enhancement.spec.ts` 中添加属性 5
+  - [x] 9.5 在 `tests/quality/decorator-enhancement.spec.ts` 中添加属性 5
     - **属性 5：父子类各有生命周期装饰器时只执行子类的** — 通过容器解析子类实例后，只有子类的生命周期方法被执行
     - **验证需求：3.3, 3.4, 3.6, 3.7**
-  - [ ]* 9.6 在 `tests/quality/decorator-enhancement.spec.ts` 中添加属性 6
+  - [x] 9.6 在 `tests/quality/decorator-enhancement.spec.ts` 中添加属性 6
     - **属性 6：只有父类有生命周期装饰器时执行父类的** — 通过容器解析子类实例后，父类的生命周期方法被执行
     - **验证需求：3.5, 3.8**
 
