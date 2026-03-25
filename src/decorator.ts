@@ -43,9 +43,9 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
         const propertyMetadata = ownPropertiesMetadata[propertyName] || {};
 
         // 如果该装饰器数据已存在于当前类自身，跳过重复写入
-        if (decoratorKey in propertyMetadata) {
-          return;
-        }
+        // if (decoratorKey in propertyMetadata) {
+        //   return;
+        // }
 
         // 设置当前装饰器的数据，如果未传参则使用默认值
         propertyMetadata[decoratorKey] =
