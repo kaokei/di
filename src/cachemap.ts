@@ -91,8 +91,8 @@ export function getMetadata(
 
   if (parentMetadata || ownMetadata) {
     return {
-      ...(parentMetadata as Record<string, unknown> || {}),
-      ...(ownMetadata as Record<string, unknown> || {}),
+      ...((parentMetadata as Record<string, unknown>) || {}),
+      ...((ownMetadata as Record<string, unknown>) || {}),
     };
   }
 }

@@ -157,10 +157,7 @@ export class Binding<T = unknown> {
    *   - 如果前置服务初始化成功，执行当前服务的 PostConstruct 方法
    *   - 如果前置服务初始化失败，rejected promise 自然传播，当前服务的 PostConstruct 不执行
    */
-  _postConstruct(
-    options: Options<T>,
-    propertyBindings: Binding[]
-  ) {
+  _postConstruct(options: Options<T>, propertyBindings: Binding[]) {
     if (BINDING.Instance === this.type) {
       const { key, value } =
         getMetadata(KEYS.POST_CONSTRUCT, this.classValue!) || {};
@@ -188,8 +185,9 @@ export class Binding<T = unknown> {
           const list = awaitBindings.map(item => item.postConstructResult);
           // 前置服务全部成功后执行当前服务的 PostConstruct
           // 如果前置服务失败，rejected promise 自然传播，当前服务的 PostConstruct 不执行
-          this.postConstructResult = Promise.all(list)
-            .then(() => this._execute(key));
+          this.postConstructResult = Promise.all(list).then(() =>
+            this._execute(key)
+          );
         } else {
           // @PostConstruct()没有指定参数
           this.postConstructResult = this._execute(key);
@@ -284,7 +282,10 @@ export class Binding<T = unknown> {
       const meta = props[prop];
       const { inject, ...rest } = meta;
       rest.parent = options;
-      const ret = this.container.get(resolveToken(inject as GenericToken), rest);
+      const ret = this.container.get(
+        resolveToken(inject as GenericToken),
+        rest
+      );
       if (!(ret === void 0 && meta.optional)) {
         result[prop] = ret;
       }

@@ -97,10 +97,7 @@ export class Container {
     token: CommonToken<T>,
     options: Options<T> & { optional: true }
   ): T | void;
-  get<T>(
-    token: CommonToken<T>,
-    options?: Options<T> & { optional?: false }
-  ): T;
+  get<T>(token: CommonToken<T>, options?: Options<T> & { optional?: false }): T;
   get<T>(token: CommonToken<T>, options?: Options<T>): T | void;
   get<T>(token: CommonToken<T>, options: Options<T> = {}): T | void {
     if (options.skipSelf) {
@@ -174,10 +171,7 @@ export class Container {
     return this._bindings.get(token) as Binding<T>;
   }
 
-  _checkBindingNotFoundError<T>(
-    token: CommonToken,
-    options: Options<T>
-  ) {
+  _checkBindingNotFoundError<T>(token: CommonToken, options: Options<T>) {
     if (!options.optional) {
       throw new BindingNotFoundError(token);
     }

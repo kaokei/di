@@ -39,7 +39,8 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
 
         // 惰性初始化：检查当前类自身是否已注册该属性的装饰器数据
         // 使用 getOwnMetadata 确保子类可以覆盖父类同名属性的元数据
-        const ownPropertiesMetadata = getOwnMetadata(KEYS.INJECTED_PROPS, Ctor) || {};
+        const ownPropertiesMetadata =
+          getOwnMetadata(KEYS.INJECTED_PROPS, Ctor) || {};
         const propertyMetadata = ownPropertiesMetadata[propertyName] || {};
 
         // 如果该装饰器数据已存在于当前类自身，跳过重复写入
@@ -213,11 +214,7 @@ export function createLazyInject(container: Container) {
 // 与 TC39 规范中 Symbol.metadata 的设计保持一致
 const DECORATE_METADATA = Symbol('decorate.metadata');
 
-export function decorate(
-  decorator: any,
-  target: any,
-  key: string
-): void {
+export function decorate(decorator: any, target: any, key: string): void {
   const decorators = Array.isArray(decorator) ? decorator : [decorator];
   const proto = target.prototype;
   const isMethod = typeof proto[key] === 'function';
