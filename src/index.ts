@@ -40,3 +40,4 @@ export { BindingNotValidError } from './errors/BindingNotValidError';
 export { CircularDependencyError } from './errors/CircularDependencyError';
 export { DuplicateBindingError } from './errors/DuplicateBindingError';
 export { PostConstructError } from './errors/PostConstructError';
+export { ContainerNotFoundError } from './errors/ContainerNotFoundError';

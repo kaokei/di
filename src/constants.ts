@@ -44,10 +44,6 @@ export const ERRORS = {
   // 用于 token.ts 的 resolveToken —— 缺少 @Inject 装饰器
   MISS_INJECT: 'Missing @Inject decorator for explicit token specification.',
 
-  // 用于 decorator.ts 的 defineLazyProperty —— 缺少容器注册
-  MISS_CONTAINER:
-    '@LazyInject requires a registered container but none was found.',
-
   // 用于 decorator.ts 的 defineLazyProperty —— 无效 token
   LAZY_INJECT_INVALID_TOKEN:
     'LazyInject requires a valid token, but received null or undefined.',

@@ -15,6 +15,7 @@ import { getOwnMetadata, defineMetadata } from './cachemap';
 import { KEYS, ERRORS, hasOwn } from './constants';
 import { resolveToken } from './token';
 import { Container } from './container';
+import { ContainerNotFoundError } from './errors/ContainerNotFoundError';
 import type { Newable, InjectFunction, GenericToken } from './interfaces';
 
 /**
@@ -167,7 +168,7 @@ function defineLazyProperty<T>(
         const con = container || Container.getContainerOf(instance);
         const Ctor = instance.constructor;
         if (!con) {
-          throw new Error(`${ERRORS.MISS_CONTAINER} ${Ctor.name}`);
+          throw new ContainerNotFoundError(resolveToken(token), Ctor);
         }
         instance[cacheKey] = con.get(resolveToken(token), {
           parent: { token: Ctor },
