@@ -23,3 +23,9 @@
 
 
 LazyInject 和 @PostConstruct 只支持class服务。
+inversify中执行顺序是：
+postConstruct --> binding handler --> container handlers
+container handlers --> binding handler --> preDestroy
+本项目执行顺序：
+binding handler --> container handlers --> postConstruct
+container handlers --> binding handler --> preDestroy
