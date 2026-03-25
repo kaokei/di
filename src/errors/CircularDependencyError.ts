@@ -13,7 +13,7 @@ export class CircularDependencyError extends BaseError {
     }
     const tokenListText = tokenArr
       .reverse()
-      .map(item => item.name)
+      .map(item => item.name || '<anonymous>')
       .join(' --> ');
 
     this.message = `Circular dependency found: ${tokenListText}`;

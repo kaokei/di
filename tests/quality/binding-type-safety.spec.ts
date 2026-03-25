@@ -341,3 +341,168 @@ describe('_getInjectProperties 返回具名对象', () => {
     expect(result.bindings).toHaveLength(0);
   });
 });
+
+// ==================== PostConstruct 异步处理（需求 17.1、17.2） ====================
+
+import { Inject, PostConstruct } from '@/index';
+
+describe('postConstructResult 类型包含 undefined（需求 17.2）', () => {
+  let container: Container;
+
+  beforeEach(() => {
+    container = new Container();
+  });
+
+  afterEach(() => {
+    container.destroy();
+  });
+
+  test('没有 @PostConstruct 装饰器时，解析后 postConstructResult 应为 undefined', () => {
+    // 当类没有使用 @PostConstruct 装饰器时，
+    // _postConstruct 方法会执行 `this.postConstructResult = void 0`，
+    // 因此 postConstructResult 应为 undefined
+    class NoPostConstructService {}
+    container.bind(NoPostConstructService).toSelf();
+    container.get(NoPostConstructService);
+    const binding = container._bindings.get(NoPostConstructService) as Binding;
+    expect(binding.postConstructResult).toBeUndefined();
+    expect(binding.postConstructResult).not.toBe(UNINITIALIZED);
+  });
+
+  test('有 @PostConstruct() 无参数时，postConstructResult 应为 _execute 的返回值', () => {
+    // 当 @PostConstruct() 没有参数时，postConstructResult 为 _execute 的返回值
+    // 如果方法返回 undefined（非 async），则 postConstructResult 为 undefined
+    class SyncPostConstructService {
+      initialized = false;
+
+      @PostConstruct()
+      init() {
+        this.initialized = true;
+        // 同步方法隐式返回 undefined
+      }
+    }
+    container.bind(SyncPostConstructService).toSelf();
+    const instance = container.get(SyncPostConstructService);
+    const binding = container._bindings.get(SyncPostConstructService) as Binding;
+    expect(instance.initialized).toBe(true);
+    // 同步 PostConstruct 方法返回 undefined
+    expect(binding.postConstructResult).toBeUndefined();
+  });
+
+  test('有 @PostConstruct() 且方法为 async 时，postConstructResult 应为 Promise', () => {
+    // 当 @PostConstruct() 的方法是 async 时，_execute 返回 Promise
+    class AsyncPostConstructService {
+      initialized = false;
+
+      @PostConstruct()
+      async init() {
+        this.initialized = true;
+      }
+    }
+    container.bind(AsyncPostConstructService).toSelf();
+    container.get(AsyncPostConstructService);
+    const binding = container._bindings.get(AsyncPostConstructService) as Binding;
+    // async 方法返回 Promise
+    expect(binding.postConstructResult).toBeInstanceOf(Promise);
+  });
+
+  test('初始值应为 UNINITIALIZED（已有测试覆盖，此处确认一致性）', () => {
+    const token = new Token<string>('init-check');
+    const binding = new Binding(token, container);
+    expect(binding.postConstructResult).toBe(UNINITIALIZED);
+  });
+});
+
+describe('前置服务 PostConstruct 失败时错误传播（需求 17.1）', () => {
+  test('当 @PostConstruct(true) 等待的前置服务 PostConstruct 返回 rejected Promise 时，错误应正确传播', async () => {
+    // 构造场景：
+    // - ServiceB 的 @PostConstruct() 返回一个 rejected Promise
+    // - ServiceA 依赖 ServiceB，且 ServiceA 使用 @PostConstruct(true) 等待 ServiceB 初始化
+    // 预期：ServiceA 的 postConstructResult 应为一个 rejected Promise，错误被正确传播
+
+    const ERROR_MESSAGE = 'ServiceB 初始化失败';
+
+    class ServiceB {
+      @PostConstruct()
+      async init() {
+        throw new Error(ERROR_MESSAGE);
+      }
+    }
+
+    class ServiceA {
+      @Inject(ServiceB) b!: ServiceB;
+
+      initCalled = false;
+
+      @PostConstruct(true)
+      init() {
+        // 如果前置服务失败，这个方法不应该被执行
+        this.initCalled = true;
+      }
+    }
+
+    const container = new Container();
+    container.bind(ServiceB).toSelf();
+    container.bind(ServiceA).toSelf();
+
+    const a = container.get(ServiceA);
+    const bindingA = container._bindings.get(ServiceA) as Binding;
+
+    // ServiceA 的 postConstructResult 应为 Promise（因为等待前置服务）
+    expect(bindingA.postConstructResult).toBeInstanceOf(Promise);
+
+    // 等待 Promise 完成，应该被拒绝（错误从 ServiceB 传播过来）
+    await expect(bindingA.postConstructResult).rejects.toThrow();
+
+    // ServiceA 的 init 方法不应该被调用（因为前置服务失败了）
+    expect(a.initCalled).toBe(false);
+
+    container.destroy();
+  });
+
+  test('当多个前置服务中有一个 PostConstruct 失败时，错误应传播到依赖方', async () => {
+    // 构造场景：ServiceA 依赖 ServiceB 和 ServiceC
+    // ServiceB 正常初始化，ServiceC 的 PostConstruct 失败
+    // ServiceA 使用 @PostConstruct(true) 等待所有前置服务
+
+    class ServiceB {
+      @PostConstruct()
+      async init() {
+        // 正常完成
+      }
+    }
+
+    class ServiceC {
+      @PostConstruct()
+      async init() {
+        throw new Error('ServiceC 初始化失败');
+      }
+    }
+
+    class ServiceA {
+      @Inject(ServiceB) b!: ServiceB;
+      @Inject(ServiceC) c!: ServiceC;
+
+      initCalled = false;
+
+      @PostConstruct(true)
+      init() {
+        this.initCalled = true;
+      }
+    }
+
+    const container = new Container();
+    container.bind(ServiceB).toSelf();
+    container.bind(ServiceC).toSelf();
+    container.bind(ServiceA).toSelf();
+
+    const a = container.get(ServiceA);
+    const bindingA = container._bindings.get(ServiceA) as Binding;
+
+    expect(bindingA.postConstructResult).toBeInstanceOf(Promise);
+    await expect(bindingA.postConstructResult).rejects.toThrow();
+    expect(a.initCalled).toBe(false);
+
+    container.destroy();
+  });
+});

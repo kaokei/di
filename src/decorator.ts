@@ -11,7 +11,7 @@
  * 注意：Stage 3 规范不支持参数装饰器，所有依赖声明统一通过实例属性装饰器完成。
  */
 
-import { getMetadata, defineMetadata } from './cachemap';
+import { getOwnMetadata, defineMetadata } from './cachemap';
 import { KEYS, ERRORS } from './constants';
 import { resolveToken } from './token';
 import { Container } from './container';
@@ -37,16 +37,22 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
         const Ctor = this.constructor as Newable;
         const propertyName = context.name as string;
 
-        // 使用 getMetadata 获取属性元数据（支持继承链合并）
-        const propertiesMetadata = getMetadata(KEYS.INJECTED_PROPS, Ctor) || {};
-        const propertyMetadata = propertiesMetadata[propertyName] || {};
+        // 惰性初始化：检查当前类自身是否已注册该属性的装饰器数据
+        // 使用 getOwnMetadata 确保子类可以覆盖父类同名属性的元数据
+        const ownPropertiesMetadata = getOwnMetadata(KEYS.INJECTED_PROPS, Ctor) || {};
+        const propertyMetadata = ownPropertiesMetadata[propertyName] || {};
+
+        // 如果该装饰器数据已存在于当前类自身，跳过重复写入
+        if (decoratorKey in propertyMetadata) {
+          return;
+        }
 
         // 设置当前装饰器的数据，如果未传参则使用默认值
         propertyMetadata[decoratorKey] =
           decoratorValue === void 0 ? defaultValue : decoratorValue;
 
-        propertiesMetadata[propertyName] = propertyMetadata;
-        defineMetadata(KEYS.INJECTED_PROPS, propertiesMetadata, Ctor);
+        ownPropertiesMetadata[propertyName] = propertyMetadata;
+        defineMetadata(KEYS.INJECTED_PROPS, ownPropertiesMetadata, Ctor);
       });
     };
   };
@@ -56,38 +62,40 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
  * 创建方法装饰器的高阶函数（Stage 3 Method Decorator）
  *
  * 用于创建 @PostConstruct 和 @PreDestroy 等生命周期装饰器。
- * 使用 WeakMap + context.metadata 在装饰器应用阶段检测同一个类上的重复使用，
- * 避免在 addInitializer 回调中误判（因为回调在每次实例化时都会执行）。
+ * 重复检测在装饰器应用阶段（类定义时）完成，不依赖 context.metadata 存储元数据，
+ * 元数据写入在 addInitializer 回调中通过 CacheMap 完成。
+ *
+ * 检测原理：同一个类定义中的所有方法装饰器同步执行。
+ * 使用 WeakMap 以 context.metadata 对象为键跟踪每个类是否已注册该装饰器。
+ * 注意：这里仅将 context.metadata 用作类定义的唯一标识（WeakMap 键），
+ * 不在其上存储任何实际元数据，所有元数据统一通过 CacheMap 管理。
  *
  * @param metaKey 元数据的键名
  * @param errorMessage 重复使用时的错误信息
  * @returns 装饰器函数
  */
 function createMetaDecorator(metaKey: string, errorMessage: string) {
-  // 用于跟踪每个类（通过 context.metadata 对象标识）是否已注册该 meta decorator
-  const registeredMethods = new WeakMap<object, string>();
+  // 仅用于重复检测：以 context.metadata 对象为键标识不同的类定义
+  // 不在 context.metadata 上存储任何数据，仅作为 WeakMap 的键
+  const appliedClasses = new WeakMap<object, true>();
 
   return (metaValue?: any) => {
     return (_value: Function, context: ClassMethodDecoratorContext) => {
       const methodName = context.name as string;
+
       // 在装饰器应用阶段（类定义时）检测重复
-      // context.metadata 是每个类独有的对象，子类会有新的 metadata 对象
-      const metadataObj = context.metadata as object;
-      if (metadataObj) {
-        if (registeredMethods.has(metadataObj)) {
+      // context.metadata 是每个类独有的对象，子类会创建新的 metadata 对象
+      const classKey = context.metadata as object;
+      if (classKey) {
+        if (appliedClasses.has(classKey)) {
           throw new Error(errorMessage);
         }
-        registeredMethods.set(metadataObj, methodName);
+        appliedClasses.set(classKey, true);
       }
 
-      // 在 addInitializer 回调中写入元数据到 CacheMap
+      // 在 addInitializer 回调中通过 CacheMap 写入元数据
       context.addInitializer(function (this: any) {
         const Ctor = this.constructor as Newable;
-        // 始终写入当前装饰器的元数据
-        // 当子类 A extends B 且两者都有 @PostConstruct 时：
-        // - B 的 initializer 先执行，写入 B 的方法名到 A 的 CacheMap
-        // - A 的 initializer 后执行，覆盖为 A 自己的方法名
-        // 这确保了子类的装饰器优先级高于父类
         defineMetadata(metaKey, { key: methodName, value: metaValue }, Ctor);
       });
     };
@@ -142,13 +150,16 @@ function defineLazyProperty<T>(
   token: GenericToken<T>,
   container?: Container
 ) {
+  if (token == null) {
+    throw new Error('LazyInject requires a valid token, but received null or undefined.');
+  }
   const cacheKey = Symbol.for(key);
   Object.defineProperty(instance, key, {
     configurable: true,
     enumerable: true,
     get() {
-      if (!instance.hasOwnProperty(cacheKey)) {
-        const con = container || Container.map.get(instance);
+      if (!Object.hasOwn(instance, cacheKey)) {
+        const con = container || Container.getContainerOf(instance);
         const Ctor = instance.constructor;
         if (!con) {
           throw new Error(`${ERRORS.MISS_CONTAINER} ${Ctor.name}`);
@@ -203,6 +214,25 @@ export function decorate(
   const initializers: Array<() => void> = [];
 
   // 构造符合 Stage 3 规范的 context 对象
+  //
+  // 关于 access 属性：
+  // Stage 3 规范要求 context 包含 access 对象（get/set/has 方法），
+  // 用于对被装饰成员进行编程式访问。但当前库的所有装饰器（@Inject、
+  // @PostConstruct 等）内部只使用 context.name 和 context.addInitializer，
+  // 没有任何装饰器会调用 context.access。
+  //
+  // 如果未来需要支持依赖 access 的第三方装饰器，可取消以下注释：
+  //
+  // access: isMethod
+  //   ? {
+  //       get(obj: any) { return obj[key]; },
+  //       has(obj: any) { return key in obj; },
+  //     }
+  //   : {
+  //       get(obj: any) { return obj[key]; },
+  //       set(obj: any, value: any) { obj[key] = value; },
+  //       has(obj: any) { return key in obj; },
+  //     },
   const context = {
     kind: isMethod ? 'method' : 'field',
     name: key,
@@ -214,10 +244,18 @@ export function decorate(
     metadata: {},
   };
 
-  // 从后向前执行装饰器（与 TypeScript 装饰器执行顺序一致）
+  // 从后向前执行装饰器，支持方法替换
+  let currentValue = isMethod ? proto[key] : undefined;
   for (let i = decorators.length - 1; i >= 0; i--) {
-    const value = isMethod ? proto[key] : undefined;
-    decorators[i](value, context);
+    const result = decorators[i](currentValue, context);
+    // 方法装饰器可能返回替换函数
+    if (isMethod && typeof result === 'function') {
+      currentValue = result;
+    }
+  }
+  // 应用方法替换
+  if (isMethod && currentValue !== proto[key]) {
+    proto[key] = currentValue;
   }
 
   // 创建 fakeInstance 并执行所有 initializer 回调

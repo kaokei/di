@@ -11,6 +11,7 @@ import type {
   Context,
   Options,
   CommonToken,
+  GenericToken,
   RecordObject,
   DynamicValue,
   PostConstructParam,
@@ -24,6 +25,13 @@ export interface InjectPropertiesResult {
 }
 
 export class Binding<T = unknown> {
+  // 类型到解析方法的静态映射表，用于替代 get 方法中的 if-else 链
+  static _resolvers: Record<string, string> = {
+    [BINDING.Instance]: '_resolveInstanceValue',
+    [BINDING.ConstantValue]: '_resolveConstantValue',
+    [BINDING.DynamicValue]: '_resolveDynamicValue',
+  };
+
   container!: Container;
 
   context!: Context;
@@ -42,7 +50,7 @@ export class Binding<T = unknown> {
 
   cache?: T;
 
-  postConstructResult?: Promise<void> | Symbol = UNINITIALIZED;
+  postConstructResult: Promise<void> | symbol | undefined = UNINITIALIZED;
 
   onActivationHandler?: ActivationHandler<T>;
 
@@ -70,7 +78,9 @@ export class Binding<T = unknown> {
   }
 
   deactivate() {
-    this.onDeactivationHandler && this.onDeactivationHandler(this.cache as T);
+    if (this.onDeactivationHandler) {
+      this.onDeactivationHandler(this.cache as T);
+    }
   }
 
   to(constructor: Newable<T>) {
@@ -103,24 +113,20 @@ export class Binding<T = unknown> {
 
   get(options: Options<T>) {
     if (STATUS.INITING === this.status) {
-      // 首先判断是否存在循环依赖
+      // 检测循环依赖
       throw new CircularDependencyError(options as Options);
-    } else if (STATUS.ACTIVATED === this.status) {
-      // 接着判断缓存中是否已经存在数据，如果存在则直接返回数据
-      return this.cache;
-    } else if (BINDING.Instance === this.type) {
-      // 如果是Instance类型的绑定，本质上是执行了new Constructor()，缓存并返回实例
-      return this._resolveInstanceValue(options);
-    } else if (BINDING.ConstantValue === this.type) {
-      // 如果是ConstantValue类型的绑定，直接缓存并返回数据
-      return this._resolveConstantValue();
-    } else if (BINDING.DynamicValue === this.type) {
-      // 如果是DynamicValue类型的绑定，执行绑定的函数，缓存并返回函数结果
-      return this._resolveDynamicValue();
-    } else {
-      // 最终抛出异常，原因是binding没有绑定对应的服务
-      throw new BindingNotValidError(this.token);
     }
+    if (STATUS.ACTIVATED === this.status) {
+      // 已激活，直接返回缓存
+      return this.cache;
+    }
+    // 通过映射表查找对应的解析方法
+    const resolver = Binding._resolvers[this.type];
+    if (resolver) {
+      return (this as any)[resolver](options);
+    }
+    // 未找到解析方法，说明 binding 未绑定有效服务
+    throw new BindingNotValidError(this.token);
   }
 
   _getAwaitBindings(
@@ -149,7 +155,7 @@ export class Binding<T = unknown> {
         // 使用了@PostConstruct装饰器
         if (value) {
           // @PostConstruct(指定了参数)，说明需要等待前置服务初始化完成之后再初始化本服务
-          // bindings是本服务依赖的所有注入的实例属性，并且Binding类型是Instance
+          // bindings 是本服务依赖的所有注入的实例属性，并且 Binding 类型是 Instance
           const bindings = propertyBindings.filter(
             item => BINDING.Instance === item?.type
           );
@@ -167,9 +173,20 @@ export class Binding<T = unknown> {
             }
           }
           const list = awaitBindings.map(item => item.postConstructResult);
-          this.postConstructResult = Promise.all(list).then(() =>
-            this._execute(key)
-          );
+          this.postConstructResult = Promise.all(list)
+            .then(() => this._execute(key))
+            .catch((_err) => {
+              // 前置服务初始化失败，本服务的 PostConstruct 不再执行
+              // 返回 rejected promise 以便调用方感知错误
+              return Promise.reject(
+                new PostConstructError({
+                  token: this.token as CommonToken,
+                  parent: options,
+                })
+              );
+            });
+          // 防止未处理的 rejection 警告（postConstructResult 可能不会被 await）
+          this.postConstructResult.catch(() => {});
         } else {
           // @PostConstruct()没有指定参数
           this.postConstructResult = this._execute(key);
@@ -188,7 +205,7 @@ export class Binding<T = unknown> {
         this._execute(key);
       }
     }
-    Container.map.delete(this.cache);
+    Container._instanceContainerMap.delete(this.cache as object);
     this.container = null as unknown as Container;
     this.context = null as unknown as Context;
     this.classValue = undefined;
@@ -207,22 +224,36 @@ export class Binding<T = unknown> {
 
   _resolveInstanceValue(options: Options<T>) {
     this.status = STATUS.INITING;
-    const ClassName = this.classValue!;
     // 无参构造实例化
-    const inst = new ClassName();
-    // ActivationHandler可能会导致循环依赖
+    const inst = this._createInstance();
+    // ActivationHandler 可能会导致循环依赖
     this.cache = this.activate(inst);
     // 实例化成功，并存入缓存，此时不会再有循环依赖的问题
     this.status = STATUS.ACTIVATED;
     // 维护实例和容器之间的关系，方便@LazyInject获取容器
-    Container.map.set(this.cache, this.container);
+    this._registerInstance();
     // 属性注入不会导致循环依赖问题
-    const { properties, bindings: propertyBindings } = this._getInjectProperties(options);
-    Object.assign(this.cache as RecordObject, properties);
-    // postConstruct特意放在了getInjectProperties之后，这样postConstruct就能访问注入的属性了
-    // 仅传 propertyBindings
-    this._postConstruct(options, propertyBindings);
+    const { properties, bindings } = this._getInjectProperties(options);
+    this._injectProperties(properties);
+    // postConstruct 特意放在了 getInjectProperties 之后，这样 postConstruct 就能访问注入的属性了
+    this._postConstruct(options, bindings);
     return this.cache;
+  }
+
+  // 创建类的实例
+  _createInstance(): T {
+    const ClassName = this.classValue!;
+    return new ClassName();
+  }
+
+  // 注册实例与容器的映射关系
+  _registerInstance() {
+    Container._instanceContainerMap.set(this.cache as object, this.container);
+  }
+
+  // 将解析后的属性注入到实例上
+  _injectProperties(properties: RecordObject) {
+    Object.assign(this.cache as RecordObject, properties);
   }
 
   _resolveConstantValue() {
@@ -250,7 +281,7 @@ export class Binding<T = unknown> {
       const meta = props[prop];
       const { inject, ...rest } = meta;
       rest.parent = options;
-      const ret = this.container.get(resolveToken(inject), rest);
+      const ret = this.container.get(resolveToken(inject as GenericToken), rest);
       if (!(ret === void 0 && meta.optional)) {
         result[prop] = ret;
       }

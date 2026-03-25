@@ -9,7 +9,13 @@ import type {
 } from './interfaces';
 
 export class Container {
-  static map = new WeakMap<any, Container>();
+  // 实例到容器的映射表，用于 @LazyInject 查找实例所属容器
+  static _instanceContainerMap = new WeakMap<object, Container>();
+
+  // 查询实例所属的容器
+  static getContainerOf(instance: object): Container | undefined {
+    return Container._instanceContainerMap.get(instance);
+  }
 
   parent?: Container;
   children?: Set<Container>;
@@ -37,9 +43,11 @@ export class Container {
   }
 
   unbindAll() {
-    this._bindings.forEach(binding => {
-      this.unbind(binding.token);
-    });
+    // 先创建 keys 快照数组，避免遍历过程中 unbind 调用 _bindings.delete 导致迭代安全问题
+    const tokens = Array.from(this._bindings.keys());
+    for (const token of tokens) {
+      this.unbind(token);
+    }
   }
 
   isCurrentBound<T>(token: CommonToken<T>) {
@@ -64,14 +72,20 @@ export class Container {
   }
 
   destroy() {
+    // 递归销毁所有子容器（先创建快照数组，避免遍历过程中修改 Set）
+    if (this.children) {
+      const childrenSnapshot = Array.from(this.children);
+      for (const child of childrenSnapshot) {
+        child.destroy();
+      }
+    }
     this.unbindAll();
     this._bindings.clear();
     this.parent?.children?.delete(this);
-    this.parent = void 0;
-    this.children?.clear();
-    this.children = void 0;
-    this._onActivationHandler = void 0;
-    this._onDeactivationHandler = void 0;
+    this.parent = undefined;
+    this.children = undefined;
+    this._onActivationHandler = undefined;
+    this._onDeactivationHandler = undefined;
   }
 
   get<T>(
@@ -84,19 +98,44 @@ export class Container {
   ): T;
   get<T>(token: CommonToken<T>, options?: Options<T>): T | void;
   get<T>(token: CommonToken<T>, options: Options<T> = {}): T | void {
-    const binding = this._getBinding(token);
     if (options.skipSelf) {
-      if (this.parent) {
-        options.skipSelf = false;
-        return this.parent.get(token, options);
-      }
-    } else if (options.self || binding) {
-      if (binding) {
-        options.token = token;
-        options.binding = binding;
-        return binding.get(options);
-      }
-    } else if (this.parent) {
+      return this._resolveSkipSelf(token, options);
+    }
+    if (options.self) {
+      return this._resolveSelf(token, options);
+    }
+    return this._resolveDefault(token, options);
+  }
+
+  // 处理 skipSelf 选项：跳过当前容器，委托父容器解析
+  _resolveSkipSelf<T>(token: CommonToken<T>, options: Options<T>): T | void {
+    if (this.parent) {
+      options.skipSelf = false;
+      return this.parent.get(token, options);
+    }
+    return this._checkBindingNotFoundError(token, options);
+  }
+
+  // 处理 self 选项：仅在当前容器中查找
+  _resolveSelf<T>(token: CommonToken<T>, options: Options<T>): T | void {
+    const binding = this._getBinding(token);
+    if (binding) {
+      options.token = token;
+      options.binding = binding;
+      return binding.get(options);
+    }
+    return this._checkBindingNotFoundError(token, options);
+  }
+
+  // 默认解析流程：当前容器 → 父容器 → 抛错
+  _resolveDefault<T>(token: CommonToken<T>, options: Options<T>): T | void {
+    const binding = this._getBinding(token);
+    if (binding) {
+      options.token = token;
+      options.binding = binding;
+      return binding.get(options);
+    }
+    if (this.parent) {
       return this.parent.get(token, options);
     }
     return this._checkBindingNotFoundError(token, options);
@@ -117,8 +156,9 @@ export class Container {
   }
 
   deactivate<T>(binding: Binding<T>) {
-    this._onDeactivationHandler &&
+    if (this._onDeactivationHandler) {
       this._onDeactivationHandler(binding.cache, binding.token);
+    }
   }
 
   _buildBinding<T>(token: CommonToken<T>) {

@@ -1,17 +1,17 @@
 export const KEYS = {
-  // 记录实例属性装饰器对应的数据的key
+  // 记录实例属性装饰器对应的数据的键
   INJECTED_PROPS: 'injected:props',
-  // Inject装饰器的key
+  // Inject 装饰器的键
   INJECT: 'inject',
-  // Self装饰器的key
+  // Self 装饰器的键
   SELF: 'self',
-  // SkipSelf装饰器的key
+  // SkipSelf 装饰器的键
   SKIP_SELF: 'skipSelf',
-  // Optional装饰器的key
+  // Optional 装饰器的键
   OPTIONAL: 'optional',
-  // PostConstruct装饰器的key
+  // PostConstruct 装饰器的键
   POST_CONSTRUCT: 'postConstruct',
-  // PreDestroy装饰器的key
+  // PreDestroy 装饰器的键
   PRE_DESTROY: 'preDestroy',
 } as const;
 
@@ -28,12 +28,23 @@ export const BINDING = {
   DynamicValue: 'DynamicValue',
 } as const;
 
+/**
+ * 错误消息模板
+ *
+ * 这些消息用于装饰器和 token 模块中的运行时错误检测，
+ * 与 errors/ 目录下的错误类无关（错误类有自己的消息前缀）。
+ */
 export const ERRORS = {
+  // 用于 decorator.ts 的 createMetaDecorator —— 重复装饰器检测
   POST_CONSTRUCT:
     'Multiple @PostConstruct decorators are not allowed in a single class.',
   PRE_DESTROY:
     'Multiple @PreDestroy decorators are not allowed in a single class.',
+
+  // 用于 token.ts 的 resolveToken —— 缺少 @Inject 装饰器
   MISS_INJECT: 'Missing @Inject decorator for explicit token specification.',
+
+  // 用于 decorator.ts 的 defineLazyProperty —— 缺少容器注册
   MISS_CONTAINER:
     '@LazyInject requires a registered container but none was found.',
 } as const;

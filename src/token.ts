@@ -2,7 +2,7 @@ import type { GenericToken, LazyTokenCallback } from './interfaces';
 import { ERRORS } from './constants';
 
 export class Token<T> {
-  _ = '' as T;
+  declare _: T; // 仅类型层面存在，无运行时开销
   name: string;
 
   constructor(name: string) {
@@ -22,7 +22,7 @@ export class LazyToken<T> {
   }
 }
 
-// token可能是Token|LazyToken|其他class
+// token 可能是 Token、LazyToken 或其他类
 export function resolveToken<T>(token?: GenericToken<T>) {
   if (!token) {
     throw new Error(ERRORS.MISS_INJECT);
