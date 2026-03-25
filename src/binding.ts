@@ -144,6 +144,20 @@ export class Binding<T = unknown> {
     }
   }
 
+  /**
+   * PostConstruct 生命周期处理
+   *
+   * postConstructResult 的三种状态：
+   * - UNINITIALIZED（Symbol）：PostConstruct 尚未执行，用于循环依赖检测
+   * - undefined：没有使用 @PostConstruct 装饰器，或 @PostConstruct() 无参数时同步执行完毕
+   * - Promise<void>：@PostConstruct(value) 有参数时，等待前置服务初始化后异步执行
+   *
+   * @PostConstruct() 无参数时：同步执行，不等待任何前置服务
+   * @PostConstruct(value) 有参数时：等待指定的前置服务初始化完成后再执行
+   *   - 如果前置服务初始化成功，执行当前服务的 PostConstruct 方法
+   *   - 如果前置服务初始化失败，当前服务的 PostConstruct 不执行（静默失败），
+   *     postConstructResult 为 rejected promise
+   */
   _postConstruct(
     options: Options<T>,
     propertyBindings: Binding[]
@@ -176,8 +190,11 @@ export class Binding<T = unknown> {
           this.postConstructResult = Promise.all(list)
             .then(() => this._execute(key))
             .catch((_err) => {
-              // 前置服务初始化失败，本服务的 PostConstruct 不再执行
-              // 返回 rejected promise 以便调用方感知错误
+              // 设计决策：前置服务初始化失败时，当前服务的 PostConstruct 不执行（静默失败）。
+              // 这是有意的设计——避免在前置依赖不可用时执行可能失败的初始化逻辑。
+              //
+              // 此处将 postConstructResult 置为 rejected promise（PostConstructError），
+              // 调用方可以通过检查 postConstructResult 来感知前置服务的失败状态。
               return Promise.reject(
                 new PostConstructError({
                   token: this.token as CommonToken,

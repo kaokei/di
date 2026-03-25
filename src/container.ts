@@ -10,6 +10,9 @@ import type {
 
 export class Container {
   // 实例到容器的映射表，用于 @LazyInject 查找实例所属容器
+  // 仅 Instance 类型的 binding 会注册映射（_registerInstance 仅在 _resolveInstanceValue 中调用）
+  // toConstantValue 和 toDynamicValue 不会触发注册
+  // 由于 Instance 类型每次都通过 new ClassName() 创建新实例，不存在同一实例被多个容器注册的覆盖风险
   static _instanceContainerMap = new WeakMap<object, Container>();
 
   // 查询实例所属的容器

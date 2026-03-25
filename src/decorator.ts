@@ -62,38 +62,36 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
  * 创建方法装饰器的高阶函数（Stage 3 Method Decorator）
  *
  * 用于创建 @PostConstruct 和 @PreDestroy 等生命周期装饰器。
- * 重复检测在装饰器应用阶段（类定义时）完成，不依赖 context.metadata 存储元数据，
- * 元数据写入在 addInitializer 回调中通过 CacheMap 完成。
+ * 重复检测在装饰器应用阶段（类定义时）通过 context.metadata 上的标记完成，
+ * 不使用额外的 WeakMap，直接在 context.metadata 对象上设置标记。
  *
- * 检测原理：同一个类定义中的所有方法装饰器同步执行。
- * 使用 WeakMap 以 context.metadata 对象为键跟踪每个类是否已注册该装饰器。
- * 注意：这里仅将 context.metadata 用作类定义的唯一标识（WeakMap 键），
- * 不在其上存储任何实际元数据，所有元数据统一通过 CacheMap 管理。
+ * 检测原理：Stage 3 规范中，同一个类定义中的所有方法装饰器共享同一个
+ * context.metadata 对象。在装饰器应用时，检查 metadata 上是否已有当前
+ * metaKey 的标记（使用 Object.hasOwn 仅检查当前类自身，不检查继承链）。
+ * 如果已存在，说明同一个类上应用了多个相同装饰器，抛出错误。
+ *
+ * 对于 decorate() 辅助函数场景，通过 decorateMetadataMap 确保同一个类的
+ * 多次 decorate 调用共享同一个 metadata 对象，使重复检测在所有场景下可靠工作。
+ *
+ * 元数据写入在 addInitializer 回调中通过 CacheMap 完成。
  *
  * @param metaKey 元数据的键名
  * @param errorMessage 重复使用时的错误信息
  * @returns 装饰器函数
  */
 function createMetaDecorator(metaKey: string, errorMessage: string) {
-  // 仅用于重复检测：以 context.metadata 对象为键标识不同的类定义
-  // 不在 context.metadata 上存储任何数据，仅作为 WeakMap 的键
-  const appliedClasses = new WeakMap<object, true>();
-
   return (metaValue?: any) => {
     return (_value: Function, context: ClassMethodDecoratorContext) => {
       const methodName = context.name as string;
 
-      // 在装饰器应用阶段（类定义时）检测重复
-      // context.metadata 是每个类独有的对象，子类会创建新的 metadata 对象
-      const classKey = context.metadata as object;
-      if (classKey) {
-        if (appliedClasses.has(classKey)) {
-          throw new Error(errorMessage);
-        }
-        appliedClasses.set(classKey, true);
+      // 在装饰器应用阶段（类定义时）通过 context.metadata 检测重复
+      // 使用 Object.hasOwn 仅检查当前类自身是否已标记，不检查继承链
+      const meta = context.metadata as Record<string, boolean>;
+      if (Object.hasOwn(meta, metaKey)) {
+        throw new Error(errorMessage);
       }
+      meta[metaKey] = true;
 
-      // 在 addInitializer 回调中通过 CacheMap 写入元数据
       context.addInitializer(function (this: any) {
         const Ctor = this.constructor as Newable;
         defineMetadata(metaKey, { key: methodName, value: metaValue }, Ctor);
@@ -151,7 +149,7 @@ function defineLazyProperty<T>(
   container?: Container
 ) {
   if (token == null) {
-    throw new Error('LazyInject requires a valid token, but received null or undefined.');
+    throw new Error(ERRORS.LAZY_INJECT_INVALID_TOKEN);
   }
   const cacheKey = Symbol.for(key);
   Object.defineProperty(instance, key, {
@@ -201,6 +199,11 @@ export function createLazyInject(container: Container) {
 
 // ==================== 辅助函数 ====================
 
+// 为 decorate() 函数维护每个类的共享 metadata 对象
+// 确保同一个类的多次 decorate 调用共享同一个 metadata，
+// 使 createMetaDecorator 的重复检测在 decorate 场景下也能正确工作
+const decorateMetadataMap = new WeakMap<object, Record<string, unknown>>();
+
 export function decorate(
   decorator: any,
   target: any,
@@ -233,6 +236,13 @@ export function decorate(
   //       set(obj: any, value: any) { obj[key] = value; },
   //       has(obj: any) { return key in obj; },
   //     },
+  // 获取或创建当前类的共享 metadata 对象
+  // 确保同一个类的多次 decorate 调用共享同一个 metadata
+  if (!decorateMetadataMap.has(target)) {
+    decorateMetadataMap.set(target, {});
+  }
+  const metadata = decorateMetadataMap.get(target)!;
+
   const context = {
     kind: isMethod ? 'method' : 'field',
     name: key,
@@ -241,7 +251,7 @@ export function decorate(
     addInitializer(fn: () => void) {
       initializers.push(fn);
     },
-    metadata: {},
+    metadata,
   };
 
   // 从后向前执行装饰器，支持方法替换

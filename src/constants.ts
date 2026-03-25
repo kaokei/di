@@ -47,6 +47,10 @@ export const ERRORS = {
   // 用于 decorator.ts 的 defineLazyProperty —— 缺少容器注册
   MISS_CONTAINER:
     '@LazyInject requires a registered container but none was found.',
+
+  // 用于 decorator.ts 的 defineLazyProperty —— 无效 token
+  LAZY_INJECT_INVALID_TOKEN:
+    'LazyInject requires a valid token, but received null or undefined.',
 } as const;
 
 // 未初始化哨兵值，用于标记 PostConstruct 尚未执行
