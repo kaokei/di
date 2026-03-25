@@ -25,7 +25,7 @@ export class LazyToken<T> {
 // token 可能是 Token、LazyToken 或其他类
 export function resolveToken<T>(token?: GenericToken<T>) {
   if (!token) {
-    throw new Error(ERRORS.MISS_INJECT);
+    throw new Error(ERRORS.INVALID_TOKEN);
   }
   if (token instanceof LazyToken) {
     return token.resolve();

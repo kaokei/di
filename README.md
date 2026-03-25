@@ -18,3 +18,8 @@
 - [API 文档](./docs/api/index.md)
 - [博客文章](./docs/note/01.什么是Token.md)
 - [codesandbox example](https://codesandbox.io/s/di-playground-zjnyv)
+
+## 补充信息
+
+
+LazyInject 和 @PostConstruct 只支持class服务。

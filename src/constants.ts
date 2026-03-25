@@ -38,15 +38,17 @@ export const ERRORS = {
   // 用于 decorator.ts 的 createMetaDecorator —— 重复装饰器检测
   POST_CONSTRUCT:
     'Multiple @PostConstruct decorators are not allowed in a single class.',
+
   PRE_DESTROY:
     'Multiple @PreDestroy decorators are not allowed in a single class.',
 
-  // 用于 token.ts 的 resolveToken —— 缺少 @Inject 装饰器
-  MISS_INJECT: 'Missing @Inject decorator for explicit token specification.',
+  // 用于 token.ts 的 resolveToken —— 无效 token
+  INVALID_TOKEN:
+    '@Inject or @LazyInject requires a valid token, but received null or undefined.',
 
   // 用于 decorator.ts 的 defineLazyProperty —— 无效 token
   LAZY_INJECT_INVALID_TOKEN:
-    'LazyInject requires a valid token, but received null or undefined.',
+    '@LazyInject requires a valid token, but received null or undefined.',
 } as const;
 
 /**
