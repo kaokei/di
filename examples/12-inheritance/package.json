@@ -4,10 +4,12 @@
   "description": "继承：子类继承父类的属性注入与 PostConstruct 规则",
   "type": "module",
   "scripts": {
-    "start": "tsx src/index.ts"
+    "start": "vite"
   },
   "dependencies": {
-    "@kaokei/di": "^4.0.0",
-    "tsx": "^4.0.0"
+    "@kaokei/di": "^4.0.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
   }
 }

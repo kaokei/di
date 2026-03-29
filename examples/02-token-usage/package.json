@@ -4,10 +4,12 @@
   "description": "Token 用法：使用 Token 实例作为 ServiceIdentifier，三种绑定方式",
   "type": "module",
   "scripts": {
-    "start": "tsx src/index.ts"
+    "start": "vite"
   },
   "dependencies": {
-    "@kaokei/di": "^4.0.0",
-    "tsx": "^4.0.0"
+    "@kaokei/di": "^4.0.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
   }
 }

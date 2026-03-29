@@ -4,10 +4,12 @@
   "description": "层级容器：父子容器的创建与依赖查找机制",
   "type": "module",
   "scripts": {
-    "start": "tsx src/index.ts"
+    "start": "vite"
   },
   "dependencies": {
-    "@kaokei/di": "^4.0.0",
-    "tsx": "^4.0.0"
+    "@kaokei/di": "^4.0.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
   }
 }

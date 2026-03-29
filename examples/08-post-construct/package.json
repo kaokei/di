@@ -4,10 +4,12 @@
   "description": "PostConstruct：同步/异步初始化与继承行为",
   "type": "module",
   "scripts": {
-    "start": "tsx src/index.ts"
+    "start": "vite"
   },
   "dependencies": {
-    "@kaokei/di": "^4.0.0",
-    "tsx": "^4.0.0"
+    "@kaokei/di": "^4.0.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
   }
 }

@@ -4,10 +4,12 @@
   "description": "动态值：toDynamicValue 工厂函数与条件注入",
   "type": "module",
   "scripts": {
-    "start": "tsx src/index.ts"
+    "start": "vite"
   },
   "dependencies": {
-    "@kaokei/di": "^4.0.0",
-    "tsx": "^4.0.0"
+    "@kaokei/di": "^4.0.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
   }
 }
