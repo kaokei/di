@@ -5,7 +5,7 @@ layout: home
 hero:
   name: '@kaokei/di'
   text: 'Tiny di library depends on typescript decorator.'
-  tagline: 'InversifyJS 的轻量级方案，不依赖reflect-metadata'
+  tagline: 'InversifyJS 的轻量级替代方案，使用stage3装饰器，不依赖reflect-metadata。'
   actions:
     - theme: brand
       text: Guide
