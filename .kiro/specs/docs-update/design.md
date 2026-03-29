@@ -307,7 +307,7 @@ examples/
 
 **访问方式**：
 ```
-https://codesandbox.io/p/github/kaokei/di/main?file=/examples/basic-usage/src/index.ts
+https://codesandbox.io/p/sandbox/github/kaokei/di?file=/examples/basic-usage/src/index.ts
 ```
 
 每个示例目录包含独立的 `package.json`，依赖 `@kaokei/di` 的已发布版本，与主包构建流程完全隔离。

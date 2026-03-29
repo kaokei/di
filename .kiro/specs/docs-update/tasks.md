@@ -269,7 +269,7 @@
   - [x] 20.3 在 `docs/guide/index.md` 中补充 CodeSandbox 示例入口说明
     - 说明 CodeSandbox 基于 GitHub 仓库生成示例的方案
     - 列出所有示例的链接和简要说明
-    - 说明 URL 格式：`https://codesandbox.io/p/github/kaokei/di/main?file=/examples/...`
+    - 说明 URL 格式：`https://codesandbox.io/p/sandbox/github/kaokei/di?file=/examples/...`
     - _需求：12.1、12.2、12.3、12.4_
 
 ## 备注

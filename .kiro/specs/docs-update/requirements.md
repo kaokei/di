@@ -155,7 +155,7 @@
 #### 验收标准
 
 1. THE Docs_System SHALL 在文档中说明 CodeSandbox 基于 GitHub 仓库生成示例的方案，包括目录规范（建议使用 `examples/` 目录）和文件结构要求。
-2. THE Docs_System SHALL 说明 CodeSandbox 的 GitHub 集成能力：通过 `https://codesandbox.io/p/github/{owner}/{repo}` 格式的 URL 可以直接基于 GitHub 仓库创建沙箱，并且每次 push 后沙箱会自动同步。
+2. THE Docs_System SHALL 说明 CodeSandbox 的 GitHub 集成能力：通过 `https://codesandbox.io/p/sandbox/github/{owner}/{repo}` 格式的 URL 可以直接基于 GitHub 仓库创建沙箱，并且每次 push 后沙箱会自动同步。
 3. THE Docs_System SHALL 评估在当前项目中放置示例文件的可行性，说明示例文件应独立于主包的构建流程，建议每个示例作为独立的子目录，包含自己的 `package.json`。
 4. WHERE CodeSandbox 示例被集成到文档中时，THE Docs_System SHALL 在相关 API 文档页面中提供对应的 CodeSandbox 链接，方便开发者直接在线运行示例。
 
