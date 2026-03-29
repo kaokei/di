@@ -24,6 +24,10 @@ export default defineConfig({
               text: '本库 API 和 inversify API 的对比',
               link: '/guide/COMPARE-API',
             },
+            {
+              text: 'CodeSandbox 在线示例',
+              link: '/guide/EXAMPLES',
+            },
           ],
         },
       ],
