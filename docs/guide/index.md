@@ -28,7 +28,7 @@ npm install @kaokei/di
 }
 ```
 
-> 注意：本库使用 Stage 3 装饰器，**不需要**设置 `experimentalDecorators: true`，也**不需要** `emitDecoratorMetadata`，因为本库不依赖装饰器元数据。
+> 注意：本库使用 Stage 3 装饰器，**不需要**设置 `experimentalDecorators: true`，也**不需要** `emitDecoratorMetadata: true`，因为本库不依赖装饰器元数据。
 
 ## 基本使用
 
