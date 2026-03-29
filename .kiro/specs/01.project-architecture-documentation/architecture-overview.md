@@ -2,7 +2,7 @@
 
 ## 1. 项目简介
 
-`@kaokei/di` 是一个轻量级的 TypeScript 依赖注入（Dependency Injection，DI）框架，版本 3.0.9。该库参考了 InversifyJS 和 Angular 的优秀设计理念，旨在为 TypeScript/JavaScript 项目提供简洁、高效的 IoC（Inversion of Control，控制反转）容器能力。
+`@kaokei/di` 是一个轻量级的 TypeScript 依赖注入（Dependency Injection，DI）框架，版本 4.0.0。该库参考了 InversifyJS 和 Angular 的优秀设计理念，旨在为 TypeScript/JavaScript 项目提供简洁、高效的 IoC（Inversion of Control，控制反转）容器能力。
 
 ### 核心特点
 
