@@ -23,9 +23,7 @@ npm install @kaokei/di
 ```json
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "experimentalDecorators": false,
-    "useDefineForClassFields": false
+    "useDefineForClassFields": true
   }
 }
 ```
@@ -102,3 +100,23 @@ countService.logger = new LoggerService();
 // 此时可以正常调用addOne方法，this.logger.log可以打印出相应的日志
 countService.addOne();
 ```
+
+## 项目特点
+
+本项目虽然不依赖`experimentalDecorators`，但是依赖`useDefineForClassFields: true`。
+
+本项目只有单例模式，没有inversify中其他模式。
+
+本项目中@LazyInject 和 @PostConstruct 只支持class服务。
+
+inversify中执行顺序是：  
+postConstruct --> binding handler --> container handlers  
+container handlers --> binding handler --> preDestroy  
+本项目执行顺序：  
+binding handler --> container handlers --> postConstruct  
+container handlers --> binding handler --> preDestroy
+
+@postConstruct装饰器在inversify中，如果A类继承了B类。  
+此时如果A类和B类都有 @postConstruct，那么B类不会执行，只有A类会执行。  
+如果A类没有@postConstruct，那么会执行B类的。  
+如果A继承B继承C，并且A，B都没有@postConstruct，那么会执行C类的。
