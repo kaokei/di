@@ -7,7 +7,7 @@
     "start": "tsx src/index.ts"
   },
   "dependencies": {
-    "@kaokei/di": "^3.0.9",
+    "@kaokei/di": "^4.0.0",
     "tsx": "^4.0.0"
   }
 }
