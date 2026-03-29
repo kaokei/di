@@ -10,6 +10,6 @@
     "@kaokei/di": "^4.0.0"
   },
   "devDependencies": {
-    "vite": "^5.0.0"
+    "vite": "^8.0.0"
   }
 }
