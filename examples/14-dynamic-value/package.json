@@ -1,0 +1,13 @@
+{
+  "name": "di-example-14-dynamic-value",
+  "version": "1.0.0",
+  "description": "动态值：toDynamicValue 工厂函数与条件注入",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@kaokei/di": "^3.0.9",
+    "tsx": "^4.0.0"
+  }
+}

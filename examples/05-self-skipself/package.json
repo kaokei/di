@@ -1,0 +1,13 @@
+{
+  "name": "di-example-05-self-skipself",
+  "version": "1.0.0",
+  "description": "Self 和 SkipSelf：控制依赖查找范围",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@kaokei/di": "^3.0.9",
+    "tsx": "^4.0.0"
+  }
+}

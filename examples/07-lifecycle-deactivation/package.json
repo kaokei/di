@@ -1,0 +1,13 @@
+{
+  "name": "di-example-07-lifecycle-deactivation",
+  "version": "1.0.0",
+  "description": "销毁生命周期：onDeactivation 钩子与执行顺序",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@kaokei/di": "^3.0.9",
+    "tsx": "^4.0.0"
+  }
+}

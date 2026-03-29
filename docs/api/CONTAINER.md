@@ -40,11 +40,13 @@ options.optional; // 当没有找到指定token时，默认时抛出异常，如
 
 需要注意如果指定了 options.optional=true，则 get 方法有可能返回 undefined，所以需要自行在运行时做判空处理。
 
-get 方法在实例化过程中会触发如下声明周期方法，顺序如下：
+get 方法在实例化过程中会触发如下生命周期方法，顺序如下：
 
 1. Binding#onActivationHandler
 2. Container#onActivationHandler
 3. Class#PostConstruct
+
+本库将 `postConstruct` 放在最后，是因为 `postConstruct` 执行时需要访问注入的属性，而属性注入发生在 activation 之后。更多详情参考 [生命周期说明](../note/13.生命周期.md)。
 
 对比 inversify 中的生命周期方法，[顺序如下：](https://inversify.io/docs/fundamentals/lifecycle/activation/)
 
@@ -100,6 +102,18 @@ function isBound<T>(token: CommonToken<T>): boolean;
 
 判断当前容器以及所有父级容器是否绑定了指定的 token。
 
+## Container#children
+
+```ts
+public children?: Set<Container>;
+```
+
+`children` 是可选的公开属性，类型为 `Set<Container> | undefined`，用于记录当前容器的所有直接子容器。
+
+- 初始状态下 `children` 为 `undefined`，只有在第一次调用 `createChild()` 后才会被初始化为 `Set`
+- 每次调用 `createChild()` 时，新创建的子容器会自动被添加到父容器的 `children` 集合中
+- 当调用子容器的 `destroy()` 时，子容器会自动从父容器的 `children` 集合中移除
+
 ## Container#createChild
 
 ```ts
@@ -111,6 +125,10 @@ function createChild(): Container;
 ```ts
 const childContainer = new Container();
 childContainer.parent = this;
+if (!this.children) {
+  this.children = new Set();
+}
+this.children.add(childContainer);
 return childContainer;
 ```
 
@@ -121,22 +139,31 @@ function destroy(): void;
 ```
 
 相对于 createChild 方法是创建一个新的容器，destroy 方法则负责销毁自身。
-而且在 unbindAll 方法的基础上清除了所有自身的状态。
+在 unbindAll 方法的基础上清除了所有自身的状态。
 
-注意`inversify`中并没有提供这个方法。
+注意 `inversify` 中并没有提供这个方法。
+
+`destroy` 会递归销毁所有子容器（遍历 `children` 集合，对每个子容器调用 `destroy()`），销毁完成后将自身从父容器的 `children` 集合中移除。
 
 ```ts
 const parent = new Container();
-const child = parent.createChild();
+const child1 = parent.createChild();
+const child2 = parent.createChild();
 
-// 这里不仅仅销毁了自身容器的所有状态，而且将自己从parent容器的children属性中删除
-child.destroy();
+// 递归销毁 parent 及其所有子容器（child1、child2 也会被一并销毁）
+parent.destroy();
+
+// 也可以单独销毁某个子容器，child1 会自动从 parent.children 中移除
+child2.destroy();
 ```
 
 ## Container#onActivation
 
 ```ts
-function onActivation(handler: ActivationHandler): void;
+function onActivation<T>(handler: ActivationHandler<T>): void;
+
+// ActivationHandler 完整签名：
+type ActivationHandler<T> = (ctx: Context, input: T, token?: CommonToken<T>) => T;
 ```
 
 注册一个 Activation 函数，会在 get 方法首次执行过程中被执行。
@@ -145,10 +172,24 @@ function onActivation(handler: ActivationHandler): void;
 
 这个 Activation 函数是当前 Container 的，当前 Container 的所有 token 都会使用这个 Activation 函数。
 
+可选的 `token` 参数可用于区分不同 token，从而实现差异化逻辑：
+
+```ts
+container.onActivation((ctx, input, token) => {
+  if (token === LoggerService) {
+    console.log('LoggerService activated');
+  }
+  return input;
+});
+```
+
 ## Container#onDeactivation
 
 ```ts
-function onDeactivation(handler: DeactivationHandler): void;
+function onDeactivation<T>(handler: DeactivationHandler<T>): void;
+
+// DeactivationHandler 完整签名：
+type DeactivationHandler<T> = (input: T, token?: CommonToken<T>) => void;
 ```
 
 注册一个 Deactivation 函数，会在 unbind 方法执行过程中被执行。
@@ -156,3 +197,44 @@ function onDeactivation(handler: DeactivationHandler): void;
 注意只能注册一个 Deactivation 函数，重复注册，只会覆盖前一个函数。
 
 这个 Deactivation 函数是当前 Container 的，当前 Container 的所有 token 都会使用这个 Deactivation 函数。
+
+可选的 `token` 参数可用于区分不同 token，从而实现差异化逻辑：
+
+```ts
+container.onDeactivation((input, token) => {
+  if (token === LoggerService) {
+    console.log('LoggerService deactivated');
+  }
+});
+```
+
+## Container.getContainerOf
+
+```ts
+static getContainerOf(instance: object): Container | undefined;
+```
+
+静态方法，用于获取某个服务实例所属的容器。
+
+- 只有通过 `to()` 或 `toSelf()` 绑定的 class 服务实例才会被记录；`toConstantValue` 和 `toDynamicValue` 的值不会被记录
+- 主要用于 `@LazyInject` 内部实现：当 `@LazyInject` 没有显式指定 container 时，通过此方法从实例反查所属容器
+
+```ts
+const container = new Container();
+container.bind(MyService).toSelf().inSingletonScope();
+
+const instance = container.get(MyService);
+Container.getContainerOf(instance); // 返回 container
+```
+
+### Container._instanceContainerMap
+
+内部使用 `WeakMap<object, Container>` 存储实例与容器的映射关系：
+
+```ts
+static _instanceContainerMap = new WeakMap<object, Container>();
+```
+
+- 只有 `Instance` 类型（`to()` / `toSelf()`）的绑定在实例化时才会注册到此映射
+- `toConstantValue` 和 `toDynamicValue` 不会注册，原因是同一个对象可能被绑定到多个容器，`WeakMap` 只能保留最后一次映射，会导致 `@LazyInject` 从错误的容器解析依赖
+- 由于 `Instance` 类型每次都通过 `new ClassName()` 创建新实例，不存在同一实例被多个容器注册的覆盖风险

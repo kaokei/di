@@ -1,0 +1,13 @@
+{
+  "name": "di-example-02-token-usage",
+  "version": "1.0.0",
+  "description": "Token 用法：使用 Token 实例作为 ServiceIdentifier，三种绑定方式",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@kaokei/di": "^3.0.9",
+    "tsx": "^4.0.0"
+  }
+}

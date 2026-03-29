@@ -1,0 +1,13 @@
+{
+  "name": "di-example-16-javascript-usage",
+  "version": "1.0.0",
+  "description": "JavaScript 用法：使用 decorate 函数手动应用装饰器",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.js"
+  },
+  "dependencies": {
+    "@kaokei/di": "^3.0.9",
+    "tsx": "^4.0.0"
+  }
+}

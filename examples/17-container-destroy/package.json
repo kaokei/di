@@ -1,0 +1,13 @@
+{
+  "name": "di-example-17-container-destroy",
+  "version": "1.0.0",
+  "description": "容器销毁：destroy 递归销毁子容器与 getContainerOf",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@kaokei/di": "^3.0.9",
+    "tsx": "^4.0.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "di-example-03-optional-inject",
+  "version": "1.0.0",
+  "description": "Optional 注入：依赖不存在时返回 undefined 而非抛出异常",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@kaokei/di": "^3.0.9",
+    "tsx": "^4.0.0"
+  }
+}
