@@ -26,7 +26,8 @@ describe('PRE_DESTROY_1 A -> B', () => {
 
   @Injectable()
   class A {
-    constructor(@Inject(B) public b: B) {}
+    // 迁移：构造函数参数 @Inject 改为属性装饰器
+    @Inject(B) b!: B;
 
     @PostConstruct()
     async init() {
@@ -84,7 +85,8 @@ describe('PRE_DESTROY_2 A -> B', () => {
 
   @Injectable()
   class A {
-    constructor(@Inject(B) public b: B) {}
+    // 迁移：构造函数参数 @Inject 改为属性装饰器
+    @Inject(B) b!: B;
 
     @PostConstruct()
     async init() {

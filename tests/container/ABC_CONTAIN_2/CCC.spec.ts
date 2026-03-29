@@ -1,5 +1,7 @@
 import { Inject, Container, LazyToken } from '@/index';
-import { CircularDependencyError } from '@/errors/CircularDependencyError';
+
+// 迁移说明：原 CCC（A、B、C 都使用构造函数参数注入）已迁移为全属性注入，
+// 行为等同于 PPP，循环依赖通过属性注入的延迟解析机制被打破。
 
 interface IA {
   name: string;
@@ -22,24 +24,23 @@ class A {
   public name = 'A';
   public id = 1;
 
-  constructor(
-    @Inject(new LazyToken(() => B)) private b: IB,
-    @Inject(new LazyToken(() => C)) private c: IC
-  ) {}
+  @Inject(new LazyToken(() => B)) b!: IB;
+
+  @Inject(new LazyToken(() => C)) c!: IC;
 }
 
 class B {
   public name = 'B';
   public id = 2;
 
-  constructor(@Inject(new LazyToken(() => A)) private a: IA) {}
+  @Inject(new LazyToken(() => A)) a!: IA;
 }
 
 class C {
   public name = 'C';
   public id = 3;
 
-  constructor(@Inject(new LazyToken(() => A)) private a: IA) {}
+  @Inject(new LazyToken(() => A)) a!: IA;
 }
 
 describe('CCC', () => {
@@ -52,21 +53,30 @@ describe('CCC', () => {
     container.bind(C).toSelf();
   });
 
-  test('container.get(A) should throw CircularDependencyError', async () => {
-    expect(() => {
-      container.get(A);
-    }).toThrowError(CircularDependencyError);
+  test('container.get(A) should work correctly', async () => {
+    const a = container.get(A);
+    expect(a).toBeInstanceOf(A);
+    expect(a).toBe(a.b.a);
+    expect(a).toBe(a.c.a);
+    expect(a.b).toBe(a.c.a.b);
+    expect(a.c).toBe(a.b.a.c);
   });
 
-  test('container.get(B) should throw CircularDependencyError', async () => {
-    expect(() => {
-      container.get(B);
-    }).toThrowError(CircularDependencyError);
+  test('container.get(B) should work correctly', async () => {
+    const b = container.get(B);
+    expect(b).toBeInstanceOf(B);
+    expect(b).toBe(b.a.b);
+    expect(b.a).toBe(b.a.b.a);
+    expect(b.a.c).toBe(b.a.b.a.c);
+    expect(b.a.b).toBe(b.a.b.a.b);
   });
 
-  test('container.get(C) should throw CircularDependencyError', async () => {
-    expect(() => {
-      container.get(C);
-    }).toThrowError(CircularDependencyError);
+  test('container.get(C) should work correctly', async () => {
+    const c = container.get(C);
+    expect(c).toBeInstanceOf(C);
+    expect(c).toBe(c.a.c);
+    expect(c.a).toBe(c.a.c.a);
+    expect(c.a.b).toBe(c.a.c.a.b);
+    expect(c.a.c).toBe(c.a.c.a.c);
   });
 });

@@ -1,3 +1,8 @@
+// 此文件原使用构造函数参数装饰器语法（@Inject 在 constructor 参数上）
+// Stage 3 规范不支持参数装饰器，esbuild 无法解析该语法
+// 保留文件以便将来可能重新支持参数装饰器时恢复
+// 原始测试内容：SkipSelf(false) Self(true) Optional(false)
+
 import { SkipSelf, Self, Optional, Inject, Container } from '@/index';
 import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
 import { hasOwn } from '@tests/utils';
@@ -22,16 +27,16 @@ class A {
   public name = 'A';
   public id = 1;
 
-  public constructor(
-    @Inject(B)
-    @SkipSelf(false)
-    @Self(true)
-    @Optional(false)
-    public b: IB
-  ) {}
+  // public constructor(
+  //   @Inject(B)
+  //   @SkipSelf(false)
+  //   @Self(true)
+  //   @Optional(false)
+  //   public b: IB
+  // ) {}
 }
 
-describe('00', () => {
+describe.skip('00', () => {
   let parent: Container;
   let child: Container;
 
@@ -89,7 +94,7 @@ describe('00', () => {
   });
 });
 
-describe('01', () => {
+describe.skip('01', () => {
   let parent: Container;
   let child: Container;
 
@@ -128,7 +133,7 @@ describe('01', () => {
   });
 });
 
-describe('10', () => {
+describe.skip('10', () => {
   let parent: Container;
   let child: Container;
 
@@ -170,7 +175,7 @@ describe('10', () => {
   });
 });
 
-describe('11', () => {
+describe.skip('11', () => {
   let parent: Container;
   let child: Container;
 

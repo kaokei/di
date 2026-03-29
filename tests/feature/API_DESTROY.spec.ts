@@ -82,16 +82,11 @@ describe('Unbind all with hierarchical container', () => {
   });
 
   test('container.get(B) should work correctly', async () => {
+    // 递归销毁：父容器 destroy 后子容器也被销毁，绑定被清空
     parent.destroy();
-    const a = child.get(A);
-    expect(a).toBeInstanceOf(A);
-    expect(a.id).toBe(1);
-    expect(a.name).toBe('A');
-    expect(a.b).toBeInstanceOf(B);
-    expect(a.b.id).toBe(2);
-    expect(a.b.name).toBe('B');
-    expect(hasOwn(child, A, a)).toBe(true);
-    expect(hasOwn(child, B, a.b)).toBe(true);
+    expect(() => {
+      child.get(A);
+    }).toThrowError(BindingNotFoundError);
   });
 
   test('container.get(A) should throw BindingNotFoundError', async () => {

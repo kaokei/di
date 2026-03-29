@@ -1,0 +1,13 @@
+{
+  "name": "18-deep-circular-dependency",
+  "version": "1.0.0",
+  "description": "展示构造函数参数注入不被支持，以及循环依赖检测",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@kaokei/di": "^3.0.9",
+    "tsx": "^4.0.0"
+  }
+}

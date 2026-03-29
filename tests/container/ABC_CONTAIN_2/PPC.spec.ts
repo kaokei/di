@@ -1,5 +1,7 @@
 import { Inject, Container, LazyToken } from '@/index';
-import { CircularDependencyError } from '@/errors/CircularDependencyError';
+
+// 迁移说明：原 PPC（C 构造函数参数注入）已迁移为全属性注入，
+// 行为等同于 PPP，循环依赖通过属性注入的延迟解析机制被打破。
 
 interface IA {
   name: string;
@@ -41,7 +43,7 @@ class C {
   public name = 'C';
   public id = 3;
 
-  constructor(@Inject(new LazyToken(() => A)) private a: IA) {}
+  @Inject(new LazyToken(() => A)) a!: IA;
 }
 
 describe('PPC', () => {
@@ -72,9 +74,12 @@ describe('PPC', () => {
     expect(b.a.b).toBe(b.a.b.a.b);
   });
 
-  test('container.get(C) should throw CircularDependencyError', async () => {
-    expect(() => {
-      container.get(C);
-    }).toThrowError(CircularDependencyError);
+  test('container.get(C) should work correctly', async () => {
+    const c = container.get(C);
+    expect(c).toBeInstanceOf(C);
+    expect(c).toBe(c.a.c);
+    expect(c.a).toBe(c.a.c.a);
+    expect(c.a.b).toBe(c.a.c.a.b);
+    expect(c.a.c).toBe(c.a.c.a.c);
   });
 });

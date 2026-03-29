@@ -1,0 +1,13 @@
+{
+  "name": "di-example-09-pre-destroy",
+  "version": "1.0.0",
+  "description": "PreDestroy：服务销毁前的清理钩子",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@kaokei/di": "^3.0.9",
+    "tsx": "^4.0.0"
+  }
+}

@@ -8,6 +8,12 @@ const container = new Container();
 
 [具体文档参考这里。](./CONTAINER.md)
 
+## Binding
+
+`container.bind(token)` 返回一个 `Binding` 对象，通过 `Binding` 可以配置 token 对应的服务类型（`toSelf()`、`to()`、`toConstantValue()`、`toDynamicValue()`、`toService()`）以及生命周期回调（`onActivation()`、`onDeactivation()`）。
+
+详细说明参考 [Binding 文档](./BINDING.md)。
+
 ## Token
 
 ```ts
@@ -79,6 +85,8 @@ export class B {
 
 具体哪些场景的循环依赖是被支持的可以[参考这里](../note/05.什么是循环依赖.md)。
 
+> 本库使用 TC39 Stage 3 装饰器规范，所有依赖声明统一通过实例属性装饰器（Field Decorator）完成，不支持构造函数参数装饰器（Parameter Decorator）。
+
 ## @Inject
 
 ```ts
@@ -103,19 +111,16 @@ class CountService {
 }
 
 class DemoService {
-  // 使用场景1: 指定注入属性的token
+  // 使用场景: 指定注入属性的token
   @Inject(LoggerService)
   public loggerService!: LoggerService;
 
-  constructor(
-    // 使用场景2: 指定注入构造函数参数的token
-    @Inject(CountService)
-    public countService: CountService
-  ) {}
+  @Inject(CountService)
+  public countService!: CountService;
 }
 ```
 
-`@Inject`可以注入属性依赖，也可以注入构造函数参数依赖。
+`@Inject` 用于注入属性依赖（Field Decorator）。
 
 `@Inject`必须指定一个 Token 实例对象或者 Class 类或者一个 LazyToken 实例对象，也就是`@Inject`的参数是必填项。
 
@@ -149,26 +154,6 @@ class DemoService {
   @SkipSelf()
   @Inject(LoggerService)
   public loggerService4!: LoggerService;
-
-  constructor(
-    @Self()
-    @Inject(LoggerService)
-    public loggerService5: LoggerService,
-
-    @Optional()
-    @Self()
-    @Inject(LoggerService)
-    public loggerService6: LoggerService,
-
-    @SkipSelf()
-    @Inject(LoggerService)
-    public loggerService7: LoggerService,
-
-    @Optional()
-    @SkipSelf()
-    @Inject(LoggerService)
-    public loggerService8: LoggerService
-  ) {}
 }
 ```
 
@@ -208,6 +193,11 @@ class StudentService {
 
 更多高级功能[参考这里](../note/06.异步初始化服务.md)，比如等待异步服务初始化完成之后，再执行自己的初始化服务。
 
+> **Note**
+> `@PostConstruct` 只对 class 服务（通过 `to()` 或 `toSelf()` 绑定）生效，对 `toConstantValue`、`toDynamicValue` 绑定的服务无效。
+>
+> 继承行为：沿继承链向上查找，执行第一个找到的 `@PostConstruct` 方法。详细说明参考 [生命周期文档](../note/13.生命周期.md)。
+
 ## @PreDestroy
 
 示例：
@@ -239,3 +229,11 @@ class DatabaseService {
 ## decorate
 
 [具体文档参考这里。](./DECORATE.md)
+
+## 错误类
+
+本库导出了 7 个错误类（`BaseError`、`BindingNotFoundError`、`BindingNotValidError`、`CircularDependencyError`、`ContainerNotFoundError`、`DuplicateBindingError`、`PostConstructError`），详细说明参考 [错误类文档](./ERRORS.md)。
+
+## 类型导出
+
+本库导出了多个 TypeScript 类型（`Newable`、`CommonToken`、`ActivationHandler` 等），详细说明参考 [类型导出文档](./TYPES.md)。

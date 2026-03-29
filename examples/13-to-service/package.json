@@ -1,0 +1,13 @@
+{
+  "name": "di-example-13-to-service",
+  "version": "1.0.0",
+  "description": "toService 别名：接口 token 映射到实现类，面向接口编程",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@kaokei/di": "^3.0.9",
+    "tsx": "^4.0.0"
+  }
+}

@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.0](https://github.com/kaokei/di/compare/v3.0.9...v4.0.0) (2026-03-29)
+
+### Features
+
+* 完成 v4 核心重构迭代，重新设计内部架构
+* 优化异常信息，提升错误可读性
+* 优化找不到容器时的异常处理
+* 增加 lazyInject 文件合并，简化使用方式
+* 支持 hasOwn 替代 hasOwnProperty
+* 增加循环依赖示例
+
+### Bug Fixes
+
+* 修复 code review 发现的若干问题
+
+### Documentation
+
+* 更新 docs 文档，记录项目特点与使用说明
+
+### Tests
+
+* 增加并优化单元测试覆盖率
+
 ### [3.0.9](https://github.com/kaokei/di/compare/v3.0.8...v3.0.9) (2025-05-12)
 
 ### [3.0.8](https://github.com/kaokei/di/compare/v3.0.7...v3.0.8) (2025-04-23)

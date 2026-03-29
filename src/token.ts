@@ -2,8 +2,8 @@ import type { GenericToken, LazyTokenCallback } from './interfaces';
 import { ERRORS } from './constants';
 
 export class Token<T> {
-  public _ = '' as T;
-  public name: string;
+  declare _: T; // 仅类型层面存在，无运行时开销
+  name: string;
 
   constructor(name: string) {
     this.name = name;
@@ -11,21 +11,21 @@ export class Token<T> {
 }
 
 export class LazyToken<T> {
-  private callback: LazyTokenCallback<T>;
+  _callback: LazyTokenCallback<T>;
 
   constructor(callback: LazyTokenCallback<T>) {
-    this.callback = callback;
+    this._callback = callback;
   }
 
-  public resolve() {
-    return this.callback();
+  resolve() {
+    return this._callback();
   }
 }
 
-// token可能是Token|LazyToken|其他class
+// token 可能是 Token、LazyToken 或其他类
 export function resolveToken<T>(token?: GenericToken<T>) {
   if (!token) {
-    throw new Error(ERRORS.MISS_INJECT);
+    throw new Error(ERRORS.INVALID_TOKEN);
   }
   if (token instanceof LazyToken) {
     return token.resolve();

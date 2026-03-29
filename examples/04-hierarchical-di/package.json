@@ -1,0 +1,13 @@
+{
+  "name": "di-example-04-hierarchical-di",
+  "version": "1.0.0",
+  "description": "层级容器：父子容器的创建与依赖查找机制",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@kaokei/di": "^3.0.9",
+    "tsx": "^4.0.0"
+  }
+}

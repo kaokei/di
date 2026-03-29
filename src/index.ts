@@ -1,6 +1,26 @@
-export * from './interfaces';
+// 类型导出
+export type {
+  Newable,
+  InjectFunction,
+  CommonToken,
+  TokenType,
+  GenericToken,
+  LazyTokenCallback,
+  Context,
+  DynamicValue,
+  RecordObject,
+  Options,
+  ActivationHandler,
+  DeactivationHandler,
+  PostConstructParam,
+} from './interfaces';
+
+// 核心类导出
 export { Container } from './container';
+export { Binding } from './binding';
 export { Token, LazyToken } from './token';
+
+// 装饰器导出
 export {
   Inject,
   Self,
@@ -9,5 +29,15 @@ export {
   PostConstruct,
   PreDestroy,
   decorate,
+  LazyInject,
+  createLazyInject,
 } from './decorator';
-export { LazyInject, createLazyInject } from './lazyinject';
+
+// 错误类导出
+export { BaseError } from './errors/BaseError';
+export { BindingNotFoundError } from './errors/BindingNotFoundError';
+export { BindingNotValidError } from './errors/BindingNotValidError';
+export { CircularDependencyError } from './errors/CircularDependencyError';
+export { DuplicateBindingError } from './errors/DuplicateBindingError';
+export { PostConstructError } from './errors/PostConstructError';
+export { ContainerNotFoundError } from './errors/ContainerNotFoundError';

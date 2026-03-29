@@ -4,10 +4,11 @@ const tokenB = new Token<string>('tokenB');
 const tokenC = new Token<string>('tokenC');
 
 class A {
+  // 迁移：构造函数参数 @Inject 改为属性装饰器
+  @Inject(tokenB) b!: string;
+
   @Inject(tokenC)
   public c!: string;
-
-  constructor(@Inject(tokenB) public b: string) {}
 
   @PostConstruct()
   init() {
@@ -91,13 +92,9 @@ describe('inversify order', () => {
   test('container.get(A) should work correctly', async () => {
     const a = container.get(A);
     expect(a).toBeInstanceOf(A);
-    expect(a.b).toBe(
-      'mockB_activationBindingB_activationContainerB_activationBindingA_activationContainerA'
-    );
-    // @notice
-    // 属性注入器晚于activation，所以activation不能访问注入的属性。
-    // 一方面是访问不到，因为此时属性还没有注入。
-    // 另一方面就算在activation中设置了属性值，后续也会被属性注入重新覆盖。
+    // 迁移后 b 和 c 都是属性注入，属性注入晚于 activation
+    // activation 阶段 b 和 c 都是 undefined，后续被属性注入覆盖
+    expect(a.b).toBe('mockB_activationBindingB_activationContainerB');
     expect(a.c).toBe('mockC_activationBindingC_activationContainerC');
 
     expect(mockB).toHaveBeenCalledTimes(1);
@@ -111,17 +108,18 @@ describe('inversify order', () => {
     expect(activationContainerB).toHaveBeenCalledTimes(1);
     expect(activationContainerC).toHaveBeenCalledTimes(1);
 
-    // 优先获取构造函数的参数依赖
+    // 迁移后所有依赖都是属性注入，执行顺序：
+    // 1. 先执行 A 自身的 activation
+    expect(activationBindingA).toHaveBeenCalledBefore(activationContainerA);
+    // 2. 再获取属性注入依赖 b
+    expect(activationContainerA).toHaveBeenCalledBefore(mockB);
     expect(mockB).toHaveBeenCalledBefore(activationBindingB);
     expect(activationBindingB).toHaveBeenCalledBefore(activationContainerB);
-    expect(activationContainerB).toHaveBeenCalledBefore(activationBindingA);
-    // 先执行自己的activation逻辑，再获取属性注入依赖
-    expect(activationBindingA).toHaveBeenCalledBefore(activationContainerA);
-    expect(activationContainerA).toHaveBeenCalledBefore(mockC);
-    // 此时再获取属性注入依赖
+    // 3. 再获取属性注入依赖 c
+    expect(activationContainerB).toHaveBeenCalledBefore(mockC);
     expect(mockC).toHaveBeenCalledBefore(activationBindingC);
     expect(activationBindingC).toHaveBeenCalledBefore(activationContainerC);
-    // 最后再执行postConstruct
+    // 4. 最后执行 postConstruct
     expect(activationContainerC).toHaveBeenCalledBefore(initSpy);
   });
 });

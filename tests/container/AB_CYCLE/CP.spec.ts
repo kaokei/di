@@ -1,5 +1,7 @@
 import { Inject, Container, LazyToken } from '@/index';
-import { CircularDependencyError } from '@/errors/CircularDependencyError';
+
+// 迁移说明：原 CP（A 构造函数参数注入，B 属性注入）已迁移为双属性注入，
+// 行为等同于 PP，循环依赖通过属性注入的延迟解析机制被打破。
 
 interface IA {
   name: string;
@@ -17,7 +19,7 @@ class A {
   public name = 'A';
   public id = 1;
 
-  constructor(@Inject(new LazyToken(() => B)) private b: IB) {}
+  @Inject(new LazyToken(() => B)) b!: IB;
 }
 
 class B {
@@ -37,10 +39,11 @@ describe('CP', () => {
     container.bind(B).toSelf();
   });
 
-  test('container.get(A) should throw CircularDependencyError', async () => {
-    expect(() => {
-      container.get(A);
-    }).toThrowError(CircularDependencyError);
+  test('container.get(A) should work correctly', async () => {
+    const a = container.get(A);
+    expect(a).toBeInstanceOf(A);
+    expect(a).toBe(a.b.a);
+    expect(a.b).toBe(a.b.a.b);
   });
 
   test('container.get(B) should work correctly', async () => {

@@ -25,6 +25,8 @@ function createLazyInject(
 3. @LazyInject 可以避免循环依赖问题。
    > 本库是支持属性注入的循环依赖的，不需要通过@LazyInject 来解决循环依赖问题。这里只是说明@LazyInject 有这样的特点。  
    > 但是在 inversify 中则只能借助于@LazyInject 来解决循环依赖问题。
+4. **使用限制**：@LazyInject 的自动容器查找（不传 `container` 参数的用法）只支持 class 服务（通过 `to()` 或 `toSelf()` 绑定的服务）。
+   对于 `toConstantValue` 或 `toDynamicValue` 绑定的服务，因为同一个对象可能被绑定到多个容器，内部的 `_instanceContainerMap` 不会记录这类实例，所以无法自动查找容器，必须显式传入 `container` 参数。
 
 ## 示例
 

@@ -21,11 +21,12 @@ interface IC {
   a: IA;
 }
 
+// 迁移：构造函数参数 @Inject 改为属性装饰器
 class A {
   public name = 'A';
   public id = 1;
 
-  constructor(@Inject(new LazyToken(() => B)) private b: IB) {}
+  @Inject(new LazyToken(() => B)) b!: IB;
 }
 
 class B {

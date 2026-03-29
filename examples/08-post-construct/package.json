@@ -1,0 +1,13 @@
+{
+  "name": "di-example-08-post-construct",
+  "version": "1.0.0",
+  "description": "PostConstruct：同步/异步初始化与继承行为",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@kaokei/di": "^3.0.9",
+    "tsx": "^4.0.0"
+  }
+}

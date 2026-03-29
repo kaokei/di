@@ -1,5 +1,8 @@
 # 本库 API 和 inversify API 的对比
 
+> **注意**：本库使用 TC39 Stage 3 装饰器规范，不需要 `reflect-metadata`。
+> inversify 依赖 `reflect-metadata` 实现构造函数参数的自动类型推导（`emitDecoratorMetadata`）。
+
 ## Container
 
 本库和 inversify 都使用 Container。
@@ -27,6 +30,9 @@ inversify 的 LazyServiceIdentifier
 
 inversify 的 inject
 
+- 本库当前版本（Stage 3 装饰器）只支持属性注入（Field Decorator），不支持构造函数参数注入（Parameter Decorator）。
+- inversify 同时支持属性注入和构造函数参数注入。
+
 ## @Optional
 
 inversify 的 optional
@@ -46,6 +52,13 @@ inversify 没有提供 @SkipSelf 装饰器
 ## @PostConstruct
 
 inversify 的 postConstruct
+
+**激活顺序差异：**
+
+- 本库：`binding handler → container handlers → @PostConstruct`
+- inversify：`@PostConstruct → binding handler → container handlers`
+
+**继承行为：** 本库与 inversify 相同，沿继承链向上查找，执行第一个找到的 `@PostConstruct` 方法。
 
 ## @PreDestroy
 
@@ -72,3 +85,8 @@ inversify 本身没有提供相应的方法，但是[第三方库](https://githu
 该三方库只提供了`getDecorators`方法，类似本库的`createLazyInject`方法。
 
 相关细节[参考这里](../api/LAZY_INJECT.md)
+
+## Binding
+
+- 本库的 `Binding` 类是公开导出的，可以直接用于类型标注。
+- inversify 的 `Binding` 类不是公开导出的，无法直接引用。

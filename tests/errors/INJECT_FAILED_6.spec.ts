@@ -12,11 +12,11 @@ interface IB {
   id: number;
 }
 
+// 迁移为属性装饰器：@Inject('') 使用空字符串作为 Token
 class A {
   public name = 'A';
   public id = 1;
-
-  public constructor(@Inject('') public b: IB) {}
+  @Inject('') b!: IB;
 }
 
 class B {
@@ -24,7 +24,7 @@ class B {
   public id = 2;
 }
 
-describe('errors -> INJECT_FAILED: Constructor @Inject use Object', () => {
+describe('errors -> INJECT_FAILED: @Inject(\'\') 使用空字符串作为 Token', () => {
   let container: Container;
 
   beforeEach(() => {
@@ -33,13 +33,13 @@ describe('errors -> INJECT_FAILED: Constructor @Inject use Object', () => {
     container.bind(B).toSelf();
   });
 
-  test('container.get(A) should throw ERRORS.MISS_INJECT', async () => {
+  test('container.get(A) 应该抛出 ERRORS.MISS_INJECT', async () => {
     expect(() => {
       container.get(A);
     }).toThrowError(ERRORS.MISS_INJECT);
   });
 
-  test('container.get(B) should work correctly', async () => {
+  test('container.get(B) 应该正常工作', async () => {
     const b = container.get(B);
     expect(b).toBeInstanceOf(B);
     expect(b.id).toBe(2);

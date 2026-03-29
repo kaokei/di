@@ -18,10 +18,19 @@ npm install @kaokei/di
 
 本库 **不依赖** `reflect-metadata`，所以 **不需要** 安装这个 npm 包。
 
-本库依赖 typescript 环境，其实是依赖装饰器特性。需要在 tsconfig.js 文件中配置如下字段。
+本库依赖 TypeScript 环境，使用 **Stage 3 装饰器**规范（TC39 标准）。需要在 `tsconfig.json` 中配置如下字段：
 
-> "experimentalDecorators": true  
-> ~~"emitDecoratorMetadata": true~~ 不需要配置这个字段，因为本库不依赖装饰器元数据
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "experimentalDecorators": false,
+    "useDefineForClassFields": false
+  }
+}
+```
+
+> 注意：本库使用 Stage 3 装饰器，**不需要**设置 `experimentalDecorators: true`，也**不需要** `emitDecoratorMetadata`，因为本库不依赖装饰器元数据。
 
 ## 基本使用
 

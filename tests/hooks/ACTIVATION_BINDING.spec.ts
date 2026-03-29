@@ -4,8 +4,9 @@ class B {
   public name = 'B';
 }
 
+// 迁移：构造函数参数 @Inject 改为属性装饰器
 class A {
-  constructor(@Inject(B) public b: B) {}
+  @Inject(B) b!: B;
 }
 
 describe('inversify activation binding', () => {

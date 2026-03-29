@@ -41,11 +41,12 @@ class B {
   public a!: IA;
 }
 
+// 迁移：构造函数参数 @Inject 改为属性装饰器
 class C {
   public name = 'C';
   public id = 3;
 
-  constructor(@Inject(new LazyToken(() => A)) private a: IA) {}
+  @Inject(new LazyToken(() => A)) a!: IA;
 }
 
 describe('PPC', () => {

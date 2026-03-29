@@ -1,0 +1,13 @@
+{
+  "name": "di-example-12-inheritance",
+  "version": "1.0.0",
+  "description": "继承：子类继承父类的属性注入与 PostConstruct 规则",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@kaokei/di": "^3.0.9",
+    "tsx": "^4.0.0"
+  }
+}

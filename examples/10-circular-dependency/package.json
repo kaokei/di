@@ -1,0 +1,13 @@
+{
+  "name": "di-example-10-circular-dependency",
+  "version": "1.0.0",
+  "description": "循环依赖：属性注入原生支持循环依赖",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@kaokei/di": "^3.0.9",
+    "tsx": "^4.0.0"
+  }
+}

@@ -6,7 +6,7 @@
 
 ## inSingletonScope 模式
 
-inversify 中支持 3 种不同的 scope 模式，但是本库只支持 inSingletonScope 模式。
+inversify 中支持 3 种不同的 scope 模式，但是本库只支持 inSingletonScope 模式。所有通过 `to()` / `toSelf()` 绑定的 class 服务都是单例的，不支持其他 scope 模式。
 
 [inversify 关于不同 scope 的解释](https://github.com/inversify/InversifyJS/blob/develop/v6/wiki/scope.md)
 
@@ -41,17 +41,9 @@ inversify 中支持 3 种不同的 scope 模式，但是本库只支持 inSingle
 inversify 在 v6 版本升级到 v7 版本时，关于继承的处理逻辑有了较大的变化。
 inversify 比较强大，在处理继承时可以同时支持构造函数参数注入和属性注入。
 
-本库则是参考 inversify@6 和 typedi，只实现了继承父类的属性注入。
+本库当前版本（Stage 3 装饰器）已不支持构造函数参数注入，继承场景下只有属性注入有效。
 
 属性注入是比较简单的，因为天然就有类似原型链的结构，子类的属性可以继承/覆盖父类的属性。
-
-但是子类在继承父类时，构造函数的参数是没有继承/覆盖的逻辑的，因为可以在子类中手动调用 super 方法自定义父类的初始化逻辑，这样就没有办法统一处理。
-
-具体例子就是假设父类构造函数有 2 个注入参数，子类构造函数也有 2 个注入参数。按道理讲依赖注入框架应该总共注入 4 个依赖参数。
-但是如果子类的构造函数中调用了`super(param1)`或者`super(param1, param2)`，此时依赖注入框架就需要相应的减少注入参数的个数，因为子类已经提供了相应的参数了。
-这种处理逻辑是非常繁琐的，所以本库没有支持继承父类的构造函数参数注入。
-
-就算是 inversify 中可以支持继承构造函数参数注入，也是有很多前提约束条件的，必须满足前提条件才能继承父类构造函数参数。
 
 本库认为一般业务代码中直接使用属性依赖注入就能满足业务的继承需求了。
 
@@ -64,6 +56,20 @@ inversify 默认是[不支持循环依赖的](https://github.com/inversify/Inver
 本库默认支持属性注入的循环依赖，因为采用的实现逻辑是先实例化对象，放入缓存，再收集注入的属性，如果此时发生了循环依赖，那么也是能获取到未注入属性的实例化对象。
 
 [查看更多](../note/05.什么是循环依赖.md)
+
+## 生命周期执行顺序
+
+本库与 inversify 在生命周期的执行顺序上存在差异。
+
+**激活顺序（本库）：** `binding handler → container handlers → @PostConstruct`
+
+**激活顺序（inversify）：** `@PostConstruct → binding handler → container handlers`
+
+**销毁顺序（两者相同）：** `container handlers → binding handler → @PreDestroy`
+
+本库将 `@PostConstruct` 放在最后的设计原因：`@PostConstruct` 执行时通常需要访问注入的属性，而属性注入发生在 activation 阶段之后，因此 `@PostConstruct` 必须在所有 activation handler 执行完毕后才能运行，以确保此时所有依赖属性均已就绪。
+
+更多详情请参考 [生命周期文档](../note/13.生命周期.md)。
 
 ## 没有@injectable 装饰器
 
@@ -168,7 +174,7 @@ inversify 的处理逻辑是又重新开始从 child 容器开始寻找，因为
 
 ❌ ~~Container snapshots~~
 
-❌ ~~Controlling the scope of the dependencies~~ 本库只支持单例模式
+❌ ~~Controlling the scope of the dependencies~~ 本库只支持单例模式，所有通过 `to()` / `toSelf()` 绑定的 class 服务均为单例，不支持 transient 或 request scope
 
 ❌ ~~Middleware~~
 

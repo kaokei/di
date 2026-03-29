@@ -1,5 +1,7 @@
 import { Inject, Container, LazyToken } from '@/index';
-import { CircularDependencyError } from '@/errors/CircularDependencyError';
+
+// 迁移说明：原 CPC（A、C 构造函数参数注入，B 属性注入）已迁移为全属性注入，
+// 行为等同于 PPP，循环依赖通过属性注入的延迟解析机制被打破。
 
 interface IA {
   name: string;
@@ -21,7 +23,7 @@ class A {
   public name = 'A';
   public id = 1;
 
-  constructor(@Inject(new LazyToken(() => B)) private b: IB) {}
+  @Inject(new LazyToken(() => B)) b!: IB;
 }
 
 class B {
@@ -36,7 +38,7 @@ class C {
   public name = 'C';
   public id = 3;
 
-  constructor(@Inject(new LazyToken(() => A)) private a: IA) {}
+  @Inject(new LazyToken(() => A)) a!: IA;
 }
 
 describe('CPC', () => {
@@ -49,10 +51,10 @@ describe('CPC', () => {
     container.bind(C).toSelf();
   });
 
-  test('container.get(A) should throw CircularDependencyError', async () => {
-    expect(() => {
-      container.get(A);
-    }).toThrowError(CircularDependencyError);
+  test('container.get(A) should work correctly', async () => {
+    const a = container.get(A);
+    expect(a).toBeInstanceOf(A);
+    expect(a).toBe(a.b.c.a);
   });
 
   test('container.get(B) should work correctly', async () => {
@@ -61,9 +63,9 @@ describe('CPC', () => {
     expect(b).toBe(b.c.a.b);
   });
 
-  test('container.get(C) should throw CircularDependencyError', async () => {
-    expect(() => {
-      container.get(C);
-    }).toThrowError(CircularDependencyError);
+  test('container.get(C) should work correctly', async () => {
+    const c = container.get(C);
+    expect(c).toBeInstanceOf(C);
+    expect(c).toBe(c.a.b.c);
   });
 });

@@ -1,6 +1,6 @@
 {
   "name": "@kaokei/di",
-  "version": "3.0.9",
+  "version": "4.0.0",
   "type": "module",
   "description": "Tiny di library depends on typescript decorator.",
   "main": "./dist/index.cjs",
@@ -55,6 +55,7 @@
     "@vitejs/plugin-vue": "^5.2.1",
     "@vitest/coverage-v8": "^3.1.1",
     "@vue/test-utils": "^2.4.6",
+    "fast-check": "^4.6.0",
     "fs-extra": "^11.3.0",
     "inversify": "^6.2.2",
     "jsdom": "^25.0.1",
