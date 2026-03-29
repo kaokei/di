@@ -55,20 +55,22 @@ console.log('=== 场景一：destroy 递归销毁子容器 ===');
 
 const root = new Container();
 root.bind(LoggerService).toSelf();
+root.bind(DatabaseService).toSelf();
 
 const child1 = root.createChild();
-child1.bind(DatabaseService).toSelf();
+child1.bind(UserService).toSelf();
 
 const child2 = root.createChild();
-child2.bind(UserService).toSelf();
+// child2 中不绑定任何服务，仅演示层级结构
 
 const grandchild = child1.createChild();
 // grandchild 中不绑定任何服务，仅演示层级结构
 
 // 获取服务（触发实例化）
+// UserService 绑定在 child1，其依赖 DatabaseService 和 LoggerService 通过父容器链从 root 解析
 root.get(LoggerService);
-child1.get(DatabaseService);
-child2.get(UserService);
+root.get(DatabaseService);
+child1.get(UserService);
 
 console.log('\n销毁前的容器层级：');
 console.log('root.children 数量：', root.children?.size);         // 2
