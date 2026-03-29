@@ -4,8 +4,6 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "strict": true,
-    "experimentalDecorators": false,
-    "useDefineForClassFields": false,
-    "allowJs": true
+    "useDefineForClassFields": true
   }
 }
