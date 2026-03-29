@@ -17,7 +17,6 @@
 - [入门指南](./docs/guide/index.md)
 - [API 文档](./docs/api/index.md)
 - [博客文章](./docs/note/01.什么是Token.md)
-- [codesandbox example](https://codesandbox.io/s/di-playground-zjnyv)
 
 ## CodeSandbox 在线示例
 
@@ -44,6 +43,7 @@ URL 格式：`https://codesandbox.io/p/github/kaokei/di/main?file=/examples/<示
 | 15-error-handling         | 错误处理：各种错误类型的触发场景与捕获方式        | [打开](https://codesandbox.io/p/github/kaokei/di/main?file=/examples/15-error-handling/src/index.ts)         |
 | 16-javascript-usage       | JavaScript 用法：使用 decorate 函数手动应用装饰器 | [打开](https://codesandbox.io/p/github/kaokei/di/main?file=/examples/16-javascript-usage/src/index.js)       |
 | 17-container-destroy      | 容器销毁：destroy 递归销毁子容器与 getContainerOf | [打开](https://codesandbox.io/p/github/kaokei/di/main?file=/examples/17-container-destroy/src/index.ts)      |
+| 18-deep-circular-dependency | 深层循环依赖：属性注入支持深层循环链，以及循环依赖检测 | [打开](https://codesandbox.io/p/github/kaokei/di/main?file=/examples/18-deep-circular-dependency/src/index.ts) |
 
 每个示例目录包含独立的 `package.json`（依赖已发布的 `@kaokei/di` 版本）和 `tsconfig.json`，与主包构建流程完全隔离，可直接在 CodeSandbox 中运行。
 
