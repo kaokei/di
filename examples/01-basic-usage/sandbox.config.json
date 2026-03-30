@@ -1,6 +1,0 @@
-{
-  "template": "vue-cli",
-  "container": {
-    "port": 5173
-  }
-}

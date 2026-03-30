@@ -4,7 +4,7 @@
   "description": "基础用法：创建容器、绑定服务、属性注入、单例验证",
   "type": "module",
   "scripts": {
-    "start": "vite"
+    "start": "vite --port 2222"
   },
   "dependencies": {
     "@kaokei/di": "^4.0.0"
