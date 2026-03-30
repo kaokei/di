@@ -3,7 +3,7 @@
   "tasks": {
     "start": {
       "name": "start",
-      "command": "npm run start",
+      "command": "pnpm start",
       "runAtStart": true,
       "preview": {
         "port": 5173
