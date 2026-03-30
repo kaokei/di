@@ -1,12 +1,10 @@
 {
+  "$schema": "https://codesandbox.io/schemas/tasks.json",
   "tasks": {
     "start": {
       "name": "start",
       "command": "npm run start",
-      "runAtStart": true,
-      "preview": {
-        "port": 5173
-      }
+      "runAtStart": true
     }
   }
 }
