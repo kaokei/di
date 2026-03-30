@@ -1,5 +1,4 @@
 {
-  "setupTasks": ["npm install"],
   "tasks": {
     "start": {
       "name": "start",
