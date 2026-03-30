@@ -62,6 +62,10 @@ export default defineConfig({
             { text: 'Vue', link: '/note/11.Vue' },
             { text: '打包大小对比', link: '/note/12.打包大小对比' },
             { text: '生命周期', link: '/note/13.生命周期' },
+            {
+              text: 'useDefineForClassFields',
+              link: '/note/14.useDefineForClassFields',
+            },
           ],
         },
       ],
