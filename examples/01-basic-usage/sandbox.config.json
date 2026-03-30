@@ -1,5 +1,5 @@
 {
-  "template": "custom",
+  "template": "static",
   "container": {
     "port": 5173
   }
