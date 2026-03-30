@@ -105,7 +105,7 @@ countService.addOne();
 
 本项目虽然不依赖`experimentalDecorators`，但是依赖`useDefineForClassFields: true`。
 
-本项目只有单例模式，没有inversify中其他模式。
+本项目只有单例模式，没有inversify的`inTransientScope`和`inRequestScope`模式。
 
 本项目中@LazyInject 和 @PostConstruct 只支持class服务。
 
