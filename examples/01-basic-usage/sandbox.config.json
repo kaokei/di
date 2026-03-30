@@ -1,0 +1,6 @@
+{
+  "template": "custom",
+  "container": {
+    "port": 5173
+  }
+}
