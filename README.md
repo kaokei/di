@@ -29,3 +29,13 @@
 - 需要重构当前的实现方案，应该通过context.metadata来收集依赖注入信息，然后通过类装饰器建立类和context.metadata的关联关系。
   addInitializer → this.constructor → class
   metadata → class decorator → WeakMap
+
+- stage3 装饰器执行顺序
+  enter method decorator --> 
+  enter field decorator --> 
+  enter class decorator -->
+  class decorator addInitializer callback -->
+  method decorator addInitializer callback -->
+  field decorator addInitializer callback -->
+  class constructor
+
