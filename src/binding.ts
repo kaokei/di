@@ -52,6 +52,9 @@ export class Binding<T = unknown> {
 
   postConstructResult: Promise<void> | symbol | undefined = UNINITIALIZED;
 
+  // 是否为瞬态作用域，默认 false（单例）
+  transient = false;
+
   onActivationHandler?: ActivationHandler<T>;
 
   onDeactivationHandler?: DeactivationHandler<T>;
@@ -105,6 +108,11 @@ export class Binding<T = unknown> {
     return this;
   }
 
+  inTransientScope() {
+    this.transient = true;
+    return this;
+  }
+
   toService(token: CommonToken<T>) {
     return this.toDynamicValue((context: Context) =>
       context.container.get(token, { parent: { token: this.token } })
@@ -117,8 +125,13 @@ export class Binding<T = unknown> {
       throw new CircularDependencyError(options as Options);
     }
     if (STATUS.ACTIVATED === this.status) {
-      // 已激活，直接返回缓存
-      return this.cache;
+      // 瞬态模式：每次都重新解析，不使用缓存
+      if (this.transient) {
+        this.status = STATUS.DEFAULT;
+      } else {
+        // 单例模式：直接返回缓存
+        return this.cache;
+      }
     }
     // 通过映射表查找对应的解析方法
     const resolver = Binding._resolvers[this.type];
