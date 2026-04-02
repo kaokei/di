@@ -110,28 +110,38 @@ console.log(a.c);
 - [Dependency injection in React using InversifyJS](https://itnext.io/dependency-injection-in-react-using-inversifyjs-a38ff0c6601)
 - [Global activation hooks](https://github.com/inversify/InversifyJS/issues/471)
 
-## todo
+## @LazyInject 与其他装饰器的兼容性
 
-正常 Inject 时，后续是通过 container.get 进行实例化的，显然这个过程中是可以获取到当前的 container 的。也可以从这个 container 中获取 @Inject 指定的依赖。
+### @LazyInject 不能与 @Self/@Optional/@SkipSelf 配合使用
 
-但是 LazyInject 只是标记这个属性会在后续访问的时候进行初始化。也就是访问`this.someProperty`时进行初始化，关键问题是此时完全不知道任何 container 的信息。
-也就是当前 this 到底是哪个 container 实例化的，只有知道这个 container 之后，才能从这个 container 中获取 LazyInject 指定的依赖。
-访问`this.someProperty`时只能拿到 this 这个对象，所以目前能想到的方案就是在 this 初始化完成时，将 this 和 container 的关联关系存储在 WeakMap 中。
-这样才能在访问`this.someProperty`时，可以通过 this 查询到对应的 container，然后再从 container 中获取其他依赖。
+`@Inject` 和 `@Self`/`@Optional`/`@SkipSelf` 都是基于 `context.metadata` 体系的属性装饰器，它们将元数据写入同一个 `INJECTED_PROPS` 结构中，在 `_getInjectProperties` 阶段统一读取和处理。
 
-注意到 @Inject 是可以和这些装饰器@Self/@Optional/@SkipSelf 进行配合的。
+而 `@LazyInject` 的实现机制完全不同：它通过 `context.addInitializer` 注册回调，在实例化时通过 `Object.defineProperty` 在实例上定义 getter/setter，与 `context.metadata` 体系完全独立。因此 `@LazyInject` 无法与 `@Self`/`@Optional`/`@SkipSelf` 配合使用。
 
-现在的问题是 @LazyInject 是否需要和这些装饰器@Self/@Optional/@SkipSelf 进行配合？
+### 必须明确使用 @Inject 才能触发依赖注入
 
-关键在于 @Inject/@Self/@Optional/@SkipSelf 这些装饰器是利用 defineMetadata/getMetadata 保存和获取相关元数据的。
+在当前实现中，只使用 `@Self`/`@Optional`/`@SkipSelf` 而不使用 `@Inject` 并不能触发依赖注入。
 
-但是 @LazyInject 装饰器是直接改写`Object.defineProperty(proto, key, descriptor`的，并没有通过 defineMetadata/getMetadata 保存和获取相关元数据。
+原因是 `_getInjectProperties` 在处理每个属性的元数据时，会通过 `resolveToken(inject)` 解析 token。如果没有使用 `@Inject` 装饰器，`inject` 字段为 `undefined`，`resolveToken` 会抛出 `INVALID_TOKEN` 错误。
 
-getMetadata 目前只能获取 INJECTED_PARAMS 和 INJECTED_PROPS 对应的装饰器属性。
-也就是 getMetadata 只能获取整个类的装饰器的数据，而不能获取指定某个类的属性的装饰器数据。
+因此 `@Self`/`@Optional`/`@SkipSelf` 必须与 `@Inject` 搭配使用才有意义：
 
-所以需要修改整体的 defineMetadata/getMetadata 方案，以方便获取指定类属性的装饰器数据。
-这个修改稍微有点复杂。可以作为低优先级的需求，后续有需要再考虑。
+```ts
+@Injectable
+class A {
+  // ✅ 正确：@Inject 指定 token，@Optional 标记可选
+  @Inject(B) @Optional() b!: B;
 
-实际上目前的设计方案中就算没有使用@Inject 装饰器，只是使用了@Self/@Optional/@SkipSelf 装饰器也仍然会触发依赖注入的逻辑。
-这一点也是有问题的，因为这样的逻辑就相当于@Self/@Optional/@SkipSelf 和@Inject 绑定了，那么就不能和@LazyInject 配合使用了。
+  // ✅ 正确：@Inject 指定 token，@Self 限制查找范围
+  @Inject(C) @Self() c!: C;
+
+  // ❌ 错误：缺少 @Inject，resolveToken 会抛出 INVALID_TOKEN 错误
+  @Optional() d!: D;
+}
+```
+
+### 容器查找机制
+
+`@LazyInject` 在不传入 `container` 参数时，通过 `Container.getContainerOf(instance)` 查找实例所属的容器。这个查找依赖于 `Container._instanceContainerMap`（WeakMap），该映射仅在 `_resolveInstanceValue` 中通过 `_registerInstance` 注册，即只有通过 `to()` 或 `toSelf()` 绑定的 class 服务才会注册。
+
+`toConstantValue` 和 `toDynamicValue` 绑定的服务不会注册到 `_instanceContainerMap`，因为同一个对象可能被绑定到多个容器，WeakMap 只能保留最后一次映射，会导致从错误的容器解析依赖。在这些场景下需要显式传入 `container` 参数。
