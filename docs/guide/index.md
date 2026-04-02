@@ -107,7 +107,9 @@ container handlers --> binding handler --> preDestroy
 binding handler --> container handlers --> postConstruct  
 container handlers --> binding handler --> preDestroy
 
-@postConstruct装饰器在inversify中，如果A类继承了B类。  
+本项目的@postConstruct装饰器参考了inversify的实现。  
+在A类继承了B类的场景中：  
 此时如果A类和B类都有 @postConstruct，那么B类不会执行，只有A类会执行。  
 如果A类没有@postConstruct，那么会执行B类的。  
-如果A继承B继承C，并且A，B都没有@postConstruct，那么会执行C类的。
+如果A继承B继承C，并且A，B都没有@postConstruct，那么会执行C类的。  
+类似于原型链的效果，只会执行最近的@postConstruct对应的方法。  
