@@ -4,9 +4,9 @@
 
 [对比 inversify 的 API 差异](./COMPARE-API.md)
 
-## inSingletonScope 模式
+## 不同作用域
 
-inversify 中支持 3 种不同的 scope 模式，但是本库只支持 inSingletonScope 模式。所有通过 `to()` / `toSelf()` 绑定的 class 服务都是单例的，不支持其他 scope 模式。
+inversify 中支持 3 种不同的 scope 模式，但是本库只支持单例模式和inTransientScope。不支持其他 request scope 模式。
 
 [inversify 关于不同 scope 的解释](https://github.com/inversify/InversifyJS/blob/develop/v6/wiki/scope.md)
 

@@ -261,7 +261,7 @@ static getContainerOf(instance: object): Container | undefined;
 
 ```ts
 const container = new Container();
-container.bind(MyService).toSelf().inSingletonScope();
+container.bind(MyService).toSelf();
 
 const instance = container.get(MyService);
 Container.getContainerOf(instance); // 返回 container
