@@ -20,7 +20,9 @@ npm install @kaokei/di
 
 本库依赖 TypeScript 环境，使用 **Stage 3 装饰器**规范（TC39 标准）。
 
-> 注意：因为本库使用 Stage 3 装饰器，**不需要**设置 `experimentalDecorators: true`，也**不需要** `emitDecoratorMetadata: true`，因为本库不依赖装饰器元数据。
+> 注意：  
+> 因为本库使用 Stage 3 装饰器，所以 **不需要** `experimentalDecorators: true`。  
+> 因为本库不依赖装饰器元数据，所以也 **不需要** `emitDecoratorMetadata: true`。
 
 ## 基本使用
 
@@ -96,7 +98,7 @@ countService.addOne();
 
 ## 项目特点
 
-本项目只有单例模式，没有inversify的`inTransientScope`和`inRequestScope`模式。
+本项目默认是单例模式，可以配置为`inTransientScope`模式。没有inversify的`inRequestScope`模式。
 
 本项目中@LazyInject 和 @PostConstruct 只支持class服务。
 
@@ -112,4 +114,22 @@ container handlers --> binding handler --> preDestroy
 此时如果A类和B类都有 @postConstruct，那么B类不会执行，只有A类会执行。  
 如果A类没有@postConstruct，那么会执行B类的。  
 如果A继承B继承C，并且A，B都没有@postConstruct，那么会执行C类的。  
-类似于原型链的效果，只会执行最近的@postConstruct对应的方法。  
+类似于原型链的效果，只会执行最近的@postConstruct对应的方法。
+
+## stage3 装饰器执行顺序
+
+```
+enter method decorator
+        ↓
+enter field decorator
+        ↓
+enter class decorator
+        ↓
+class decorator addInitializer callback
+        ↓
+method decorator addInitializer callback
+        ↓
+field decorator addInitializer callback
+        ↓
+class constructor
+```
