@@ -27,9 +27,9 @@ export interface InjectPropertiesResult {
 export class Binding<T = unknown> {
   // 类型到解析方法的静态映射表，用于替代 get 方法中的 if-else 链
   static _resolvers: Record<string, string> = {
-    [BINDING.Instance]: '_resolveInstanceValue',
-    [BINDING.ConstantValue]: '_resolveConstantValue',
-    [BINDING.DynamicValue]: '_resolveDynamicValue',
+    [BINDING.INSTANCE]: '_resolveInstanceValue',
+    [BINDING.CONSTANT]: '_resolveConstantValue',
+    [BINDING.DYNAMIC]: '_resolveDynamicValue',
   };
 
   container!: Container;
@@ -38,7 +38,7 @@ export class Binding<T = unknown> {
 
   token!: CommonToken<T>;
 
-  type: BindingType = BINDING.Invalid;
+  type: BindingType = BINDING.INVALID;
 
   status: StatusType = STATUS.DEFAULT;
 
@@ -87,7 +87,7 @@ export class Binding<T = unknown> {
   }
 
   to(constructor: Newable<T>) {
-    this.type = BINDING.Instance;
+    this.type = BINDING.INSTANCE;
     this.classValue = constructor;
     return this;
   }
@@ -97,13 +97,13 @@ export class Binding<T = unknown> {
   }
 
   toConstantValue(value: T) {
-    this.type = BINDING.ConstantValue;
+    this.type = BINDING.CONSTANT;
     this.constantValue = value;
     return this;
   }
 
   toDynamicValue(func: DynamicValue<T>) {
-    this.type = BINDING.DynamicValue;
+    this.type = BINDING.DYNAMIC;
     this.dynamicValue = func;
     return this;
   }
@@ -171,7 +171,7 @@ export class Binding<T = unknown> {
    *   - 如果前置服务初始化失败，rejected promise 自然传播，当前服务的 PostConstruct 不执行
    */
   _postConstruct(options: Options<T>, propertyBindings: Binding[]) {
-    if (BINDING.Instance === this.type) {
+    if (BINDING.INSTANCE === this.type) {
       const { key, value } = getPostConstruct(this.classValue!) || {};
       if (key) {
         // 使用了@PostConstruct装饰器
@@ -179,7 +179,7 @@ export class Binding<T = unknown> {
           // @PostConstruct(指定了参数)，说明需要等待前置服务初始化完成之后再初始化本服务
           // bindings 是本服务依赖的所有注入的实例属性，并且 Binding 类型是 Instance
           const bindings = propertyBindings.filter(
-            item => BINDING.Instance === item?.type
+            item => BINDING.INSTANCE === item?.type
           );
           // 通过@PostConstruct(指定的参数)，也就是value来过滤指定的需要等待的binding
           const awaitBindings = this._getAwaitBindings(bindings, value);
@@ -212,7 +212,7 @@ export class Binding<T = unknown> {
   }
 
   preDestroy() {
-    if (BINDING.Instance === this.type) {
+    if (BINDING.INSTANCE === this.type) {
       const { key } = getPreDestroy(this.classValue!) || {};
       if (key) {
         this._execute(key);

@@ -83,7 +83,7 @@ export const STATUS = { ... } as const;
 export type StatusType = (typeof STATUS)[keyof typeof STATUS];
 
 // binding.ts - 使用联合类型
-type: BindingType = BINDING.Invalid;
+type: BindingType = BINDING.INVALID;
 status: StatusType = STATUS.DEFAULT;
 ```
 
@@ -124,9 +124,9 @@ this.cache = undefined;
 // binding.ts
 // 类级别的静态映射表
 static _resolvers: Record<string, string> = {
-  [BINDING.Instance]: '_resolveInstanceValue',
-  [BINDING.ConstantValue]: '_resolveConstantValue',
-  [BINDING.DynamicValue]: '_resolveDynamicValue',
+  [BINDING.INSTANCE]: '_resolveInstanceValue',
+  [BINDING.CONSTANT]: '_resolveConstantValue',
+  [BINDING.DYNAMIC]: '_resolveDynamicValue',
 };
 
 get(options: Options<T>) {

@@ -22,10 +22,10 @@ export const STATUS = {
 } as const;
 
 export const BINDING = {
-  Invalid: 'Invalid',
-  Instance: 'Instance',
-  ConstantValue: 'ConstantValue',
-  DynamicValue: 'DynamicValue',
+  INVALID: 'Invalid',
+  INSTANCE: 'Instance',
+  CONSTANT: 'ConstantValue',
+  DYNAMIC: 'DynamicValue',
 } as const;
 
 /**

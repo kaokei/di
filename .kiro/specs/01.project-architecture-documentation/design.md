@@ -152,9 +152,9 @@ IoC 容器的核心类，负责管理 Token 与服务之间的绑定关系，支
 
 | 类型 | 常量 | 解析逻辑 |
 |------|------|---------|
-| Instance | `BINDING.Instance` | `new ClassName(...args)` → Activation → 缓存 → 属性注入 → PostConstruct |
-| ConstantValue | `BINDING.ConstantValue` | 直接取 `constantValue` → Activation → 缓存 |
-| DynamicValue | `BINDING.DynamicValue` | 执行 `dynamicValue(context)` → Activation → 缓存 |
+| Instance | `BINDING.INSTANCE` | `new ClassName(...args)` → Activation → 缓存 → 属性注入 → PostConstruct |
+| ConstantValue | `BINDING.CONSTANT` | 直接取 `constantValue` → Activation → 缓存 |
+| DynamicValue | `BINDING.DYNAMIC` | 执行 `dynamicValue(context)` → Activation → 缓存 |
 
 #### 关键内部属性
 

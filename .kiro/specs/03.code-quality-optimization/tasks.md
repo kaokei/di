@@ -29,7 +29,7 @@
     - 创建 `tests/quality/binding-type-safety.spec.ts`
     - 测试 `BindingType` 和 `StatusType` 联合类型是否正确约束 `type` 和 `status` 字段
     - 测试 `UNINITIALIZED` Symbol 具有描述字符串
-    - 测试 Binding 实例的 `type` 默认值为 `BINDING.Invalid`，`status` 默认值为 `STATUS.DEFAULT`
+    - 测试 Binding 实例的 `type` 默认值为 `BINDING.INVALID`，`status` 默认值为 `STATUS.DEFAULT`
     - _需求：1.1、1.2、1.3、1.4、18.1、18.2_
 
   - [x] 3.2 实施常量模块优化

@@ -170,13 +170,13 @@ public get(options: Options<T>) {
   } else if (STATUS.ACTIVATED === this.status) {
     // 2. 缓存命中：如果 status 为 ACTIVATED，直接返回缓存
     return this.cache;
-  } else if (BINDING.Instance === this.type) {
+  } else if (BINDING.INSTANCE === this.type) {
     // 3. Instance 类型：实例化类
     return this.resolveInstanceValue(options);
-  } else if (BINDING.ConstantValue === this.type) {
+  } else if (BINDING.CONSTANT === this.type) {
     // 4. ConstantValue 类型：返回常量值
     return this.resolveConstantValue();
-  } else if (BINDING.DynamicValue === this.type) {
+  } else if (BINDING.DYNAMIC === this.type) {
     // 5. DynamicValue 类型：执行工厂函数
     return this.resolveDynamicValue();
   } else {
@@ -202,7 +202,7 @@ Binding 的 `status` 属性是一个简单的三态状态机，定义在 `consta
 
 三种绑定类型通过 Binding 的 `type` 属性区分，定义在 `constants.ts` 的 `BINDING` 常量中。每种类型的解析逻辑有显著差异：
 
-#### 2.2.1 Instance 类型（`BINDING.Instance`）
+#### 2.2.1 Instance 类型（`BINDING.INSTANCE`）
 
 通过 `binding.to(ClassName)` 或 `binding.toSelf()` 创建。这是最复杂的绑定类型，涉及完整的实例化流程（详见第 3 节）。
 
@@ -214,7 +214,7 @@ Binding 的 `status` 属性是一个简单的三态状态机，定义在 `consta
 
 **解析方法：** `resolveInstanceValue(options)`
 
-#### 2.2.2 ConstantValue 类型（`BINDING.ConstantValue`）
+#### 2.2.2 ConstantValue 类型（`BINDING.CONSTANT`）
 
 通过 `binding.toConstantValue(value)` 创建。直接使用预设的常量值。
 
@@ -242,7 +242,7 @@ private resolveConstantValue() {
 4. 将 `status` 设为 `ACTIVATED`
 5. 返回缓存值
 
-#### 2.2.3 DynamicValue 类型（`BINDING.DynamicValue`）
+#### 2.2.3 DynamicValue 类型（`BINDING.DYNAMIC`）
 
 通过 `binding.toDynamicValue(factory)` 或 `binding.toService(token)` 创建。通过执行工厂函数动态生成值。
 
@@ -498,14 +498,14 @@ private postConstruct(
   binding1: Binding[],  // 构造函数参数的 Binding 数组
   binding2: Binding[]   // 属性注入的 Binding 数组
 ) {
-  if (BINDING.Instance === this.type) {
+  if (BINDING.INSTANCE === this.type) {
     const { key, value } =
       getMetadata(KEYS.POST_CONSTRUCT, this.classValue) || {};
     if (key) {
       if (value) {
         // 带参数模式：等待指定的前置服务完成 PostConstruct
         const bindings = [...binding1, ...binding2].filter(
-          item => BINDING.Instance === item?.type
+          item => BINDING.INSTANCE === item?.type
         );
         const awaitBindings = this.getAwaitBindings(bindings, value);
         for (const binding of awaitBindings) {
@@ -545,7 +545,7 @@ private postConstruct(
 
 **带参数模式的详细逻辑：**
 1. 合并构造函数参数的 Binding 数组和属性注入的 Binding 数组
-2. 过滤出 `type === BINDING.Instance` 的 Binding（只有 Instance 类型才有 PostConstruct）
+2. 过滤出 `type === BINDING.INSTANCE` 的 Binding（只有 Instance 类型才有 PostConstruct）
 3. 根据 `@PostConstruct` 的参数（`value`）进一步过滤需要等待的 Binding
 4. 检查每个需要等待的 Binding 的 `postConstructResult`：如果仍为 `DEFAULT_VALUE`（初始标记值），说明该依赖的 PostConstruct 尚未开始，存在 PostConstruct 内部的循环依赖，抛出 `PostConstructError`
 5. 收集所有需要等待的 `postConstructResult`（Promise），通过 `Promise.all` 等待全部完成后再执行本服务的 PostConstruct 方法

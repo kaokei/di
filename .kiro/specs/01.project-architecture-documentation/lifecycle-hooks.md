@@ -225,7 +225,7 @@ PreDestroy 是最后执行的销毁阶段钩子。它通过 `@PreDestroy()` 装�
 
 ```typescript
 public preDestroy() {
-  if (BINDING.Instance === this.type) {
+  if (BINDING.INSTANCE === this.type) {
     const { key } = getMetadata(KEYS.PRE_DESTROY, this.classValue) || {};
     if (key) {
       this.execute(key);
@@ -441,7 +441,7 @@ class A {
 ```typescript
 // binding.ts 中的核心逻辑
 const bindings = [...binding1, ...binding2].filter(
-  item => BINDING.Instance === item?.type
+  item => BINDING.INSTANCE === item?.type
 );
 const awaitBindings = this.getAwaitBindings(bindings, value); // value = true
 const list = awaitBindings.map(item => item.postConstructResult);

@@ -148,11 +148,11 @@ public get(options: Options<T>) {
     throw new CircularDependencyError(options as Options);
   } else if (STATUS.ACTIVATED === this.status) {
     return this.cache;
-  } else if (BINDING.Instance === this.type) {
+  } else if (BINDING.INSTANCE === this.type) {
     return this.resolveInstanceValue(options);
-  } else if (BINDING.ConstantValue === this.type) {
+  } else if (BINDING.CONSTANT === this.type) {
     return this.resolveConstantValue();
-  } else if (BINDING.DynamicValue === this.type) {
+  } else if (BINDING.DYNAMIC === this.type) {
     return this.resolveDynamicValue();
   } else {
     // type 为 Invalid，说明 binding 没有绑定对应的服务

@@ -35,22 +35,22 @@ describe('Binding._resolvers 策略映射表', () => {
   });
 
   test('_resolvers 包含 Instance 键，映射到 _resolveInstanceValue 方法名', () => {
-    expect(BindingClass._resolvers).toHaveProperty(BINDING.Instance);
-    expect(BindingClass._resolvers[BINDING.Instance]).toBe('_resolveInstanceValue');
+    expect(BindingClass._resolvers).toHaveProperty(BINDING.INSTANCE);
+    expect(BindingClass._resolvers[BINDING.INSTANCE]).toBe('_resolveInstanceValue');
   });
 
   test('_resolvers 包含 ConstantValue 键，映射到 _resolveConstantValue 方法名', () => {
-    expect(BindingClass._resolvers).toHaveProperty(BINDING.ConstantValue);
-    expect(BindingClass._resolvers[BINDING.ConstantValue]).toBe('_resolveConstantValue');
+    expect(BindingClass._resolvers).toHaveProperty(BINDING.CONSTANT);
+    expect(BindingClass._resolvers[BINDING.CONSTANT]).toBe('_resolveConstantValue');
   });
 
   test('_resolvers 包含 DynamicValue 键，映射到 _resolveDynamicValue 方法名', () => {
-    expect(BindingClass._resolvers).toHaveProperty(BINDING.DynamicValue);
-    expect(BindingClass._resolvers[BINDING.DynamicValue]).toBe('_resolveDynamicValue');
+    expect(BindingClass._resolvers).toHaveProperty(BINDING.DYNAMIC);
+    expect(BindingClass._resolvers[BINDING.DYNAMIC]).toBe('_resolveDynamicValue');
   });
 
   test('_resolvers 不包含 Invalid 键', () => {
-    expect(BindingClass._resolvers).not.toHaveProperty(BINDING.Invalid);
+    expect(BindingClass._resolvers).not.toHaveProperty(BINDING.INVALID);
   });
 
   test('_resolvers 恰好包含三个键', () => {
@@ -140,8 +140,8 @@ describe('Invalid 类型抛出 BindingNotValidError', () => {
   test('未绑定服务的 Binding 调用 get 抛出 BindingNotValidError', () => {
     const token = new Token<string>('unbound');
     const binding = new Binding(token, container);
-    // type 默认为 BINDING.Invalid，直接调用 get 应抛出错误
-    expect(binding.type).toBe(BINDING.Invalid);
+    // type 默认为 BINDING.INVALID，直接调用 get 应抛出错误
+    expect(binding.type).toBe(BINDING.INVALID);
     expect(() => {
       binding.get({ parent: { token } } as any);
     }).toThrow(BindingNotValidError);
@@ -150,7 +150,7 @@ describe('Invalid 类型抛出 BindingNotValidError', () => {
   test('循环依赖检测：INITING 状态的 Binding 调用 get 抛出 CircularDependencyError', () => {
     const token = new Token<string>('circular');
     const binding = new Binding(token, container);
-    binding.type = BINDING.Instance;
+    binding.type = BINDING.INSTANCE;
     // 手动设置状态为 INITING 模拟循环依赖场景
     binding.status = STATUS.INITING;
     expect(() => {
