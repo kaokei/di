@@ -159,8 +159,7 @@ export class Binding<T = unknown> {
    */
   _postConstruct(options: Options<T>, propertyBindings: Binding[]) {
     if (BINDING.Instance === this.type) {
-      const { key, value } =
-        getPostConstruct(this.classValue!) || {};
+      const { key, value } = getPostConstruct(this.classValue!) || {};
       if (key) {
         // 使用了@PostConstruct装饰器
         if (value) {

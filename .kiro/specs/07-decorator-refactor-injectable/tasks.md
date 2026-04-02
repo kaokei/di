@@ -124,41 +124,41 @@
 - [x] 7. 检查点 - 所有测试通过
   - Ensure all tests pass, ask the user if questions arise。
 
-- [ ] 8. 新增属性测试
-  - [ ]* 8.1 编写 Property 1 属性测试：属性装饰器元数据存储正确性
+- [x] 8. 新增属性测试
+  - [x] 8.1 编写 Property 1 属性测试：属性装饰器元数据存储正确性
     - **Property 1：属性装饰器元数据存储正确性**
     - 使用 `decorate()` 动态应用随机装饰器组合（@Inject、@Self、@SkipSelf、@Optional）
     - 验证 `getInjectedProps(Ctor)` 返回的元数据与预期一致
     - 使用 fast-check 生成随机 Token 名称和装饰器组合标志
     - **Validates: Requirements 1.1, 1.2, 1.3, 1.4, 1.5**
 
-  - [ ]* 8.2 编写 Property 2 属性测试：方法装饰器元数据存储正确性
+  - [x] 8.2 编写 Property 2 属性测试：方法装饰器元数据存储正确性
     - **Property 2：方法装饰器元数据存储正确性**
     - 使用 `decorate()` 动态应用 @PostConstruct/@PreDestroy
     - 验证 `getPostConstruct(Ctor)` 和 `getPreDestroy(Ctor)` 返回正确元数据
     - **Validates: Requirements 2.1, 2.2**
 
-  - [ ]* 8.3 编写 Property 3 属性测试：方法装饰器重复检测
+  - [x] 8.3 编写 Property 3 属性测试：方法装饰器重复检测
     - **Property 3：方法装饰器重复检测**
     - 通过 `decorate()` 对同一类应用两个 @PostConstruct 或 @PreDestroy，验证抛出错误
     - **Validates: Requirements 2.3, 2.4, 6.2**
 
-  - [ ]* 8.4 编写 Property 4 属性测试：端到端 round-trip
+  - [x] 8.4 编写 Property 4 属性测试：端到端 round-trip
     - **Property 4：装饰器到 CacheMap 的端到端 round-trip**
     - 创建带 @Injectable + @Inject 的类，绑定到容器，解析实例，验证注入属性值正确
     - **Validates: Requirements 3.1, 3.2, 3.3, 4.1, 4.2, 4.3**
 
-  - [ ]* 8.5 编写 Property 5 属性测试：decorate() 与装饰器语法等价性
+  - [x] 8.5 编写 Property 5 属性测试：decorate() 与装饰器语法等价性
     - **Property 5：decorate() 与装饰器语法等价性**
     - 对比装饰器语法 + @Injectable 与 decorate() 产生的 CacheMap 元数据
     - **Validates: Requirements 6.1, 6.3**
 
-  - [ ]* 8.6 编写 Property 6 属性测试：继承链元数据正确性
+  - [x] 8.6 编写 Property 6 属性测试：继承链元数据正确性
     - **Property 6：继承链元数据正确性**
     - 创建父子类，各自使用 @Injectable + 装饰器，验证 getInjectedProps/getPostConstruct/getPreDestroy 的继承合并行为
     - **Validates: Requirements 7.1, 7.2, 7.3, 7.4, 7.5, 7.6**
 
-  - [ ]* 8.7 编写 Property 7 属性测试：继承链子类可独立定义生命周期方法
+  - [x] 8.7 编写 Property 7 属性测试：继承链子类可独立定义生命周期方法
     - **Property 7：继承链中子类可独立定义生命周期方法**
     - 父类有 @PostConstruct，子类也有 @PostConstruct，验证不触发重复检测错误
     - **Validates: Requirements 7.7**
