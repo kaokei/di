@@ -18,17 +18,9 @@ npm install @kaokei/di
 
 本库 **不依赖** `reflect-metadata`，所以 **不需要** 安装这个 npm 包。
 
-本库依赖 TypeScript 环境，使用 **Stage 3 装饰器**规范（TC39 标准）。需要在 `tsconfig.json` 中配置如下字段：
+本库依赖 TypeScript 环境，使用 **Stage 3 装饰器**规范（TC39 标准）。
 
-```json
-{
-  "compilerOptions": {
-    "useDefineForClassFields": true
-  }
-}
-```
-
-> 注意：本库使用 Stage 3 装饰器，**不需要**设置 `experimentalDecorators: true`，也**不需要** `emitDecoratorMetadata: true`，因为本库不依赖装饰器元数据。
+> 注意：因为本库使用 Stage 3 装饰器，**不需要**设置 `experimentalDecorators: true`，也**不需要** `emitDecoratorMetadata: true`，因为本库不依赖装饰器元数据。
 
 ## 基本使用
 
@@ -103,8 +95,6 @@ countService.addOne();
 ```
 
 ## 项目特点
-
-本项目虽然不依赖`experimentalDecorators`，但是依赖`useDefineForClassFields: true`。
 
 本项目只有单例模式，没有inversify的`inTransientScope`和`inRequestScope`模式。
 
