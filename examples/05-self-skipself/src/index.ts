@@ -7,13 +7,14 @@
  * 3. 父子容器中的组合使用场景
  */
 
-import { Container, Token, Inject, Self, SkipSelf, Optional, BindingNotFoundError } from '@kaokei/di';
+import { Container, Token, Inject, Self, SkipSelf, Optional, Injectable, BindingNotFoundError } from '@kaokei/di';
 
 // ==================== 定义 Token 和服务 ====================
 
 const LOGGER = new Token<{ log: (msg: string) => void }>('LOGGER');
 
 // 使用 @Self：只在当前容器查找 LOGGER
+@Injectable
 class ServiceWithSelf {
   @Inject(LOGGER)
   @Self()
@@ -25,6 +26,7 @@ class ServiceWithSelf {
 }
 
 // 使用 @SkipSelf：跳过当前容器，从父容器查找 LOGGER
+@Injectable
 class ServiceWithSkipSelf {
   @Inject(LOGGER)
   @SkipSelf()
@@ -36,6 +38,7 @@ class ServiceWithSkipSelf {
 }
 
 // 组合使用：@Self + @Optional，当前容器找不到时返回 undefined
+@Injectable
 class ServiceWithSelfOptional {
   @Inject(LOGGER)
   @Self()

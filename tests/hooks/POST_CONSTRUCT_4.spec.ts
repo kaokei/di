@@ -1,4 +1,4 @@
-import { Container, Inject, LazyToken, PostConstruct } from '@/index';
+import { Container, Inject, Injectable, LazyToken, PostConstruct } from '@/index';
 
 interface IA {
   name: string;
@@ -11,6 +11,7 @@ interface IB {
   id: number;
 }
 
+@Injectable
 class B {
   public name = 'B';
   public id = 2;
@@ -24,6 +25,7 @@ class B {
   }
 }
 
+@Injectable
 class A {
   public name = 'A';
   public id = 1;

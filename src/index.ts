@@ -28,6 +28,7 @@ export {
   Optional,
   PostConstruct,
   PreDestroy,
+  Injectable,
   decorate,
   LazyInject,
   createLazyInject,

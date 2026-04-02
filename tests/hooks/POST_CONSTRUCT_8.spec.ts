@@ -1,6 +1,7 @@
-import { Container, PostConstruct, Inject } from '@/index';
+import { Container, PostConstruct, Inject, Injectable } from '@/index';
 
 describe('errors -> INJECT_FAILED: Property miss @Inject and use interface', () => {
+  @Injectable
   class B {
     public name = 'B';
     public id = 2;
@@ -11,6 +12,7 @@ describe('errors -> INJECT_FAILED: Property miss @Inject and use interface', () 
     }
   }
 
+  @Injectable
   class A {
     public name = 'A';
     public id = 1;
@@ -41,6 +43,7 @@ describe('errors -> INJECT_FAILED: Property miss @Inject and use interface', () 
 });
 
 describe('errors -> INJECT_FAILED: Property miss @Inject and use interface', () => {
+  @Injectable
   class B {
     public name = 'B';
     public id = 2;
@@ -51,6 +54,7 @@ describe('errors -> INJECT_FAILED: Property miss @Inject and use interface', () 
     }
   }
 
+  @Injectable
   class A {
     public name = 'A';
     public id = 1;

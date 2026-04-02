@@ -1,5 +1,6 @@
 import {
   Container,
+  injectable as Injectable,
   inject as Inject,
   LazyServiceIdentifier as LazyToken,
 } from 'inversify';
@@ -17,6 +18,7 @@ interface IB {
 }
 
 // 迁移：构造函数参数 @Inject 改为属性装饰器
+@Injectable()
 class A {
   public name = 'A';
   public id = 1;
@@ -24,6 +26,7 @@ class A {
   @Inject(new LazyToken(() => B)) b!: IB;
 }
 
+@Injectable()
 class B {
   public name = 'B';
   public id = 2;

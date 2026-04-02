@@ -1,4 +1,4 @@
-import { Container, inject as Inject } from 'inversify';
+import { Container, inject as Inject, injectable as Injectable } from 'inversify';
 import { BindingNotFoundError } from '@tests/inversify/constant.ts';
 
 interface IA {
@@ -17,6 +17,7 @@ class B {
   public id = 2;
 }
 
+@Injectable()
 class A {
   public name = 'A';
   public id = 1;

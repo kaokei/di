@@ -2,6 +2,7 @@ import {
   Container,
   inject as Inject,
   LazyServiceIdentifier as LazyToken,
+  injectable as Injectable,
 } from 'inversify';
 import { CircularDependencyError } from '@tests/inversify/constant.ts';
 
@@ -22,6 +23,7 @@ interface IC {
   b: IB;
 }
 
+@Injectable()
 class A {
   public name = 'A';
   public id = 1;
@@ -33,6 +35,7 @@ class A {
   public c!: IC;
 }
 
+@Injectable()
 // 迁移：构造函数参数 @Inject 改为属性装饰器
 class B {
   public name = 'B';
@@ -41,6 +44,7 @@ class B {
   @Inject(new LazyToken(() => C)) c!: IC;
 }
 
+@Injectable()
 class C {
   public name = 'C';
   public id = 3;

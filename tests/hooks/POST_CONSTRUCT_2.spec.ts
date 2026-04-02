@@ -1,7 +1,8 @@
-import { Inject, Container, PostConstruct } from '@/index';
+import { Inject, Injectable, Container, PostConstruct } from '@/index';
 import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
 
 describe('PRE_DESTROY_1 A -> B', () => {
+  @Injectable
   class B {
     public inited = false;
 
@@ -22,6 +23,7 @@ describe('PRE_DESTROY_1 A -> B', () => {
     }
   }
 
+  @Injectable
   class A {
     public inited = false;
 
@@ -68,6 +70,7 @@ describe('PRE_DESTROY_1 A -> B', () => {
 });
 
 describe('PRE_DESTROY_2 A -> B', () => {
+  @Injectable
   class B {
     public inited = false;
 
@@ -88,6 +91,7 @@ describe('PRE_DESTROY_2 A -> B', () => {
     }
   }
 
+  @Injectable
   class A {
     public inited = false;
 
@@ -119,6 +123,7 @@ describe('PRE_DESTROY_2 A -> B', () => {
 });
 
 describe('PRE_DESTROY_3 A -> B', () => {
+  @Injectable
   class B {
     public inited = false;
 
@@ -139,6 +144,7 @@ describe('PRE_DESTROY_3 A -> B', () => {
     }
   }
 
+  @Injectable
   class A {
     public inited = false;
 
@@ -185,6 +191,7 @@ describe('PRE_DESTROY_3 A -> B', () => {
 });
 
 describe('PRE_DESTROY_4 A -> B', () => {
+  @Injectable
   class B {
     public inited = false;
 
@@ -205,6 +212,7 @@ describe('PRE_DESTROY_4 A -> B', () => {
     }
   }
 
+  @Injectable
   class A {
     public inited = false;
 

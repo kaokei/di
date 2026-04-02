@@ -1,7 +1,7 @@
 // A extends B
 // B has property di of C
 // C has property di of B
-import { Inject, Container, LazyToken } from '@/index';
+import { Inject, Injectable, Container, LazyToken } from '@/index';
 
 interface IA {
   name: string;
@@ -24,6 +24,7 @@ interface IC {
   b: IB;
 }
 
+@Injectable
 class C {
   public name = 'C';
   public id = 3;
@@ -34,6 +35,7 @@ class C {
   public b!: IB;
 }
 
+@Injectable
 class B {
   public name = 'B';
   public id = 2;

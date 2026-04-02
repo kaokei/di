@@ -35,7 +35,7 @@ npm install @kaokei/di
 下面例子展示了`container.get(CountService)`可以快速获取实例化的 countService 对象，并且自动完成了 logger 属性的注入。
 
 ```ts
-import { Container, Inject } from '@kaokei/di';
+import { Container, Inject, Injectable } from '@kaokei/di';
 
 class LoggerService {
   public log(...msg: any[]) {
@@ -43,6 +43,7 @@ class LoggerService {
   }
 }
 
+@Injectable
 class CountService {
   public count = 0;
 

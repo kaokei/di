@@ -7,10 +7,11 @@
  * 3. Container.getContainerOf(instance) 获取实例所属容器
  */
 
-import { Container, Inject, PostConstruct, PreDestroy } from '@kaokei/di';
+import { Container, Inject, PostConstruct, PreDestroy, Injectable } from '@kaokei/di';
 
 // ==================== 定义服务类 ====================
 
+@Injectable
 class LoggerService {
   name: string;
 
@@ -29,6 +30,7 @@ class LoggerService {
   }
 }
 
+@Injectable
 class DatabaseService {
   @Inject(LoggerService)
   logger!: LoggerService;
@@ -39,6 +41,7 @@ class DatabaseService {
   }
 }
 
+@Injectable
 class UserService {
   @Inject(DatabaseService)
   db!: DatabaseService;

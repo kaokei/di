@@ -23,7 +23,7 @@
  * inversify 需要借助 LazyServiceIdentifier 才能支持循环依赖。
  */
 
-import { Container, Inject, PostConstruct, LazyToken } from '@kaokei/di';
+import { Container, Inject, PostConstruct, LazyToken, Injectable } from '@kaokei/di';
 
 // ==================== 场景一：简单循环依赖 A ↔ B ====================
 
@@ -31,6 +31,7 @@ console.log('=== 场景一：简单循环依赖 A ↔ B ===');
 
 // 使用 LazyToken 解决 JS 模块中的前向引用问题
 // （两个类互相引用时，其中一个在声明时另一个还未定义）
+@Injectable
 class ServiceA {
   @Inject(new LazyToken(() => ServiceB))
   b!: ServiceB;
@@ -42,6 +43,7 @@ class ServiceA {
   }
 }
 
+@Injectable
 class ServiceB {
   @Inject(ServiceA)
   a!: ServiceA;
@@ -72,18 +74,21 @@ console.log('b.a === a:', b.a === a); // true
 
 console.log('\n=== 场景二：三角循环依赖 A → B → C → A ===');
 
+@Injectable
 class NodeA {
   @Inject(new LazyToken(() => NodeB))
   next!: NodeB;
   id = 'A';
 }
 
+@Injectable
 class NodeB {
   @Inject(new LazyToken(() => NodeC))
   next!: NodeC;
   id = 'B';
 }
 
+@Injectable
 class NodeC {
   @Inject(NodeA)
   next!: NodeA;
@@ -106,6 +111,7 @@ console.log(
 console.log('\n=== 场景三：@PostConstruct 中访问循环依赖属性 ===');
 
 // @PostConstruct 在属性注入之后执行，因此可以安全访问循环依赖的属性
+@Injectable
 class Alpha {
   @Inject(new LazyToken(() => Beta))
   beta!: Beta;
@@ -120,6 +126,7 @@ class Alpha {
   }
 }
 
+@Injectable
 class Beta {
   @Inject(Alpha)
   alpha!: Alpha;

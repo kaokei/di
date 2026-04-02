@@ -10,7 +10,7 @@
  * 需求：12.1、12.2
  */
 
-import { Container, Token, PreDestroy } from '@/index';
+import { Container, Token, Injectable, PreDestroy } from '@/index';
 
 // ==================== unbindAll 基本行为（需求 12.1） ====================
 
@@ -144,6 +144,7 @@ describe('unbindAll 触发 deactivation 和 preDestroy', () => {
   test('unbindAll 触发每个 Instance 绑定的 @PreDestroy', () => {
     const destroyedServices: string[] = [];
 
+    @Injectable
     class ServiceA {
       @PreDestroy()
       cleanup() {
@@ -151,6 +152,7 @@ describe('unbindAll 触发 deactivation 和 preDestroy', () => {
       }
     }
 
+    @Injectable
     class ServiceB {
       @PreDestroy()
       cleanup() {

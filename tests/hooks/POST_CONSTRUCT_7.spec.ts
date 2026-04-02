@@ -1,5 +1,6 @@
-import { Container, PostConstruct, PreDestroy, Token } from '@/index';
+import { Container, Injectable, PostConstruct, PreDestroy, Token } from '@/index';
 
+@Injectable
 class A {
   public name = 'A';
   public id = 1;

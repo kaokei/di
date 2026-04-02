@@ -8,10 +8,11 @@
  *    （本库与 inversify 销毁顺序相同）
  */
 
-import { Container, Inject, PreDestroy } from '@kaokei/di';
+import { Container, Inject, PreDestroy, Injectable } from '@kaokei/di';
 
 // ==================== 定义服务类 ====================
 
+@Injectable
 class DatabaseService {
   connected = true;
 
@@ -23,6 +24,7 @@ class DatabaseService {
   }
 }
 
+@Injectable
 class CacheService {
   size = 100;
 
@@ -33,6 +35,7 @@ class CacheService {
   }
 }
 
+@Injectable
 class UserService {
   @Inject(DatabaseService)
   db!: DatabaseService;

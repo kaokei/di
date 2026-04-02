@@ -1,4 +1,4 @@
-import { Inject, Container, LazyToken, Token } from '@/index';
+import { Inject, Injectable, Container, LazyToken, Token } from '@/index';
 
 interface IA {
   name: string;
@@ -11,6 +11,7 @@ interface IB {
   id: number;
 }
 
+@Injectable
 class A {
   public name = 'A';
   public id = 1;

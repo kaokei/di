@@ -16,7 +16,7 @@
  * - access 属性已从 decorate 的 context 中移除，测试验证其不存在
  */
 
-import { Container, PostConstruct, PreDestroy, decorate } from '@/index';
+import { Container, PostConstruct, PreDestroy, Injectable, decorate } from '@/index';
 import { ERRORS } from '@/constants';
 
 // ==================== 重复装饰器检测（需求 10.2、10.3） ====================
@@ -75,6 +75,7 @@ describe('重复装饰器检测', () => {
   test('子类的 @PostConstruct 在容器解析时正确执行', () => {
     const calls: string[] = [];
 
+    @Injectable
     class Parent {
       @PostConstruct()
       parentInit() {
@@ -82,6 +83,7 @@ describe('重复装饰器检测', () => {
       }
     }
 
+    @Injectable
     class Child extends Parent {
       @PostConstruct()
       childInit() {

@@ -71,11 +71,13 @@ inversify 默认是[不支持循环依赖的](https://github.com/inversify/Inver
 
 更多详情请参考 [生命周期文档](../note/13.生命周期.md)。
 
-## 没有@injectable 装饰器
+## @Injectable 装饰器
 
-在 inversify 中这个装饰器主要是收集构造函数的参数的元数据，以用于构造函数的默认依赖注入，如果参数的类型是类，那么就不需要明确使用@Inject 来指定依赖的 token。
+在 inversify 中 `@injectable()` 装饰器主要是收集构造函数的参数的元数据，以用于构造函数的默认依赖注入，如果参数的类型是类，那么就不需要明确使用 `@Inject` 来指定依赖的 token。
 
-本库不支持通过参数类型信息完成自动注入，不管是属性注入还是构造函数注入都需要明确通过@Inject 指定依赖的 token。
+本库的 `@Injectable` 装饰器用途不同：它用于在类定义阶段将装饰器元数据（`context.metadata`）关联到类。使用了 `@Inject`、`@PostConstruct`、`@PreDestroy` 的类必须添加 `@Injectable`。
+
+本库不支持通过参数类型信息完成自动注入，不管是属性注入还是构造函数注入都需要明确通过 `@Inject` 指定依赖的 token。
 
 根本原因是不期望依赖 typescript 的 emitDecoratorMetadata 选项。
 
@@ -94,6 +96,7 @@ inversify 是支持在同一个 token 上绑定多个服务的，最终可以实
 ```ts
 // A和B都是class，并且A依赖B
 class B {}
+@Injectable
 class A {
   @Inject(B)
   public b!: B;

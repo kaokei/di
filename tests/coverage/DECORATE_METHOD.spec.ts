@@ -1,8 +1,9 @@
 /**
- * 覆盖 decorator.ts 第 145/157 行：decorate() 函数中 isMethod=true 的分支
+ * 覆盖 decorator.ts 中 decorate() 函数的 isMethod=true 分支
  *
  * 使用 decorate 函数手动应用方法装饰器（如 PostConstruct），
  * 触发 decorate 内部 isMethod 为 true 的代码路径。
+ * decorate() 内部模拟 @Injectable 行为，自动调用 defineMetadata 关联元数据。
  */
 import { Container, PostConstruct, decorate } from '@/index';
 

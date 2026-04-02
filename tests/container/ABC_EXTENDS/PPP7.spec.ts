@@ -1,8 +1,9 @@
 // A extends B
 // 父类和子类都有 PostConstruct
 // 可以通过super调用父类的方法
-import { PostConstruct, Container } from '@/index';
+import { PostConstruct, Injectable, Container } from '@/index';
 
+@Injectable
 class B {
   public name = 'B';
   public id = 2;
@@ -13,6 +14,7 @@ class B {
   }
 }
 
+@Injectable
 class A extends B {
   public name = 'A';
   public id = 1;

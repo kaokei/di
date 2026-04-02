@@ -1,4 +1,4 @@
-import { Inject, Container } from '@/index';
+import { Inject, Injectable, Container } from '@/index';
 import { ERRORS } from '@/constants';
 
 interface IA {
@@ -13,6 +13,7 @@ interface IB {
 }
 
 // 迁移为属性装饰器：@Inject('') 使用空字符串作为 Token
+@Injectable
 class A {
   public name = 'A';
   public id = 1;

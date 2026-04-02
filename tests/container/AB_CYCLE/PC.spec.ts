@@ -1,4 +1,4 @@
-import { Inject, Container, LazyToken } from '@/index';
+import { Inject, Injectable, Container, LazyToken } from '@/index';
 
 // 迁移说明：原 PC（A 属性注入，B 构造函数参数注入）已迁移为双属性注入，
 // 行为等同于 PP，循环依赖通过属性注入的延迟解析机制被打破。
@@ -15,6 +15,7 @@ interface IB {
   a: IA;
 }
 
+@Injectable
 class A {
   public name = 'A';
   public id = 1;
@@ -23,6 +24,7 @@ class A {
   public b!: IB;
 }
 
+@Injectable
 class B {
   public name = 'B';
   public id = 2;

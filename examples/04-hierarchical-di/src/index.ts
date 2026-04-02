@@ -15,12 +15,13 @@
  * 这意味着子容器可以"覆盖"父容器中服务的依赖，实现更灵活的依赖替换。
  */
 
-import { Container, Token, Inject } from '@kaokei/di';
+import { Container, Token, Inject, Injectable } from '@kaokei/di';
 
 // ==================== 定义服务 ====================
 
 const DB_URL = new Token<string>('DB_URL');
 
+@Injectable
 class DatabaseService {
   @Inject(DB_URL)
   url!: string;
@@ -30,6 +31,7 @@ class DatabaseService {
   }
 }
 
+@Injectable
 class UserService {
   @Inject(DatabaseService)
   db!: DatabaseService;

@@ -1,6 +1,7 @@
-import { Inject, Container, PreDestroy } from '@/index';
+import { Inject, Injectable, Container, PreDestroy } from '@/index';
 
 describe('PRE_DESTROY_1 A -> B', () => {
+  @Injectable
   class B {
     public closed = false;
 
@@ -21,6 +22,7 @@ describe('PRE_DESTROY_1 A -> B', () => {
     }
   }
 
+  @Injectable
   class A {
     public closed = false;
 
@@ -69,6 +71,7 @@ describe('PRE_DESTROY_1 A -> B', () => {
 });
 
 describe('PRE_DESTROY_2 A -> B', () => {
+  @Injectable
   class B {
     public closed = false;
 
@@ -89,6 +92,7 @@ describe('PRE_DESTROY_2 A -> B', () => {
     }
   }
 
+  @Injectable
   class A {
     public closed = false;
 
@@ -137,6 +141,7 @@ describe('PRE_DESTROY_2 A -> B', () => {
 });
 
 describe('PRE_DESTROY_3 A -> B', () => {
+  @Injectable
   class B {
     public closed = false;
 
@@ -157,6 +162,7 @@ describe('PRE_DESTROY_3 A -> B', () => {
     }
   }
 
+  @Injectable
   class A {
     public closed = false;
 
@@ -205,6 +211,7 @@ describe('PRE_DESTROY_3 A -> B', () => {
 });
 
 describe('PRE_DESTROY_4 A -> B', () => {
+  @Injectable
   class B {
     public closed = false;
 
@@ -225,6 +232,7 @@ describe('PRE_DESTROY_4 A -> B', () => {
     }
   }
 
+  @Injectable
   class A {
     public closed = false;
 

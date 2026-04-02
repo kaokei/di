@@ -5,6 +5,7 @@ import {
   Container,
   inject as Inject,
   LazyServiceIdentifier as LazyToken,
+  injectable as Injectable,
 } from 'inversify';
 
 interface IA {
@@ -28,6 +29,7 @@ interface IC {
   b: IB;
 }
 
+@Injectable()
 class C {
   public name = 'C';
   public id = 3;
@@ -45,6 +47,7 @@ class B {
   public bId = 2;
 }
 
+@Injectable()
 class A extends B {
   public name = 'A';
   public id = 1;

@@ -1,4 +1,4 @@
-import { Container, Inject, LazyToken } from '@/index';
+import { Container, Inject, Injectable, LazyToken } from '@/index';
 import { hasOwn } from '@tests/utils';
 
 interface IA {
@@ -12,6 +12,7 @@ interface IB {
   id: number;
 }
 
+@Injectable
 class A implements IA {
   public name = 'A';
   public id = 1;

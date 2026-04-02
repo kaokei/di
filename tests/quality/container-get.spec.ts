@@ -10,7 +10,7 @@
  * 需求：6.1、6.2、6.3
  */
 
-import { Container, Token, Inject, Self, SkipSelf, Optional } from '@/index';
+import { Container, Token, Inject, Injectable, Self, SkipSelf, Optional } from '@/index';
 import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
 
 // ==================== skipSelf 边界情况（需求 6.3） ====================
@@ -219,6 +219,7 @@ describe('Container.get 与装饰器选项的集成', () => {
       value = 'dep';
     }
 
+    @Injectable
     class MyService {
       @Inject(Dep) @Self() dep!: Dep;
     }
@@ -238,6 +239,7 @@ describe('Container.get 与装饰器选项的集成', () => {
       value = 'dep';
     }
 
+    @Injectable
     class MyService {
       @Inject(Dep) @SkipSelf() dep!: Dep;
     }
@@ -258,6 +260,7 @@ describe('Container.get 与装饰器选项的集成', () => {
   test('@Optional 装饰器在服务不存在时返回 undefined 而非抛错', () => {
     const TOKEN = new Token<string>('missing');
 
+    @Injectable
     class MyService {
       @Inject(TOKEN) @Optional() dep!: string;
     }
@@ -273,6 +276,7 @@ describe('Container.get 与装饰器选项的集成', () => {
   test('@SkipSelf + @Optional 无父容器时返回 undefined', () => {
     class Dep {}
 
+    @Injectable
     class MyService {
       @Inject(Dep) @SkipSelf() @Optional() dep!: Dep;
     }

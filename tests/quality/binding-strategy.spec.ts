@@ -10,7 +10,7 @@
  * 需求：3.1、3.2、3.3、16.1、16.2
  */
 
-import { Container, Token, Inject, PostConstruct } from '@/index';
+import { Container, Token, Inject, Injectable, PostConstruct } from '@/index';
 import { Binding } from '@/binding';
 import { BINDING, STATUS } from '@/constants';
 import { BindingNotValidError } from '@/errors/BindingNotValidError';
@@ -204,10 +204,12 @@ describe('_resolveInstanceValue 职责分离', () => {
     const executionOrder: string[] = [];
 
     // 创建一个带有属性注入和 PostConstruct 的服务
+    @Injectable
     class Dep {
       value = 'dep-value';
     }
 
+    @Injectable
     class MyService {
       @Inject(Dep) dep!: Dep;
 
@@ -266,8 +268,10 @@ describe('_resolveInstanceValue 职责分离', () => {
   });
 
   test('属性注入在实例激活之后执行', () => {
+    @Injectable
     class Dep {}
 
+    @Injectable
     class MyService {
       @Inject(Dep) dep!: Dep;
     }

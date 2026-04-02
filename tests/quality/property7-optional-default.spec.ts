@@ -18,7 +18,7 @@
  */
 
 import fc from 'fast-check';
-import { Token, Inject, Optional, Container } from '@/index';
+import { Token, Inject, Optional, Injectable, Container } from '@/index';
 
 // Feature: stage3-decorator-migration, Property 7: Optional 属性未绑定时保留默认值
 
@@ -46,7 +46,7 @@ test('Property 7: Optional 属性的 Token 未绑定时，属性应保留类定�
       const container = new Container();
 
       try {
-        // 创建带有默认值的 Optional 属性的服务类
+        @Injectable
         class TestService {
           @Inject(token) @Optional() optionalDep: string = defaultVal;
         }
@@ -76,6 +76,7 @@ test('Property 7: Optional 属性的 Token 未绑定时，属性应保留类定�
       const container = new Container();
 
       try {
+        @Injectable
         class TestService {
           @Inject(token) @Optional() optionalDep: number = defaultNum;
         }
@@ -113,6 +114,7 @@ test('Property 7: 非 Optional 属性正常注入，Optional 属性（Token 未�
           }
 
           // 主服务：同时有必需依赖和可选依赖
+          @Injectable
           class MainService {
             @Inject(requiredToken) requiredDep!: RequiredService;
             @Inject(optionalToken) @Optional() optionalDep: string = defaultVal;
@@ -154,6 +156,7 @@ test('Property 7: Optional 属性的 Token 已绑定时，属性应被正常注�
           marker = 'injected-service';
         }
 
+        @Injectable
         class TestService {
           @Inject(token) @Optional() optionalDep: any = defaultVal;
         }
@@ -194,6 +197,7 @@ test('Property 7: 多个 Optional 属性中，已绑定的被注入，未绑定�
             marker = 'bound';
           }
 
+          @Injectable
           class TestService {
             @Inject(token1) @Optional() dep1: any = default1;
             @Inject(token2) @Optional() dep2: any = default2;

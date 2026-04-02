@@ -1,4 +1,4 @@
-import { Inject, Container, LazyToken } from '@/index';
+import { Inject, Injectable, Container, LazyToken } from '@/index';
 import { BindingNotValidError } from '@/errors/BindingNotValidError';
 
 interface IA {
@@ -12,6 +12,7 @@ interface IB {
   id: number;
 }
 
+@Injectable
 class A {
   public name = 'A';
   public id = 1;

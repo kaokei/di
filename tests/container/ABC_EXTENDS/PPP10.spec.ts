@@ -1,8 +1,9 @@
 // A extends B
 // B extends C
 // C extends D
-import { PostConstruct, Container, Inject } from '@/index';
+import { PostConstruct, Injectable, Container, Inject } from '@/index';
 
+@Injectable
 class D {
   public name = 'D';
   public id = 4;
@@ -14,6 +15,7 @@ class D {
   }
 }
 
+@Injectable
 class C {
   public name = 'C';
   public id = 3;
@@ -27,6 +29,7 @@ class C {
   }
 }
 
+@Injectable
 class B {
   public name = 'B';
   public id = 2;
@@ -41,6 +44,7 @@ class B {
   }
 }
 
+@Injectable
 class A {
   public name = 'A';
   public id = 1;

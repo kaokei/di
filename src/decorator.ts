@@ -11,7 +11,7 @@
  * 注意：Stage 3 规范不支持参数装饰器，所有依赖声明统一通过实例属性装饰器完成。
  */
 
-import { getOwnMetadata, defineMetadata } from './cachemap';
+import { defineMetadata } from './cachemap';
 import { KEYS, ERRORS, hasOwn } from './constants';
 import { resolveToken } from './token';
 import { Container } from './container';
@@ -21,8 +21,8 @@ import type { Newable, InjectFunction, GenericToken } from './interfaces';
 /**
  * 创建属性装饰器的高阶函数（Stage 3 Field Decorator）
  *
- * 通过 context.addInitializer 在实例化时获取构造函数引用，
- * 并将装饰器元数据存储到 CacheMap 的 INJECTED_PROPS 分区。
+ * 直接在装饰器执行阶段将元数据写入 context.metadata，
+ * 不再使用 context.addInitializer，消除实例化时的重复回调。
  *
  * @param decoratorKey 装饰器名称（如 'inject'、'self' 等）
  * @param defaultValue 装饰器的默认参数值
@@ -32,30 +32,24 @@ function createDecorator(decoratorKey: string, defaultValue?: any) {
   // decoratorValue 是实际使用装饰器时传入的参数
   return function (decoratorValue?: any) {
     return function (_value: undefined, context: ClassFieldDecoratorContext) {
-      // 通过 addInitializer 在每次实例化时执行回调
-      // 回调中的 this 指向正在构造的实例，this.constructor 即为类的构造函数
-      context.addInitializer(function (this: any) {
-        const Ctor = this.constructor as Newable;
-        const propertyName = context.name as string;
+      const propertyName = context.name as string;
+      const meta = context.metadata as Record<string, any>;
 
-        // 惰性初始化：检查当前类自身是否已注册该属性的装饰器数据
-        // 使用 getOwnMetadata 确保子类可以覆盖父类同名属性的元数据
-        const ownPropertiesMetadata =
-          getOwnMetadata(KEYS.INJECTED_PROPS, Ctor) || {};
-        const propertyMetadata = ownPropertiesMetadata[propertyName] || {};
+      // 惰性初始化：确保 metadata 中有 INJECTED_PROPS 条目
+      // 使用 hasOwn 确保只操作当前类自身的数据，不影响父类
+      if (!hasOwn(meta, KEYS.INJECTED_PROPS)) {
+        meta[KEYS.INJECTED_PROPS] = {};
+      }
+      const propsMap = meta[KEYS.INJECTED_PROPS];
 
-        // 如果该装饰器数据已存在于当前类自身，跳过重复写入
-        // if (decoratorKey in propertyMetadata) {
-        //   return;
-        // }
+      // 惰性初始化：确保该属性名有对应的条目
+      if (!propsMap[propertyName]) {
+        propsMap[propertyName] = {};
+      }
 
-        // 设置当前装饰器的数据，如果未传参则使用默认值
-        propertyMetadata[decoratorKey] =
-          decoratorValue === void 0 ? defaultValue : decoratorValue;
-
-        ownPropertiesMetadata[propertyName] = propertyMetadata;
-        defineMetadata(KEYS.INJECTED_PROPS, ownPropertiesMetadata, Ctor);
-      });
+      // 写入装饰器数据，如果未传参则使用默认值
+      propsMap[propertyName][decoratorKey] =
+        decoratorValue === void 0 ? defaultValue : decoratorValue;
     };
   };
 }
@@ -85,19 +79,15 @@ function createMetaDecorator(metaKey: string, errorMessage: string) {
   return (metaValue?: any) => {
     return (_value: Function, context: ClassMethodDecoratorContext) => {
       const methodName = context.name as string;
+      const meta = context.metadata as Record<string, any>;
 
-      // 在装饰器应用阶段（类定义时）通过 context.metadata 检测重复
-      // 使用 hasOwn 仅检查当前类自身是否已标记，不检查继承链
-      const meta = context.metadata as Record<string, boolean>;
+      // 重复检测：使用 hasOwn 仅检查当前类自身，不检查继承链
       if (hasOwn(meta, metaKey)) {
         throw new Error(errorMessage);
       }
-      meta[metaKey] = true;
 
-      context.addInitializer(function (this: any) {
-        const Ctor = this.constructor as Newable;
-        defineMetadata(metaKey, { key: methodName, value: metaValue }, Ctor);
-      });
+      // 直接写入 context.metadata，不再使用 addInitializer
+      meta[metaKey] = { key: methodName, value: metaValue };
     };
   };
 }
@@ -126,6 +116,21 @@ export const PreDestroy = createMetaDecorator(
   KEYS.PRE_DESTROY,
   ERRORS.PRE_DESTROY
 );
+
+/**
+ * 类装饰器：在类定义阶段关联 target（类构造函数）和 context.metadata
+ *
+ * 当所有成员装饰器（@Inject、@PostConstruct 等）执行完毕后，
+ * @Injectable 读取 context.metadata 并通过 defineMetadata 写入 CacheMap，
+ * 建立 target → metadata 的映射关系。
+ *
+ * 使用方式：@Injectable（无参数，直接作为装饰器使用）
+ */
+export function Injectable(Ctor: Function, context: ClassDecoratorContext) {
+  const meta = context.metadata as Record<string, any>;
+  // 直接关联 target 和 context.metadata
+  defineMetadata(Ctor as Newable, meta);
+}
 
 /**
  * 手动应用装饰器的辅助函数（适配 Stage 3 规范）
@@ -275,10 +280,17 @@ export function decorate(decorator: any, target: any, key: string): void {
     proto[key] = currentValue;
   }
 
-  // 创建 fakeInstance 并执行所有 initializer 回调
-  // fakeInstance 的原型链指向 target.prototype，确保 this.constructor 指向 target
-  const fakeInstance = Object.create(proto);
-  for (const init of initializers) {
-    init.call(fakeInstance);
+  // 模拟 @Injectable 的行为：直接关联 target 和 metadata
+  // 由于 defineMetadata 存储的是 metadata 对象引用，
+  // 多次调用 decorate() 时 metadata 是同一个引用（通过 DECORATE_METADATA Symbol 保证），
+  // 后续调用会自动累积数据
+  defineMetadata(target, metadata);
+
+  // 执行 initializers（仅用于 @LazyInject 等需要实例化操作的装饰器）
+  if (initializers.length > 0) {
+    const fakeInstance = Object.create(proto);
+    for (const init of initializers) {
+      init.call(fakeInstance);
+    }
   }
 }

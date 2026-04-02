@@ -1,10 +1,11 @@
-import { Inject, Container } from '@/index';
+import { Inject, Injectable, Container } from '@/index';
 
 class B {
   public name = 'B';
 }
 
 // 迁移：构造函数参数 @Inject 改为属性装饰器
+@Injectable
 class A {
   @Inject(B) b!: B;
 }

@@ -6,13 +6,14 @@
 // C has property di of c1
 // D has property di of d1
 // 自动继承所有父类的注入属性
-import { Inject, Container, LazyToken, Token } from '@/index';
+import { Inject, Injectable, Container, LazyToken, Token } from '@/index';
 
 const tokenA1 = new Token<number>('a1');
 const tokenB1 = new Token<number>('b1');
 const tokenC1 = new Token<number>('c1');
 const tokenD1 = new Token<number>('d1');
 
+@Injectable
 class D {
   public name = 'D';
   public id = 4;
@@ -21,6 +22,7 @@ class D {
   public d1!: number;
 }
 
+@Injectable
 class C extends D {
   public name = 'C';
   public id = 3;
@@ -29,6 +31,7 @@ class C extends D {
   public c1!: number;
 }
 
+@Injectable
 class B extends C {
   public name = 'B';
   public id = 2;
@@ -37,6 +40,7 @@ class B extends C {
   public b1!: number;
 }
 
+@Injectable
 class A extends B {
   public name = 'A';
   public id = 1;

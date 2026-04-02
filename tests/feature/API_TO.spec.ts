@@ -1,4 +1,4 @@
-import { Inject, Container, Token } from '@/index';
+import { Inject, Injectable, Container, Token } from '@/index';
 import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
 
 class UserClass {
@@ -13,6 +13,7 @@ class UserClass {
   }
 }
 
+@Injectable
 class User {
   private name = 'zhangsan';
   private age = 12;

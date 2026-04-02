@@ -11,7 +11,7 @@
 
 import fc from 'fast-check';
 import { decorate, PostConstruct, PreDestroy } from '@/decorator';
-import { getOwnMetadata } from '@/cachemap';
+import { getPostConstruct, getPreDestroy } from '@/cachemap';
 import { ERRORS, KEYS } from '@/constants';
 
 // 需要从随机方法名中过滤掉的特殊属性名
@@ -266,12 +266,12 @@ describe('Feature: 05.decorator-enhancement, Property 3: decorate() 父子类生
           decorate(PostConstruct(), Child, childMethodName);
 
           // 验证父类的 ownMetadata 独立存在且正确
-          const parentMeta = getOwnMetadata(KEYS.POST_CONSTRUCT, Parent);
+          const parentMeta = getPostConstruct(Parent);
           expect(parentMeta).toBeDefined();
           expect(parentMeta!.key).toBe(parentMethodName);
 
           // 验证子类的 ownMetadata 独立存在且正确
-          const childMeta = getOwnMetadata(KEYS.POST_CONSTRUCT, Child);
+          const childMeta = getPostConstruct(Child);
           expect(childMeta).toBeDefined();
           expect(childMeta!.key).toBe(childMethodName);
         }
@@ -300,12 +300,12 @@ describe('Feature: 05.decorator-enhancement, Property 3: decorate() 父子类生
           decorate(PreDestroy(), Child, childMethodName);
 
           // 验证父类的 ownMetadata 独立存在且正确
-          const parentMeta = getOwnMetadata(KEYS.PRE_DESTROY, Parent);
+          const parentMeta = getPreDestroy(Parent);
           expect(parentMeta).toBeDefined();
           expect(parentMeta!.key).toBe(parentMethodName);
 
           // 验证子类的 ownMetadata 独立存在且正确
-          const childMeta = getOwnMetadata(KEYS.PRE_DESTROY, Child);
+          const childMeta = getPreDestroy(Child);
           expect(childMeta).toBeDefined();
           expect(childMeta!.key).toBe(childMethodName);
         }

@@ -17,9 +17,9 @@
  */
 
 import fc from 'fast-check';
-import { Container, Token, Inject, PostConstruct } from '@/index';
+import { Container, Token, Inject, Injectable, PostConstruct } from '@/index';
 import { Binding } from '@/binding';
-import { defineMetadata, getMetadata, getOwnMetadata } from '@/cachemap';
+import { defineMetadata, getInjectedProps } from '@/cachemap';
 import { KEYS } from '@/constants';
 import { BaseError } from '@/errors/BaseError';
 
@@ -76,6 +76,7 @@ describe('Feature: code-quality-optimization, Property 11: 服务解析行为保
       const VALUE_TOKEN = new Token<string>('value');
       container.bind(VALUE_TOKEN).toConstantValue('injected-value');
 
+      @Injectable
       class ServiceWithInject {
         @Inject(VALUE_TOKEN) myProp!: string;
         initialized = false;
@@ -193,27 +194,25 @@ describe('Feature: code-quality-optimization, Property 4: 元数据深拷贝隔�
           // 创建父类并设置元数据
           class Parent {}
           defineMetadata(
-            KEYS.INJECTED_PROPS,
-            { [parentProp]: { inject: 'parentToken' } },
-            Parent
+            Parent,
+            { [KEYS.INJECTED_PROPS]: { [parentProp]: { inject: 'parentToken' } } }
           );
 
           // 创建子类
           class Child extends Parent {}
           defineMetadata(
-            KEYS.INJECTED_PROPS,
-            { [childProp]: { inject: 'childToken' } },
-            Child
+            Child,
+            { [KEYS.INJECTED_PROPS]: { [childProp]: { inject: 'childToken' } } }
           );
 
           // 获取子类的合并元数据并在外层添加新键
-          const childMeta = getMetadata(KEYS.INJECTED_PROPS, Child) as Record<string, Record<string, unknown>>;
+          const childMeta = getInjectedProps(Child) as Record<string, Record<string, unknown>>;
           if (childMeta) {
             childMeta[extraKey] = { inject: 'extra' };
           }
 
-          // 验证父类元数据的外层键未被修改（getMetadata 返回的外层对象是新建的）
-          const parentMeta = getOwnMetadata(KEYS.INJECTED_PROPS, Parent) as Record<string, Record<string, unknown>>;
+          // 验证父类元数据的外层键未被修改（getInjectedProps 返回的外层对象是新建的）
+          const parentMeta = getInjectedProps(Parent) as Record<string, Record<string, unknown>>;
           if (parentMeta && extraKey !== parentProp && extraKey !== childProp) {
             expect(Object.hasOwn(parentMeta, extraKey)).toBe(false);
           }
@@ -334,6 +333,7 @@ describe('Feature: code-quality-optimization, Property 7: 重复方法装饰器�
     try {
       const order: string[] = [];
 
+      @Injectable
       class Parent {
         @PostConstruct()
         init() {
@@ -341,6 +341,7 @@ describe('Feature: code-quality-optimization, Property 7: 重复方法装饰器�
         }
       }
 
+      @Injectable
       class Child extends Parent {
         @PostConstruct()
         override init() {

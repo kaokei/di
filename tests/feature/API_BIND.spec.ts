@@ -1,5 +1,5 @@
 // 测试bind，unbind，unbindAll
-import { Inject, Container, LazyToken, Token } from '@/index';
+import { Inject, Injectable, Container, LazyToken, Token } from '@/index';
 import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
 import { hasOwn } from '@tests/utils';
 
@@ -16,6 +16,7 @@ interface IB {
   id: number;
 }
 
+@Injectable
 class A implements IA {
   public name = 'A';
   public id = 1;
@@ -24,6 +25,7 @@ class A implements IA {
   public b!: IB;
 }
 
+@Injectable
 class ABackup implements IA {
   public name = 'ABackup';
   public id = 11;
