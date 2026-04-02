@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.0.0](https://github.com/kaokei/di/compare/v4.0.0...v5.0.0) (2026-04-02)
+
+### Breaking Changes
+
+* 移除 `context.addInitializer` 依赖，所有装饰器元数据直接在装饰器执行阶段写入 `context.metadata`
+* 新增 `@Injectable` 类装饰器，用于关联 target 和 `context.metadata`，所有使用装饰器的类必须添加 `@Injectable`
+* 重构 `CacheMap` 模块，`defineMetadata` 签名变更为 `defineMetadata(target, metadata)`
+* 移除 `getOwnMetadata`、`getMetadata` 通用函数，替换为专用的 `getPostConstruct`、`getPreDestroy`、`getInjectedProps`
+
+### Features
+
+* 装饰器元数据直接写入 `context.metadata`，消除实例化时的重复回调，提升性能
+* `decorate()` 函数适配新架构，模拟 `@Injectable` 行为直接关联 target 和 metadata
+* 新增大量属性级测试用例，覆盖继承、重复检测、端到端解析等场景
+
+### Bug Fixes
+
+* 修复 `decorate()` 中 initializers 仅在有需要时才执行的逻辑
+
+### Documentation
+
+* 更新装饰器相关文档，补充 `@Injectable` 使用说明
+* 更新笔记文档，补充 `useDefineForClassFields` 相关说明
+
+### Tests
+
+* 新增属性元数据、方法元数据、重复检测、继承、端到端等测试套件
+* 更新所有现有测试以适配新的 `@Injectable` 装饰器
+
 ## [4.0.0](https://github.com/kaokei/di/compare/v3.0.9...v4.0.0) (2026-03-29)
 
 ### Features
