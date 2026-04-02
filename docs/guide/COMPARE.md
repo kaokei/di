@@ -177,7 +177,7 @@ inversify 的处理逻辑是又重新开始从 child 容器开始寻找，因为
 
 ❌ ~~Container snapshots~~
 
-❌ ~~Controlling the scope of the dependencies~~ 本库只支持单例模式，所有通过 `to()` / `toSelf()` 绑定的 class 服务均为单例，不支持 transient 或 request scope
+❌ ~~Controlling the scope of the dependencies~~ 本库只支持 transient 模式和单例模式，不支持 request scope。
 
 ❌ ~~Middleware~~
 

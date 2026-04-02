@@ -92,7 +92,7 @@ function to(constructor: Newable<T>): this;
 
 将当前 token 关联到指定的类。当调用 `container.get` 方法时，会自动实例化这个类。
 
-`to()` 绑定的服务默认且只支持单例模式：首次 `container.get()` 时实例化，后续调用直接返回缓存的实例。本库不支持 transient、request 等其他作用域模式。
+`to()` 绑定的服务默认为单例模式：首次 `container.get()` 时实例化，后续调用直接返回缓存的实例。可以通过 `inTransientScope()` 切换为瞬态模式。
 
 ## Binding#toSelf
 
@@ -105,7 +105,7 @@ function toSelf(): this;
 
 需要注意的是，如果 token 不是一个类，而是一个 Token 实例对象，那么就不能使用 toSelf 方法。
 
-`toSelf()` 绑定的服务同样默认且只支持单例模式：首次 `container.get()` 时实例化，后续调用直接返回缓存的实例。本库不支持 transient、request 等其他作用域模式。
+`toSelf()` 绑定的服务同样默认为单例模式：首次 `container.get()` 时实例化，后续调用直接返回缓存的实例。可以通过 `inTransientScope()` 切换为瞬态模式。
 
 ## Binding#toConstantValue
 
@@ -130,6 +130,52 @@ function toService(token: CommonToken<T>): this;
 ```
 
 将当前 tokenA 关联到另一个 tokenB。当调用 `container.get(tokenA)` 方法时，会返回 `container.get(tokenB)` 的结果。
+
+## Binding#inTransientScope
+
+```ts
+function inTransientScope(): this;
+```
+
+将当前绑定设置为瞬态作用域。默认情况下所有绑定都是单例模式（首次 `get` 时创建实例并缓存，后续直接返回缓存）。调用 `inTransientScope()` 后，每次 `container.get()` 都会重新创建新实例。
+
+`inTransientScope()` 支持链式调用，可以在 `to()`、`toSelf()`、`toDynamicValue()` 之后调用：
+
+```ts
+// 每次 get 返回新实例
+container.bind(MyService).toSelf().inTransientScope();
+
+// 每次 get 重新执行工厂函数
+container.bind(TOKEN).toDynamicValue(() => createInstance()).inTransientScope();
+
+// 也可以继续链式调用 onActivation
+container.bind(MyService).toSelf().inTransientScope().onActivation((ctx, inst) => {
+  // 每次创建新实例时都会触发
+  return inst;
+});
+```
+
+瞬态模式下的行为特点：
+
+- `onActivation` 和 `@PostConstruct` 每次 `get` 都会执行
+- 依赖注入每次都会重新解析（但如果依赖本身是单例，注入的仍然是同一个实例）
+- `toConstantValue` 配合 `inTransientScope` 时，由于常量值本身不变，每次返回的仍然是同一个值
+
+```ts
+const container = new Container();
+
+// 单例（默认）
+container.bind(A).toSelf();
+const a1 = container.get(A);
+const a2 = container.get(A);
+console.log(a1 === a2); // true
+
+// 瞬态
+container.bind(B).toSelf().inTransientScope();
+const b1 = container.get(B);
+const b2 = container.get(B);
+console.log(b1 === b2); // false
+```
 
 ## 生命周期执行顺序
 
