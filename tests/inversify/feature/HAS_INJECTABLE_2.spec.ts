@@ -27,8 +27,10 @@ describe('No bindings - with autoBindInjectable:true', () => {
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
     expect(a.name).toBe('A');
-    // @notice
-    expect(a.b).toBeUndefined();
+    // @notice emitDecoratorMetadata 启用后，inversify 可以通过 design:paramtypes 自动解析构造函数参数
+    expect(a.b).toBeInstanceOf(B);
+    expect(a.b.id).toBe(2);
+    expect(a.b.name).toBe('B');
   });
 
   test('container.get(B) should work correctly', async () => {
@@ -73,8 +75,10 @@ describe('Has bindings - with autoBindInjectable:true', () => {
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
     expect(a.name).toBe('A');
-    // @notice
-    expect(a.b).toBeUndefined();
+    // @notice emitDecoratorMetadata 启用后，inversify 可以通过 design:paramtypes 自动解析构造函数参数
+    expect(a.b).toBeInstanceOf(B);
+    expect(a.b.id).toBe(2);
+    expect(a.b.name).toBe('B');
   });
 
   test('container.get(B) should work correctly', async () => {
@@ -99,8 +103,10 @@ describe('Has bindings - without autoBindInjectable:true', () => {
     expect(a).toBeInstanceOf(A);
     expect(a.id).toBe(1);
     expect(a.name).toBe('A');
-    // @notice
-    expect(a.b).toBeUndefined();
+    // @notice emitDecoratorMetadata 启用后，inversify 可以通过 design:paramtypes 自动解析构造函数参数
+    expect(a.b).toBeInstanceOf(B);
+    expect(a.b.id).toBe(2);
+    expect(a.b.name).toBe('B');
   });
 
   test('container.get(B) should work correctly', async () => {
