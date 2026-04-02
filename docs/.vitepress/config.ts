@@ -66,6 +66,10 @@ export default defineConfig({
               text: 'useDefineForClassFields',
               link: '/note/14.useDefineForClassFields',
             },
+            {
+              text: 'inversify使用条件',
+              link: '/note/15.inversify使用条件',
+            },
           ],
         },
       ],
