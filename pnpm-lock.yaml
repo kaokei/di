@@ -76,7 +76,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -92,7 +92,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -108,7 +108,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -124,7 +124,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -140,7 +140,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -156,7 +156,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -172,7 +172,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -188,7 +188,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -204,7 +204,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -220,7 +220,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -236,7 +236,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -252,7 +252,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -268,7 +268,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -284,7 +284,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -300,7 +300,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -316,7 +316,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -332,7 +332,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -348,7 +348,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -364,7 +364,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -380,7 +380,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.0
+        version: 5.0.1
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -826,8 +826,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@kaokei/di@5.0.0':
-    resolution: {integrity: sha512-r24sRTj6b/Umo5ttufufGeJB0sen9XtfJVqV6sC+BnCt95LC6r551TmS1riwCLm9ZN8JO2o5BABxJHGCG1V/Qw==}
+  '@kaokei/di@5.0.1':
+    resolution: {integrity: sha512-/VcN0phTiX6GC0+50o8P7rf4JCJ3Oa6NKCXpV+o7YxHC7VKyE5iUXMr7jDVgHogSvf7AUGhf6DZUzfYCvFM4rA==}
 
   '@microsoft/api-extractor-model@7.33.5':
     resolution: {integrity: sha512-Xh4dXuusndVQqVz4nEN9xOp0DyzsKxeD2FFJkSPg4arAjDSKPcy6cAc7CaeBPA7kF2wV1fuDlo2p/bNMpVr8yg==}
@@ -3537,7 +3537,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@kaokei/di@5.0.0': {}
+  '@kaokei/di@5.0.1': {}
 
   '@microsoft/api-extractor-model@7.33.5(@types/node@22.19.15)':
     dependencies:
