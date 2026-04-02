@@ -8,10 +8,11 @@
  * 3. 通过 token 参数实现差异化激活逻辑
  */
 
-import { Container, Inject, PostConstruct } from '@kaokei/di';
+import { Container, Inject, PostConstruct, Injectable } from '@kaokei/di';
 
 // ==================== 定义服务类 ====================
 
+@Injectable
 class DatabaseService {
   connected = false;
 
@@ -27,6 +28,7 @@ class DatabaseService {
   }
 }
 
+@Injectable
 class CacheService {
   initialized = false;
 
@@ -37,6 +39,7 @@ class CacheService {
   }
 }
 
+@Injectable
 class UserService {
   @Inject(DatabaseService)
   db!: DatabaseService;

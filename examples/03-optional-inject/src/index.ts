@@ -7,7 +7,7 @@
  * 3. 与不加 @Optional 时抛出异常的对比
  */
 
-import { Container, Token, Inject, Optional, BindingNotFoundError } from '@kaokei/di';
+import { Container, Token, Inject, Optional, Injectable, BindingNotFoundError } from '@kaokei/di';
 
 // ==================== 定义 Token ====================
 
@@ -29,6 +29,7 @@ class MetricsService {
 }
 
 // 主服务：某些依赖是可选的（插件式架构中常见）
+@Injectable
 class AppService {
   // 必须依赖：不加 @Optional，找不到时抛出 BindingNotFoundError
   @Inject(CACHE_SERVICE)

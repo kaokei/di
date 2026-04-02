@@ -18,10 +18,12 @@ function decorate(decorator: any, target: any, key: string): void;
 
 `decorate` 内部会根据 `key` 对应的成员类型，构造符合 Stage 3 规范的 `context` 对象，然后执行装饰器：
 
-- **属性装饰器**：构造 `{ kind: 'field', name: key, ... }` 形式的 context 对象，通过 `addInitializer` 回调将元数据写入 CacheMap。
+- **属性装饰器**：构造 `{ kind: 'field', name: key, ... }` 形式的 context 对象，将元数据写入共享的 metadata 对象。
 - **方法装饰器**：构造 `{ kind: 'method', name: key, ... }` 形式的 context 对象，支持装饰器返回替换函数。
 
-所有 `addInitializer` 回调在装饰器执行完毕后，通过一个原型链指向 `target.prototype` 的 `fakeInstance` 统一触发，确保 `this.constructor` 正确指向目标类。
+`decorate` 在执行完所有装饰器后，会自动模拟 `@Injectable` 的行为，将 metadata 关联到目标类并写入 CacheMap。因此使用 `decorate()` 的类不需要手动添加 `@Injectable` 装饰器。
+
+> **注意**：`decorate()` 内部已模拟 `@Injectable` 行为，无需手动添加 `@Injectable`。
 
 ## 示例
 
@@ -41,6 +43,7 @@ decorate(Inject(B), A, 'b');
 
 ```ts
 class B {}
+@Injectable
 class A {
   @Inject(B)
   public b!: B;
@@ -63,6 +66,7 @@ decorate([Inject(B), Self(), Optional()], A, 'b');
 
 ```ts
 class B {}
+@Injectable
 class A {
   @Inject(B)
   @Self()
@@ -87,6 +91,7 @@ decorate(PostConstruct(), A, 'init');
 上面的例子相当于如下代码：
 
 ```ts
+@Injectable
 class A {
   @PostConstruct()
   init() {
@@ -102,11 +107,13 @@ class A {
 **场景一：子类和父类都有 `@PostConstruct`**
 
 ```ts
+@Injectable
 class B {
   @PostConstruct()
   init() { console.log('B.init'); }
 }
 
+@Injectable
 class A extends B {
   @PostConstruct()
   setup() { console.log('A.setup'); }
@@ -118,6 +125,7 @@ class A extends B {
 **场景二：只有父类有 `@PostConstruct`**
 
 ```ts
+@Injectable
 class B {
   @PostConstruct()
   init() { console.log('B.init'); }
@@ -131,6 +139,7 @@ class A extends B {}
 **场景三：多级继承，只有祖先类有 `@PostConstruct`**
 
 ```ts
+@Injectable
 class C {
   @PostConstruct()
   init() { console.log('C.init'); }

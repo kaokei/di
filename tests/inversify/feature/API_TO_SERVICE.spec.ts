@@ -4,6 +4,7 @@ import {
   Container,
   inject as Inject,
   LazyServiceIdentifier as LazyToken,
+  injectable as Injectable,
 } from 'inversify';
 
 interface IA {
@@ -21,6 +22,7 @@ const KEY_B1: any = new Token<IB>('KEY_B1');
 const KEY_B2: any = new Token<IB>('KEY_B2');
 const KEY_B3: any = new Token<IB>('KEY_B3');
 
+@Injectable()
 class A {
   public name = 'A';
   public id = 1;

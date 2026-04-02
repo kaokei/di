@@ -1,4 +1,4 @@
-import { Inject, Container, LazyToken } from '@/index';
+import { Inject, Injectable, Container, LazyToken } from '@/index';
 
 // 迁移说明：原 PCP（A、C 属性注入，B 构造函数参数注入）已迁移为全属性注入，
 // 行为等同于 PPP，循环依赖通过属性注入的延迟解析机制被打破。
@@ -19,6 +19,7 @@ interface IC {
   a: IA;
 }
 
+@Injectable
 class A {
   public name = 'A';
   public id = 1;
@@ -27,6 +28,7 @@ class A {
   public b!: IB;
 }
 
+@Injectable
 class B {
   public name = 'B';
   public id = 2;
@@ -34,6 +36,7 @@ class B {
   @Inject(new LazyToken(() => C)) c!: IC;
 }
 
+@Injectable
 class C {
   public name = 'C';
   public id = 3;

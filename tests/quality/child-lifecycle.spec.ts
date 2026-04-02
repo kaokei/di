@@ -11,7 +11,7 @@
  * 需求：12.2、13.1、13.2、13.3
  */
 
-import { Container, Token, PreDestroy } from '@/index';
+import { Container, Token, Injectable, PreDestroy } from '@/index';
 
 // ==================== 子容器销毁后从父容器移除（需求 13.2） ====================
 
@@ -185,6 +185,7 @@ describe('destroy 递归销毁所有子容器', () => {
   test('递归销毁触发子容器中 Instance 绑定的 @PreDestroy', () => {
     const destroyedServices: string[] = [];
 
+    @Injectable
     class ChildService {
       @PreDestroy()
       cleanup() {
@@ -192,6 +193,7 @@ describe('destroy 递归销毁所有子容器', () => {
       }
     }
 
+    @Injectable
     class GrandchildService {
       @PreDestroy()
       cleanup() {

@@ -3,6 +3,7 @@ import {
   inject as Inject,
   LazyServiceIdentifier as LazyToken,
   postConstruct as PostConstruct,
+  injectable as Injectable,
 } from 'inversify';
 
 interface IA {
@@ -16,6 +17,7 @@ interface IB {
   id: number;
 }
 
+@Injectable()
 class A {
   public name = 'A';
   public id = 1;
@@ -34,6 +36,7 @@ class A {
   }
 }
 
+@Injectable()
 class B {
   public name = 'B';
   public id = 2;

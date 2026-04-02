@@ -1,7 +1,7 @@
-import { BINDING, KEYS, STATUS, UNINITIALIZED } from './constants';
+import { BINDING, STATUS, UNINITIALIZED } from './constants';
 import type { BindingType, StatusType } from './constants';
 import { Container } from './container';
-import { getMetadata } from './cachemap';
+import { getPostConstruct, getPreDestroy, getInjectedProps } from './cachemap';
 import { resolveToken } from './token';
 import { CircularDependencyError } from './errors/CircularDependencyError';
 import { BindingNotValidError } from './errors/BindingNotValidError';
@@ -159,8 +159,7 @@ export class Binding<T = unknown> {
    */
   _postConstruct(options: Options<T>, propertyBindings: Binding[]) {
     if (BINDING.Instance === this.type) {
-      const { key, value } =
-        getMetadata(KEYS.POST_CONSTRUCT, this.classValue!) || {};
+      const { key, value } = getPostConstruct(this.classValue!) || {};
       if (key) {
         // 使用了@PostConstruct装饰器
         if (value) {
@@ -201,7 +200,7 @@ export class Binding<T = unknown> {
 
   preDestroy() {
     if (BINDING.Instance === this.type) {
-      const { key } = getMetadata(KEYS.PRE_DESTROY, this.classValue!) || {};
+      const { key } = getPreDestroy(this.classValue!) || {};
       if (key) {
         this._execute(key);
       }
@@ -273,7 +272,7 @@ export class Binding<T = unknown> {
   }
 
   _getInjectProperties(options: Options<T>) {
-    const props = getMetadata(KEYS.INJECTED_PROPS, this.classValue!) || {};
+    const props = getInjectedProps(this.classValue!) || {};
     const propKeys = Object.keys(props);
     const result = Object.create(null) as RecordObject;
     const binding: Binding[] = [];

@@ -1,12 +1,11 @@
 /**
- * 覆盖 cachemap.ts 第 54 行：getMetadata 中 ownMetadata 为 falsy 的分支
+ * 覆盖 cachemap.ts 中 getInjectedProps 的继承链合并分支
  *
  * 当子类继承父类，父类有装饰器元数据但子类没有自己的元数据时，
- * getMetadata 会递归获取父类元数据。此时 ownMetadata 为 undefined，
- * parentMetadata 存在，走到 `ownMetadata || {}` 分支。
+ * getInjectedProps 会递归获取父类元数据。此时子类的 ownProps 为 undefined，
+ * parentProps 存在，走到合并分支返回父类的属性注入配置。
  *
- * 使用 decorate 函数手动给父类设置元数据，避免 Stage 3 装饰器
- * 的 addInitializer 在子类实例化时自动写入子类元数据。
+ * 使用 decorate 函数手动给父类设置元数据（decorate 内部模拟 @Injectable 行为）。
  */
 import { Inject, Container, decorate } from '@/index';
 
@@ -22,13 +21,13 @@ class Parent {
 decorate(Inject(B), Parent, 'b');
 
 // 子类继承父类，自身没有任何装饰器元数据
-// decorate 只给 Parent 写入了元数据，Child 自身的 ownMetadata 为 undefined
-// getMetadata(Child) 时会递归到 Parent，触发 ownMetadata || {} 分支
+// decorate 只给 Parent 写入了元数据，Child 自身的 ownProps 为 undefined
+// getInjectedProps(Child) 时会递归到 Parent，触发 parentProps 合并分支
 class Child extends Parent {
   public name = 'Child';
 }
 
-describe('getMetadata — 子类无自身元数据但父类有元数据', () => {
+describe('getInjectedProps — 子类无自身元数据但父类有元数据', () => {
   test('子类应继承父类的注入元数据（通过 decorate 设置）', () => {
     const container = new Container();
     container.bind(Child).toSelf();
@@ -44,11 +43,11 @@ describe('getMetadata — 子类无自身元数据但父类有元数据', () => 
 });
 
 /**
- * 覆盖 cachemap.ts 第 53 行：getMetadata 中 parentMetadata 为 falsy 的分支
+ * 覆盖 cachemap.ts 中 getInjectedProps 的继承链合并分支
  *
  * 当子类有自己的装饰器元数据，但父类没有任何元数据时，
- * getMetadata 递归到父类返回 undefined，此时 parentMetadata 为 falsy，
- * 走到 `parentMetadata || {}` 的 `{}` 分支。
+ * getInjectedProps 递归到父类返回 undefined，此时 parentProps 为 undefined，
+ * 走到合并分支仅返回子类自身的属性注入配置。
  */
 
 // 父类没有任何装饰器元数据
@@ -62,7 +61,7 @@ class Derived extends Base {
 }
 decorate(Inject(B), Derived, 'b');
 
-describe('getMetadata — 子类有自身元数据但父类无元数据', () => {
+describe('getInjectedProps — 子类有自身元数据但父类无元数据', () => {
   test('子类应正常使用自身的注入元数据', () => {
     const container = new Container();
     container.bind(Derived).toSelf();

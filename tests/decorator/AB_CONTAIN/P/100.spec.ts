@@ -1,4 +1,4 @@
-import { SkipSelf, Self, Optional, Inject, Container } from '@/index';
+import { SkipSelf, Self, Optional, Inject, Injectable, Container } from '@/index';
 import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
 import { hasOwn } from '@tests/utils';
 
@@ -18,6 +18,7 @@ class B {
   public id = 2;
 }
 
+@Injectable
 class A {
   public name = 'A';
   public id = 1;

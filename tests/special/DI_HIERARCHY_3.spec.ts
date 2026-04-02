@@ -1,4 +1,4 @@
-import { Container, Inject, LazyToken } from '@/index';
+import { Container, Inject, Injectable, LazyToken } from '@/index';
 import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
 import { hasOwn } from '@tests/utils';
 
@@ -19,6 +19,7 @@ interface IC {
   id: number;
 }
 
+@Injectable
 class A implements IA {
   public name = 'A';
   public id = 1;
@@ -27,6 +28,7 @@ class A implements IA {
   public b!: IB;
 }
 
+@Injectable
 class B implements IB {
   public name = 'B';
   public id = 2;

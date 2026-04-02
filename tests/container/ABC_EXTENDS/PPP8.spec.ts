@@ -1,6 +1,7 @@
 // A extends B
-import { PreDestroy, Container } from '@/index';
+import { PreDestroy, Injectable, Container } from '@/index';
 
+@Injectable
 class B {
   public name = 'B';
   public id = 2;
@@ -11,6 +12,7 @@ class B {
   }
 }
 
+@Injectable
 class A extends B {
   public name = 'A';
   public id = 1;

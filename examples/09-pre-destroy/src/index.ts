@@ -6,10 +6,11 @@
  * 2. container.destroy() 触发所有 @PreDestroy
  */
 
-import { Container, Inject, PostConstruct, PreDestroy } from '@kaokei/di';
+import { Container, Inject, PostConstruct, PreDestroy, Injectable } from '@kaokei/di';
 
 // ==================== 定义服务类 ====================
 
+@Injectable
 class TimerService {
   private timerId?: ReturnType<typeof setInterval>;
   running = false;
@@ -34,6 +35,7 @@ class TimerService {
   }
 }
 
+@Injectable
 class ConnectionService {
   connected = false;
 
@@ -50,6 +52,7 @@ class ConnectionService {
   }
 }
 
+@Injectable
 class AppService {
   @Inject(TimerService)
   timer!: TimerService;

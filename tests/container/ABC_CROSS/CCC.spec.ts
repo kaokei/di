@@ -1,6 +1,6 @@
 // ABC_CROSS: A→B,C  B→A,C  C→A,B（交叉循环依赖）
 // CCC = 三个类都使用构造函数参数注入 → 迁移为属性注入
-import { Inject, Container, LazyToken } from '@/index';
+import { Inject, Injectable, Container, LazyToken } from '@/index';
 import { CircularDependencyError } from '@/errors/CircularDependencyError';
 
 interface IA {
@@ -22,6 +22,7 @@ interface IC {
   b: IB;
 }
 
+@Injectable
 class A {
   public name = 'A';
   public id = 1;
@@ -33,6 +34,7 @@ class A {
   public c!: IC;
 }
 
+@Injectable
 class B {
   public name = 'B';
   public id = 2;
@@ -44,6 +46,7 @@ class B {
   public c!: IC;
 }
 
+@Injectable
 class C {
   public name = 'C';
   public id = 3;

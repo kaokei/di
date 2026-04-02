@@ -1,5 +1,5 @@
 import { Token } from '@/index';
-import { Container, inject as Inject } from 'inversify';
+import { Container, inject as Inject, injectable as Injectable } from 'inversify';
 import { BindingNotFoundError } from '@tests/inversify/constant.ts';
 
 class UserClass {
@@ -14,6 +14,7 @@ class UserClass {
   }
 }
 
+@Injectable()
 class User {
   private name = 'zhangsan';
   private age = 12;

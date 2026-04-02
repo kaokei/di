@@ -1,4 +1,4 @@
-import { Inject, Container } from '@/index';
+import { Inject, Injectable, Container } from '@/index';
 import { ERRORS } from '@/constants';
 
 interface IA {
@@ -17,6 +17,7 @@ class B {
   public id = 2;
 }
 
+@Injectable
 class A {
   public name = 'A';
   public id = 1;

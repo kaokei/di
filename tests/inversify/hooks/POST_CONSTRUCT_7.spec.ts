@@ -2,8 +2,10 @@ import {
   Container,
   postConstruct as PostConstruct,
   preDestroy as PreDestroy,
+  injectable as Injectable,
 } from 'inversify';
 
+@Injectable()
 class A {
   public name = 'A';
   public id = 1;

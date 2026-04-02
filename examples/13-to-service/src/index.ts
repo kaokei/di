@@ -6,7 +6,7 @@
  * 2. 面向接口编程：接口 token 映射到实现类
  */
 
-import { Container, Token, Inject } from '@kaokei/di';
+import { Container, Token, Inject, Injectable } from '@kaokei/di';
 
 // ==================== 场景一：简单 token 别名 ====================
 
@@ -66,6 +66,7 @@ class LocalStorage implements IStorage {
 }
 
 // 业务服务：依赖接口 Token，不依赖具体实现
+@Injectable
 class UserService {
   @Inject(LOGGER)
   logger!: ILogger;

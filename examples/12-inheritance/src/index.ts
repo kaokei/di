@@ -13,7 +13,7 @@
  * - 都没有 → 不执行
  */
 
-import { Container, Inject, PostConstruct } from '@kaokei/di';
+import { Container, Inject, PostConstruct, Injectable } from '@kaokei/di';
 
 // ==================== 定义基础服务 ====================
 
@@ -33,6 +33,7 @@ class CacheService {
 
 console.log('=== 场景一：子类继承父类的属性注入 ===');
 
+@Injectable
 class BaseRepository {
   // 父类中声明的注入属性，子类自动继承
   @Inject(LoggerService)
@@ -46,6 +47,7 @@ class BaseRepository {
   }
 }
 
+@Injectable
 class UserRepository extends BaseRepository {
   // 子类新增自己的注入属性
   @Inject(CacheService)
@@ -83,6 +85,7 @@ class SpecialLogger {
   log(msg: string) { console.log(`[SpecialLogger ★] ${msg}`); }
 }
 
+@Injectable
 class SpecialRepository extends BaseRepository {
   // 子类用不同的 token 覆盖父类的 logger 属性
   @Inject(SpecialLogger)
@@ -107,6 +110,7 @@ specialRepo.doWork(); // 输出 [SpecialLogger ★]
 
 console.log('\n=== 场景三A：子类有 @PostConstruct，父类也有 → 只执行子类的 ===');
 
+@Injectable
 class BaseServiceA {
   initLog: string[] = [];
 
@@ -117,6 +121,7 @@ class BaseServiceA {
   }
 }
 
+@Injectable
 class ChildServiceA extends BaseServiceA {
   @PostConstruct()
   childInit() {
@@ -132,6 +137,7 @@ console.log('执行记录：', childA.initLog); // ['ChildServiceA.childInit']
 
 console.log('\n=== 场景三B：子类没有 @PostConstruct，父类有 → 执行父类的 ===');
 
+@Injectable
 class BaseServiceB {
   initLog: string[] = [];
 

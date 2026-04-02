@@ -64,6 +64,7 @@ new LazyToken(() => Token | Newable);
 ```ts
 // a.ts 文件
 import { B } from './b.ts';
+@Injectable
 export class A {
   public name = 'A';
   @Inject(new LazyToken(() => B))
@@ -72,6 +73,7 @@ export class A {
 
 // b.ts 文件
 import { A } from './a.ts';
+@Injectable
 export class B {
   public name = 'B';
   @Inject(new LazyToken(() => A))
@@ -86,6 +88,37 @@ export class B {
 具体哪些场景的循环依赖是被支持的可以[参考这里](../note/05.什么是循环依赖.md)。
 
 > 本库使用 TC39 Stage 3 装饰器规范，所有依赖声明统一通过实例属性装饰器（Field Decorator）完成，不支持构造函数参数装饰器（Parameter Decorator）。
+
+## @Injectable
+
+```ts
+@Injectable
+```
+
+`@Injectable` 是一个无参数的类装饰器，用于在类定义阶段将装饰器元数据关联到类。
+
+使用了 `@Inject`、`@PostConstruct`、`@PreDestroy` 的类必须添加 `@Injectable`。
+
+仅使用 `@LazyInject` 的类不需要 `@Injectable`。
+
+使用 `decorate()` 的类不需要 `@Injectable`（`decorate()` 内部已模拟 `@Injectable` 行为）。
+
+`@Injectable` 放在类声明的最外层（最上面的装饰器位置），直接使用 `@Injectable` 而非 `@Injectable()`。
+
+用法：
+
+```ts
+@Injectable
+class DemoService {
+  @Inject(LoggerService)
+  public loggerService!: LoggerService;
+
+  @PostConstruct()
+  init() {
+    console.log('initialized');
+  }
+}
+```
 
 ## @Inject
 
@@ -110,6 +143,7 @@ class CountService {
   }
 }
 
+@Injectable
 class DemoService {
   // 使用场景: 指定注入属性的token
   @Inject(LoggerService)
@@ -136,6 +170,7 @@ class LoggerService {
   }
 }
 
+@Injectable
 class DemoService {
   @Self()
   @Inject(LoggerService)
@@ -177,6 +212,7 @@ class DemoService {
 示例：
 
 ```ts
+@Injectable
 class StudentService {
   public student: StudentVO;
 
@@ -203,6 +239,7 @@ class StudentService {
 示例：
 
 ```ts
+@Injectable
 class DatabaseService {
   public db: DatabaseVO;
 

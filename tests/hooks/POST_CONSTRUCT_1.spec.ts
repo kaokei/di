@@ -1,6 +1,7 @@
-import { Inject, Container, PostConstruct } from '@/index';
+import { Inject, Injectable, Container, PostConstruct } from '@/index';
 
 describe('POST_CONSTRUCT_1 A -> B', () => {
+  @Injectable
   class B {
     public inited = false;
 
@@ -21,6 +22,7 @@ describe('POST_CONSTRUCT_1 A -> B', () => {
     }
   }
 
+  @Injectable
   class A {
     public inited = false;
 
@@ -65,6 +67,7 @@ describe('POST_CONSTRUCT_1 A -> B', () => {
 });
 
 describe('POST_CONSTRUCT_2 B -> A', () => {
+  @Injectable
   class B {
     public inited = false;
 
@@ -85,6 +88,7 @@ describe('POST_CONSTRUCT_2 B -> A', () => {
     }
   }
 
+  @Injectable
   class A {
     public inited = false;
 
@@ -129,6 +133,7 @@ describe('POST_CONSTRUCT_2 B -> A', () => {
 });
 
 describe('POST_CONSTRUCT_3 A -> B', () => {
+  @Injectable
   class B {
     public inited = false;
 
@@ -149,6 +154,7 @@ describe('POST_CONSTRUCT_3 A -> B', () => {
     }
   }
 
+  @Injectable
   class A {
     public inited = false;
 
@@ -193,6 +199,7 @@ describe('POST_CONSTRUCT_3 A -> B', () => {
 });
 
 describe('POST_CONSTRUCT_4 B -> A', () => {
+  @Injectable
   class B {
     public inited = false;
 
@@ -213,6 +220,7 @@ describe('POST_CONSTRUCT_4 B -> A', () => {
     }
   }
 
+  @Injectable
   class A {
     public inited = false;
 

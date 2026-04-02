@@ -9,7 +9,7 @@
  * 需求：5.1、5.2、5.3
  */
 
-import { Container, Token, Inject } from '@/index';
+import { Container, Token, Inject, Injectable } from '@/index';
 import { Binding } from '@/binding';
 
 // 类型辅助：重构后的新 API
@@ -145,6 +145,7 @@ describe('实例映射与属性注入集成', () => {
       value = 'dep';
     }
 
+    @Injectable
     class MyService {
       @Inject(Dep) dep!: Dep;
     }

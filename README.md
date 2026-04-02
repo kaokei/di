@@ -39,3 +39,6 @@
   field decorator addInitializer callback -->
   class constructor
 
+- 5.0.4，5.1.6并不支持context.metadata
+- 5.2.2 开始支持context.metadata
+

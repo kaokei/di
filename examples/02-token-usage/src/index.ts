@@ -7,7 +7,7 @@
  * 3. Token 与 class 混合使用
  */
 
-import { Container, Token, Inject } from '@kaokei/di';
+import { Container, Token, Inject, Injectable } from '@kaokei/di';
 
 // ==================== 定义 Token ====================
 
@@ -20,6 +20,7 @@ const CONFIG = new Token<{ debug: boolean; timeout: number }>('CONFIG');
 
 // ==================== 定义服务类 ====================
 
+@Injectable
 class LoggerService {
   // 通过 Token 注入字符串类型的依赖
   @Inject(APP_NAME)
@@ -33,6 +34,7 @@ class LoggerService {
   }
 }
 
+@Injectable
 class HttpService {
   // 注入数字类型的依赖
   @Inject(MAX_RETRY)

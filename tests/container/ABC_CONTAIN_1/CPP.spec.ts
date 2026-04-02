@@ -1,4 +1,4 @@
-import { Inject, Container, LazyToken } from '@/index';
+import { Inject, Injectable, Container, LazyToken } from '@/index';
 
 interface IA {
   name: string;
@@ -18,6 +18,7 @@ interface IC {
 }
 
 // 迁移说明：原 CPP（A 构造函数参数注入）已迁移为属性注入，行为等同于 PPP。
+@Injectable
 class A {
   public name = 'A';
   public id = 1;
@@ -27,6 +28,7 @@ class A {
   @Inject(new LazyToken(() => C)) c!: IC;
 }
 
+@Injectable
 class B {
   public name = 'B';
   public id = 2;
@@ -35,6 +37,7 @@ class B {
   public c!: IC;
 }
 
+@Injectable
 class C {
   public name = 'C';
   public id = 3;

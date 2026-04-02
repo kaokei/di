@@ -2,76 +2,77 @@
  * CacheMap 类型安全测试
  *
  * 覆盖范围：
- * - defineMetadata 和 getMetadata/getOwnMetadata 的基本读写
- * - 父子类继承场景下 getMetadata 的合并行为
+ * - defineMetadata 和 getInjectedProps/getPostConstruct/getPreDestroy 的基本读写
+ * - 父子类继承场景下 getInjectedProps 的合并行为
  * - 子类修改 INJECTED_PROPS 元数据后父类元数据不受影响（深拷贝验证）
  *
  * 需求：7.1、7.2、7.3、7.4
  */
 
-import { defineMetadata, getMetadata, getOwnMetadata } from '@/cachemap';
+import { defineMetadata, getInjectedProps, getPostConstruct, getPreDestroy } from '@/cachemap';
 import { KEYS } from '@/constants';
 import { Inject, decorate } from '@/index';
 
 // ==================== 基本读写（需求 7.1、7.2） ====================
 
-describe('defineMetadata 和 getMetadata/getOwnMetadata 基本读写', () => {
-  test('defineMetadata 写入后 getOwnMetadata 可以读取', () => {
+describe('defineMetadata 和 getInjectedProps/getPostConstruct/getPreDestroy 基本读写', () => {
+  test('defineMetadata 写入后 getInjectedProps 可以读取', () => {
     class Target {}
-    const metadata = { propA: { inject: Target } };
-    defineMetadata(KEYS.INJECTED_PROPS, metadata, Target);
+    const metadata: Record<string, unknown> = { [KEYS.INJECTED_PROPS]: { propA: { inject: Target } } };
+    defineMetadata(Target, metadata);
 
-    const result = getOwnMetadata(KEYS.INJECTED_PROPS, Target);
-    expect(result).toEqual(metadata);
+    const result = getInjectedProps(Target);
+    expect(result).toEqual({ propA: { inject: Target } });
   });
 
-  test('getOwnMetadata 对未设置元数据的类返回 undefined', () => {
+  test('getInjectedProps 对未设置元数据的类返回 undefined', () => {
     class Empty {}
-    const result = getOwnMetadata(KEYS.INJECTED_PROPS, Empty);
+    const result = getInjectedProps(Empty);
     expect(result).toBeUndefined();
   });
 
   test('defineMetadata 可以覆盖已有的元数据', () => {
     class Target {}
-    defineMetadata(KEYS.INJECTED_PROPS, { a: { inject: Target } }, Target);
-    defineMetadata(KEYS.INJECTED_PROPS, { b: { inject: Target } }, Target);
+    defineMetadata(Target, { [KEYS.INJECTED_PROPS]: { a: { inject: Target } } });
+    defineMetadata(Target, { [KEYS.INJECTED_PROPS]: { b: { inject: Target } } });
 
-    const result = getOwnMetadata(KEYS.INJECTED_PROPS, Target);
+    const result = getInjectedProps(Target);
     expect(result).toEqual({ b: { inject: Target } });
   });
 
-  test('不同 metadataKey 互不干扰', () => {
+  test('不同元数据类型互不干扰', () => {
     class Target {}
-    defineMetadata(KEYS.INJECTED_PROPS, { prop: {} }, Target);
-    defineMetadata(KEYS.POST_CONSTRUCT, { key: 'init' }, Target);
+    defineMetadata(Target, {
+      [KEYS.INJECTED_PROPS]: { prop: {} },
+      [KEYS.POST_CONSTRUCT]: { key: 'init' },
+    });
 
-    expect(getOwnMetadata(KEYS.INJECTED_PROPS, Target)).toEqual({ prop: {} });
-    expect(getOwnMetadata(KEYS.POST_CONSTRUCT, Target)).toEqual({ key: 'init' });
+    expect(getInjectedProps(Target)).toEqual({ prop: {} });
+    expect(getPostConstruct(Target)).toEqual({ key: 'init' });
   });
 
   test('不同类的元数据互不干扰', () => {
     class A {}
     class B {}
-    defineMetadata(KEYS.INJECTED_PROPS, { fromA: {} }, A);
-    defineMetadata(KEYS.INJECTED_PROPS, { fromB: {} }, B);
+    defineMetadata(A, { [KEYS.INJECTED_PROPS]: { fromA: {} } });
+    defineMetadata(B, { [KEYS.INJECTED_PROPS]: { fromB: {} } });
 
-    expect(getOwnMetadata(KEYS.INJECTED_PROPS, A)).toEqual({ fromA: {} });
-    expect(getOwnMetadata(KEYS.INJECTED_PROPS, B)).toEqual({ fromB: {} });
+    expect(getInjectedProps(A)).toEqual({ fromA: {} });
+    expect(getInjectedProps(B)).toEqual({ fromB: {} });
   });
 
-  test('getMetadata 对无父类的类等同于 getOwnMetadata', () => {
+  test('getInjectedProps 对无父类的类直接返回自身数据', () => {
     class Standalone {}
-    defineMetadata(KEYS.INJECTED_PROPS, { x: { inject: Standalone } }, Standalone);
+    defineMetadata(Standalone, { [KEYS.INJECTED_PROPS]: { x: { inject: Standalone } } });
 
-    const own = getOwnMetadata(KEYS.INJECTED_PROPS, Standalone);
-    const full = getMetadata(KEYS.INJECTED_PROPS, Standalone);
-    expect(full).toEqual(own);
+    const result = getInjectedProps(Standalone);
+    expect(result).toEqual({ x: { inject: Standalone } });
   });
 });
 
 // ==================== 父子类继承合并（需求 7.3） ====================
 
-describe('父子类继承场景下 getMetadata 的合并行为', () => {
+describe('父子类继承场景下 getInjectedProps 的合并行为', () => {
   test('子类继承父类的 INJECTED_PROPS 元数据', () => {
     class Dep {}
 
@@ -83,7 +84,7 @@ describe('父子类继承场景下 getMetadata 的合并行为', () => {
     // 子类自身没有元数据，但通过继承链可以获取父类的
     class Child extends Parent {}
 
-    const childMeta = getMetadata(KEYS.INJECTED_PROPS, Child);
+    const childMeta = getInjectedProps(Child);
     expect(childMeta).toBeDefined();
     expect(childMeta).toHaveProperty('dep');
   });
@@ -102,7 +103,7 @@ describe('父子类继承场景下 getMetadata 的合并行为', () => {
     }
     decorate(Inject(DepB), Child, 'b');
 
-    const childMeta = getMetadata(KEYS.INJECTED_PROPS, Child);
+    const childMeta = getInjectedProps(Child);
     // 应同时包含父类的 a 和子类的 b
     expect(childMeta).toHaveProperty('a');
     expect(childMeta).toHaveProperty('b');
@@ -122,33 +123,13 @@ describe('父子类继承场景下 getMetadata 的合并行为', () => {
     }
     decorate(Inject(DepB), Child, 'shared');
 
-    const childMeta = getMetadata(KEYS.INJECTED_PROPS, Child);
+    const childMeta = getInjectedProps(Child)!;
     // 子类的 shared 应覆盖父类的 shared
     expect(childMeta.shared.inject).toBe(DepB);
 
     // 父类的元数据不应被改变
-    const parentMeta = getMetadata(KEYS.INJECTED_PROPS, Parent);
+    const parentMeta = getInjectedProps(Parent)!;
     expect(parentMeta.shared.inject).toBe(DepA);
-  });
-
-  test('getOwnMetadata 不返回父类的元数据', () => {
-    class Dep {}
-
-    class Parent {
-      dep!: Dep;
-    }
-    decorate(Inject(Dep), Parent, 'dep');
-
-    class Child extends Parent {}
-
-    // getOwnMetadata 只返回子类自身的元数据
-    const ownMeta = getOwnMetadata(KEYS.INJECTED_PROPS, Child);
-    expect(ownMeta).toBeUndefined();
-
-    // getMetadata 可以获取继承链上的元数据
-    const fullMeta = getMetadata(KEYS.INJECTED_PROPS, Child);
-    expect(fullMeta).toBeDefined();
-    expect(fullMeta).toHaveProperty('dep');
   });
 
   test('多层继承链的元数据正确合并', () => {
@@ -171,7 +152,7 @@ describe('父子类继承场景下 getMetadata 的合并行为', () => {
     }
     decorate(Inject(DepC), Child, 'c');
 
-    const childMeta = getMetadata(KEYS.INJECTED_PROPS, Child);
+    const childMeta = getInjectedProps(Child)!;
     expect(childMeta).toHaveProperty('a');
     expect(childMeta).toHaveProperty('b');
     expect(childMeta).toHaveProperty('c');
@@ -187,23 +168,24 @@ describe('父子类继承场景下 getMetadata 的合并行为', () => {
     }
     decorate(Inject(Dep), Child, 'dep');
 
-    const childMeta = getMetadata(KEYS.INJECTED_PROPS, Child);
+    const childMeta = getInjectedProps(Child)!;
     expect(childMeta).toHaveProperty('dep');
   });
 
-  test('父子类都无元数据时 getMetadata 返回 undefined', () => {
+  test('父子类都无元数据时 getInjectedProps 返回 undefined', () => {
     class Parent {}
     class Child extends Parent {}
 
-    const result = getMetadata(KEYS.INJECTED_PROPS, Child);
+    const result = getInjectedProps(Child);
     expect(result).toBeUndefined();
   });
 });
 
+
 // ==================== 深拷贝隔离验证（需求 7.4） ====================
 
 describe('子类修改 INJECTED_PROPS 元数据后父类不受影响（深拷贝验证）', () => {
-  test('修改 getMetadata 返回的子类元数据的内层对象会影响父类（内层为原始引用）', () => {
+  test('修改 getInjectedProps 返回的子类元数据的内层对象会影响父类（内层为原始引用）', () => {
     class DepA {}
     class DepB {}
 
@@ -218,19 +200,19 @@ describe('子类修改 INJECTED_PROPS 元数据后父类不受影响（深拷贝
     decorate(Inject(DepB), Child, 'b');
 
     // 获取子类的合并元数据
-    const childMeta = getMetadata(KEYS.INJECTED_PROPS, Child);
+    const childMeta = getInjectedProps(Child)!;
 
     // 移除 deepCloneInjectedProps 后，内层对象为原始引用
     // 修改子类元数据中继承自父类的属性会影响父类（这是已知行为）
     // 但所有消费者（_getInjectProperties 中的 { inject, ...rest } 解构）都不会修改内层对象
     childMeta.a.inject = DepB;
 
-    const parentMeta = getMetadata(KEYS.INJECTED_PROPS, Parent);
+    const parentMeta = getInjectedProps(Parent)!;
     // 内层为原始引用，修改会传播到父类
     expect(parentMeta.a.inject).toBe(DepB);
   });
 
-  test('向 getMetadata 返回的子类元数据添加新属性不影响父类', () => {
+  test('向 getInjectedProps 返回的子类元数据添加新属性不影响父类', () => {
     class Dep {}
 
     class Parent {
@@ -241,11 +223,11 @@ describe('子类修改 INJECTED_PROPS 元数据后父类不受影响（深拷贝
     class Child extends Parent {}
 
     // 获取子类的合并元数据并添加新属性
-    const childMeta = getMetadata(KEYS.INJECTED_PROPS, Child);
+    const childMeta = getInjectedProps(Child)!;
     childMeta.newProp = { inject: Dep };
 
     // 父类的元数据不应包含新添加的属性
-    const parentMeta = getMetadata(KEYS.INJECTED_PROPS, Parent);
+    const parentMeta = getInjectedProps(Parent)!;
     expect(parentMeta).not.toHaveProperty('newProp');
   });
 
@@ -260,15 +242,15 @@ describe('子类修改 INJECTED_PROPS 元数据后父类不受影响（深拷贝
     class Child extends Parent {}
 
     // 获取子类的合并元数据
-    const childMeta = getMetadata(KEYS.INJECTED_PROPS, Child);
+    const childMeta = getInjectedProps(Child)!;
 
     // 移除 deepCloneInjectedProps 后，内层对象为原始引用
     // 修改深层嵌套的属性值会影响父类（这是已知行为）
     // 但所有消费者都不会修改内层对象，因此不会造成实际问题
-    childMeta.dep.extraField = 'polluted';
+    (childMeta.dep as any).extraField = 'polluted';
 
     // 内层为原始引用，修改会传播到父类
-    const parentMeta = getOwnMetadata(KEYS.INJECTED_PROPS, Parent);
+    const parentMeta = getInjectedProps(Parent)!;
     expect(parentMeta.dep).toHaveProperty('extraField', 'polluted');
   });
 });
@@ -276,18 +258,18 @@ describe('子类修改 INJECTED_PROPS 元数据后父类不受影响（深拷贝
 // ==================== 非 INJECTED_PROPS 元数据的父子类继承合并 ====================
 
 describe('非 INJECTED_PROPS 元数据的父子类继承合并', () => {
-  test('子类继承父类的 POST_CONSTRUCT 元数据（通过 decorate 设置）', () => {
+  test('子类继承父类的 POST_CONSTRUCT 元数据（通过 defineMetadata 设置）', () => {
     class Parent {
       init() {}
     }
     // 手动通过 defineMetadata 给父类设置 POST_CONSTRUCT 元数据
-    defineMetadata(KEYS.POST_CONSTRUCT, { key: 'init' }, Parent);
+    defineMetadata(Parent, { [KEYS.POST_CONSTRUCT]: { key: 'init' } });
 
     // 子类自身没有 POST_CONSTRUCT 元数据
     class Child extends Parent {}
 
-    // getMetadata 应通过继承链获取父类的 POST_CONSTRUCT
-    const childMeta = getMetadata(KEYS.POST_CONSTRUCT, Child);
+    // getPostConstruct 应通过继承链获取父类的 POST_CONSTRUCT
+    const childMeta = getPostConstruct(Child);
     expect(childMeta).toBeDefined();
     expect(childMeta).toHaveProperty('key', 'init');
   });
@@ -296,19 +278,19 @@ describe('非 INJECTED_PROPS 元数据的父子类继承合并', () => {
     class Parent {
       parentInit() {}
     }
-    defineMetadata(KEYS.POST_CONSTRUCT, { key: 'parentInit' }, Parent);
+    defineMetadata(Parent, { [KEYS.POST_CONSTRUCT]: { key: 'parentInit' } });
 
     class Child extends Parent {
       childInit() {}
     }
-    defineMetadata(KEYS.POST_CONSTRUCT, { key: 'childInit' }, Child);
+    defineMetadata(Child, { [KEYS.POST_CONSTRUCT]: { key: 'childInit' } });
 
-    // 子类的元数据应覆盖父类的（展开运算符后者覆盖前者）
-    const childMeta = getMetadata(KEYS.POST_CONSTRUCT, Child);
+    // 子类的元数据应覆盖父类的
+    const childMeta = getPostConstruct(Child);
     expect(childMeta).toHaveProperty('key', 'childInit');
 
     // 父类的元数据不受影响
-    const parentMeta = getOwnMetadata(KEYS.POST_CONSTRUCT, Parent);
+    const parentMeta = getPostConstruct(Parent);
     expect(parentMeta).toHaveProperty('key', 'parentInit');
   });
 
@@ -316,11 +298,11 @@ describe('非 INJECTED_PROPS 元数据的父子类继承合并', () => {
     class Parent {
       cleanup() {}
     }
-    defineMetadata(KEYS.PRE_DESTROY, { key: 'cleanup' }, Parent);
+    defineMetadata(Parent, { [KEYS.PRE_DESTROY]: { key: 'cleanup' } });
 
     class Child extends Parent {}
 
-    const childMeta = getMetadata(KEYS.PRE_DESTROY, Child);
+    const childMeta = getPreDestroy(Child);
     expect(childMeta).toBeDefined();
     expect(childMeta).toHaveProperty('key', 'cleanup');
   });
@@ -331,9 +313,9 @@ describe('非 INJECTED_PROPS 元数据的父子类继承合并', () => {
     class Child extends Parent {
       init() {}
     }
-    defineMetadata(KEYS.POST_CONSTRUCT, { key: 'init' }, Child);
+    defineMetadata(Child, { [KEYS.POST_CONSTRUCT]: { key: 'init' } });
 
-    const childMeta = getMetadata(KEYS.POST_CONSTRUCT, Child);
+    const childMeta = getPostConstruct(Child);
     expect(childMeta).toHaveProperty('key', 'init');
   });
 });

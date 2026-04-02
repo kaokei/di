@@ -6,6 +6,7 @@ import {
   Container,
   inject as Inject,
   LazyServiceIdentifier as LazyToken,
+  injectable as Injectable,
 } from 'inversify';
 import { CircularDependencyError } from '@tests/inversify/constant.ts';
 
@@ -30,6 +31,7 @@ interface IC {
   b: IB;
 }
 
+@Injectable()
 class C {
   public name = 'C';
   public id = 3;
@@ -40,6 +42,7 @@ class C {
   public b!: IB;
 }
 
+@Injectable()
 class B {
   public name = 'B';
   public id = 2;
@@ -50,6 +53,7 @@ class B {
   public c!: IC;
 }
 
+@Injectable()
 class A extends B {
   public name = 'A';
   public id = 1;

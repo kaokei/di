@@ -1,8 +1,9 @@
-import { Inject, Container, PostConstruct, Token } from '@/index';
+import { Inject, Injectable, Container, PostConstruct, Token } from '@/index';
 
 const tokenB = new Token<string>('tokenB');
 const tokenC = new Token<string>('tokenC');
 
+@Injectable
 class A {
   // 迁移：构造函数参数 @Inject 改为属性装饰器
   @Inject(tokenB) b!: string;

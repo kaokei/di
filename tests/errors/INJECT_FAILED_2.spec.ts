@@ -1,4 +1,4 @@
-import { Inject, Container } from '@/index';
+import { Inject, Injectable, Container } from '@/index';
 import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
 
 interface IA {
@@ -12,6 +12,7 @@ interface IB {
   id: number;
 }
 
+@Injectable
 class A {
   public name = 'A';
   public id = 1;
