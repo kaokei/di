@@ -28,6 +28,9 @@ const RESERVED_PROPERTY_NAMES = [
   'toString',
   'valueOf',
   'toLocaleString',
+  'caller',
+  'callee',
+  'arguments',
 ];
 
 // 公共的合法方法名 arbitrary，过滤掉所有保留属性名

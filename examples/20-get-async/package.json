@@ -1,0 +1,17 @@
+{
+  "name": "di-example-20-get-async",
+  "version": "1.0.0",
+  "description": "异步获取服务：使用 getAsync 等待 PostConstruct 完成后再返回实例",
+  "type": "module",
+  "scripts": {
+    "start": "vite"
+  },
+  "dependencies": {
+    "@kaokei/di": "^5.0.0"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-decorators": "^7.29.0",
+    "@rollup/plugin-babel": "^7.0.0",
+    "vite": "^5.3.0"
+  }
+}

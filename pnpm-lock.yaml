@@ -360,6 +360,38 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0(@types/node@22.19.15)
 
+  examples/19-transient-scope:
+    dependencies:
+      '@kaokei/di':
+        specifier: ^5.0.0
+        version: 5.0.0
+    devDependencies:
+      '@babel/plugin-proposal-decorators':
+        specifier: ^7.29.0
+        version: 7.29.0(@babel/core@7.29.0)
+      '@rollup/plugin-babel':
+        specifier: ^7.0.0
+        version: 7.0.0(@babel/core@7.29.0)(rollup@4.60.1)
+      vite:
+        specifier: ^5.3.0
+        version: 5.3.0(@types/node@22.19.15)
+
+  examples/20-get-async:
+    dependencies:
+      '@kaokei/di':
+        specifier: ^5.0.0
+        version: 5.0.0
+    devDependencies:
+      '@babel/plugin-proposal-decorators':
+        specifier: ^7.29.0
+        version: 7.29.0(@babel/core@7.29.0)
+      '@rollup/plugin-babel':
+        specifier: ^7.0.0
+        version: 7.0.0(@babel/core@7.29.0)(rollup@4.60.1)
+      vite:
+        specifier: ^5.3.0
+        version: 5.3.0(@types/node@22.19.15)
+
 packages:
 
   '@algolia/abtesting@1.16.1':
