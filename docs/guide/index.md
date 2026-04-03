@@ -39,7 +39,7 @@ class LoggerService {
   }
 }
 
-@Injectable
+@Injectable()
 class CountService {
   public count = 0;
 

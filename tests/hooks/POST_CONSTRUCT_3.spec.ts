@@ -11,7 +11,7 @@ interface IB {
   id: number;
 }
 
-@Injectable
+@Injectable()
 class A {
   public name = 'A';
   public id = 1;
@@ -30,7 +30,7 @@ class A {
   }
 }
 
-@Injectable
+@Injectable()
 class B {
   public name = 'B';
   public id = 2;

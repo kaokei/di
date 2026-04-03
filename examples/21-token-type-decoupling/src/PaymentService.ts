@@ -7,7 +7,7 @@
 
 import { Injectable } from '@kaokei/di';
 
-@Injectable
+@Injectable()
 export class PaymentService {
   // 支付方式
   method = 'credit_card';

@@ -13,7 +13,7 @@ class UserClass {
   }
 }
 
-@Injectable
+@Injectable()
 class User {
   private name = 'zhangsan';
   private age = 12;

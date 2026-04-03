@@ -12,7 +12,7 @@ interface IB {
   a: IA;
 }
 
-@Injectable
+@Injectable()
 class A {
   public name = 'A';
   public id = 1;

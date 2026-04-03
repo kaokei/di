@@ -127,7 +127,7 @@ console.log(a.c);
 因此 `@Self`/`@Optional`/`@SkipSelf` 必须与 `@Inject` 搭配使用才有意义：
 
 ```ts
-@Injectable
+@Injectable()
 class A {
   // ✅ 正确：@Inject 指定 token，@Optional 标记可选
   @Inject(B) @Optional() b!: B;

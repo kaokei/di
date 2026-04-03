@@ -11,7 +11,7 @@ import { delay } from '@tests/utils';
  */
 
 describe('PostConstruct 异步失败 - 场景 1：前置服务 PostConstruct 异步失败', () => {
-  @Injectable
+  @Injectable()
   class B {
     public name = 'B';
     public id = 2;
@@ -24,7 +24,7 @@ describe('PostConstruct 异步失败 - 场景 1：前置服务 PostConstruct 异
     }
   }
 
-  @Injectable
+  @Injectable()
   class A {
     public name = 'A';
     public id = 1;
@@ -87,7 +87,7 @@ describe('PostConstruct 异步失败 - 场景 1：前置服务 PostConstruct 异
 });
 
 describe('PostConstruct 异步失败 - 场景 2：前置服务 PostConstruct 成功（保持测试）', () => {
-  @Injectable
+  @Injectable()
   class B {
     public name = 'B';
     public id = 2;
@@ -99,7 +99,7 @@ describe('PostConstruct 异步失败 - 场景 2：前置服务 PostConstruct 成
     }
   }
 
-  @Injectable
+  @Injectable()
   class A {
     public name = 'A';
     public id = 1;

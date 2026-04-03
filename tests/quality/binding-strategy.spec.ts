@@ -204,12 +204,12 @@ describe('_resolveInstanceValue 职责分离', () => {
     const executionOrder: string[] = [];
 
     // 创建一个带有属性注入和 PostConstruct 的服务
-    @Injectable
+    @Injectable()
     class Dep {
       value = 'dep-value';
     }
 
-    @Injectable
+    @Injectable()
     class MyService {
       @Inject(Dep) dep!: Dep;
 
@@ -268,10 +268,10 @@ describe('_resolveInstanceValue 职责分离', () => {
   });
 
   test('属性注入在实例激活之后执行', () => {
-    @Injectable
+    @Injectable()
     class Dep {}
 
-    @Injectable
+    @Injectable()
     class MyService {
       @Inject(Dep) dep!: Dep;
     }

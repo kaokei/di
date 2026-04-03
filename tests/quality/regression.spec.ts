@@ -191,7 +191,7 @@ describe('回归测试：属性注入（@Inject）', () => {
       value = 'A';
     }
 
-    @Injectable
+    @Injectable()
     class ServiceB {
       @Inject(ServiceA) a!: ServiceA;
     }
@@ -209,7 +209,7 @@ describe('回归测试：属性注入（@Inject）', () => {
   test('使用 Token 进行属性注入', () => {
     const TOKEN = new Token<string>('myToken');
 
-    @Injectable
+    @Injectable()
     class MyService {
       @Inject(TOKEN) msg!: string;
     }
@@ -228,7 +228,7 @@ describe('回归测试：属性注入（@Inject）', () => {
       name = 'dep';
     }
 
-    @Injectable
+    @Injectable()
     class Main {
       @Inject(new LazyToken(() => Dep)) dep!: Dep;
     }
@@ -246,7 +246,7 @@ describe('回归测试：属性注入（@Inject）', () => {
   test('@Optional 装饰器：服务不存在时返回 undefined', () => {
     const TOKEN = new Token<string>('optional-token');
 
-    @Injectable
+    @Injectable()
     class MyService {
       @Inject(TOKEN) @Optional() optionalDep!: string;
     }
@@ -266,7 +266,7 @@ describe('回归测试：生命周期（@PostConstruct / @PreDestroy）', () => 
   test('@PostConstruct 在实例化后被调用', () => {
     let initialized = false;
 
-    @Injectable
+    @Injectable()
     class MyService {
       @PostConstruct()
       init() {
@@ -285,7 +285,7 @@ describe('回归测试：生命周期（@PostConstruct / @PreDestroy）', () => 
     const TOKEN = new Token<string>('greeting');
     let capturedValue = '';
 
-    @Injectable
+    @Injectable()
     class MyService {
       @Inject(TOKEN) greeting!: string;
 
@@ -306,7 +306,7 @@ describe('回归测试：生命周期（@PostConstruct / @PreDestroy）', () => 
   test('@PreDestroy 在 unbind 时被调用', () => {
     let destroyed = false;
 
-    @Injectable
+    @Injectable()
     class MyService {
       @PreDestroy()
       cleanup() {
@@ -326,7 +326,7 @@ describe('回归测试：生命周期（@PostConstruct / @PreDestroy）', () => 
   test('@PostConstruct 返回 Promise 时异步执行', async () => {
     let result = 0;
 
-    @Injectable
+    @Injectable()
     class MyService {
       @PostConstruct()
       async init() {
@@ -400,7 +400,7 @@ describe('回归测试：父子容器', () => {
       value = 'dep';
     }
 
-    @Injectable
+    @Injectable()
     class MyService {
       @Inject(Dep) @Self() dep!: Dep;
     }
@@ -419,7 +419,7 @@ describe('回归测试：父子容器', () => {
       value = 'dep';
     }
 
-    @Injectable
+    @Injectable()
     class MyService {
       @Inject(Dep) @SkipSelf() dep!: Dep;
     }

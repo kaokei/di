@@ -42,7 +42,7 @@ interface IH {
   c: IC;
 }
 
-@Injectable
+@Injectable()
 class A {
   public name = 'A';
   public id = 1;
@@ -51,7 +51,7 @@ class A {
   public b!: IB;
 }
 
-@Injectable
+@Injectable()
 class B {
   public name = 'B';
   public id = 2;
@@ -60,7 +60,7 @@ class B {
   public c!: IC;
 }
 
-@Injectable
+@Injectable()
 class C {
   public name = 'C';
   public id = 3;
@@ -69,7 +69,7 @@ class C {
   public d!: ID;
 }
 
-@Injectable
+@Injectable()
 class D {
   public name = 'D';
   public id = 4;
@@ -78,7 +78,7 @@ class D {
   public e!: IE;
 }
 
-@Injectable
+@Injectable()
 class E {
   public name = 'E';
   public id = 5;
@@ -87,7 +87,7 @@ class E {
   public f!: IF;
 }
 
-@Injectable
+@Injectable()
 class F {
   public name = 'F';
   public id = 6;
@@ -96,7 +96,7 @@ class F {
   public g!: IG;
 }
 
-@Injectable
+@Injectable()
 class G {
   public name = 'G';
   public id = 7;
@@ -105,7 +105,7 @@ class G {
   public h!: IH;
 }
 
-@Injectable
+@Injectable()
 class H {
   public name = 'H';
   public id = 8;

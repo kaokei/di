@@ -111,7 +111,7 @@ describe('Transient: 属性注入正常工作', () => {
     public id = 2;
   }
 
-  @Injectable
+  @Injectable()
   class A {
     public name = 'A';
     @Inject(B) b!: B;
@@ -147,7 +147,7 @@ describe('Transient: 依赖也是 Transient', () => {
     public name = 'B';
   }
 
-  @Injectable
+  @Injectable()
   class A {
     public name = 'A';
     @Inject(B) b!: B;
@@ -320,7 +320,7 @@ describe('Transient: Container onActivation 每次 get 都触发', () => {
 describe('Transient: @PostConstruct 每次 get 都执行', () => {
   let initCount = 0;
 
-  @Injectable
+  @Injectable()
   class A {
     public name = 'A';
 
@@ -388,7 +388,7 @@ describe('Transient: 层级容器中的瞬态服务', () => {
 describe('Transient: unbind 和 destroy 正常工作', () => {
   let destroyCount = 0;
 
-  @Injectable
+  @Injectable()
   class A {
     public name = 'A';
 
@@ -471,12 +471,12 @@ describe('Transient: 默认是单例模式', () => {
 // ==================== Transient 与 LazyToken ====================
 
 describe('Transient: 与 LazyToken 配合使用', () => {
-  @Injectable
+  @Injectable()
   class B {
     public name = 'B';
   }
 
-  @Injectable
+  @Injectable()
   class A {
     public name = 'A';
     @Inject(new LazyToken(() => B)) b!: B;

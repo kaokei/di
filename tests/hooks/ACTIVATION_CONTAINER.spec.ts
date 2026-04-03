@@ -5,7 +5,7 @@ class B {
 }
 
 // 迁移：构造函数参数 @Inject 改为属性装饰器
-@Injectable
+@Injectable()
 class A {
   @Inject(B) b!: B;
 }

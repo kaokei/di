@@ -10,7 +10,7 @@ import { Container, Inject, PostConstruct, PreDestroy, Injectable } from '@kaoke
 
 // ==================== 定义服务类 ====================
 
-@Injectable
+@Injectable()
 class TimerService {
   private timerId?: ReturnType<typeof setInterval>;
   running = false;
@@ -35,7 +35,7 @@ class TimerService {
   }
 }
 
-@Injectable
+@Injectable()
 class ConnectionService {
   connected = false;
 
@@ -52,7 +52,7 @@ class ConnectionService {
   }
 }
 
-@Injectable
+@Injectable()
 class AppService {
   @Inject(TimerService)
   timer!: TimerService;

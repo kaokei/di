@@ -15,7 +15,7 @@ interface IB {
   a: IA;
 }
 
-@Injectable
+@Injectable()
 class A {
   public name = 'A';
   public id = 1;
@@ -23,7 +23,7 @@ class A {
   @Inject(new LazyToken(() => B)) b!: IB;
 }
 
-@Injectable
+@Injectable()
 class B {
   public name = 'B';
   public id = 2;

@@ -144,7 +144,7 @@ describe('unbindAll 触发 deactivation 和 preDestroy', () => {
   test('unbindAll 触发每个 Instance 绑定的 @PreDestroy', () => {
     const destroyedServices: string[] = [];
 
-    @Injectable
+    @Injectable()
     class ServiceA {
       @PreDestroy()
       cleanup() {
@@ -152,7 +152,7 @@ describe('unbindAll 触发 deactivation 和 preDestroy', () => {
       }
     }
 
-    @Injectable
+    @Injectable()
     class ServiceB {
       @PreDestroy()
       cleanup() {

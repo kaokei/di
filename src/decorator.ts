@@ -124,12 +124,14 @@ export const PreDestroy = createMetaDecorator(
  * @Injectable 读取 context.metadata 并通过 defineMetadata 写入 CacheMap，
  * 建立 target → metadata 的映射关系。
  *
- * 使用方式：@Injectable（无参数，直接作为装饰器使用）
+ * 使用方式：@Injectable()（需要调用，与其他装饰器保持一致）
  */
-export function Injectable(Ctor: Function, context: ClassDecoratorContext) {
-  const meta = context.metadata as Record<string, any>;
-  // 直接关联 target 和 context.metadata
-  defineMetadata(Ctor as Newable, meta);
+export function Injectable() {
+  return function (Ctor: Function, context: ClassDecoratorContext) {
+    const meta = context.metadata as Record<string, any>;
+    // 直接关联 target 和 context.metadata
+    defineMetadata(Ctor as Newable, meta);
+  };
 }
 
 /**
@@ -304,7 +306,7 @@ export function decorate(decorator: any, target: any, key: string): void {
     proto[key] = currentValue;
   }
 
-  // 模拟 @Injectable 的行为：直接关联 target 和 metadata
+  // 模拟 @Injectable() 的行为：直接关联 target 和 metadata
   // 由于 defineMetadata 存储的是 metadata 对象引用，
   // 多次调用 decorate() 时 metadata 是同一个引用（通过 DECORATE_METADATA Symbol 保证），
   // 后续调用会自动累积数据

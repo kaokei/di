@@ -1,6 +1,6 @@
 import { Container, Injectable, PostConstruct, PreDestroy, Token } from '@/index';
 
-@Injectable
+@Injectable()
 class A {
   public name = 'A';
   public id = 1;

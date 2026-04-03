@@ -55,7 +55,7 @@ class DatabaseService {
 }
 
 // 请求处理器：每次请求创建新实例，但共享同一个数据库连接
-@Injectable
+@Injectable()
 class RequestHandler {
   @Inject(DatabaseService)
   db!: DatabaseService;

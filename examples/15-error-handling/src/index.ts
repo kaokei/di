@@ -47,7 +47,7 @@ function tryGet(label: string, fn: () => void) {
 console.log('=== 场景一：BindingNotFoundError ===');
 
 class LoggerService {}
-@Injectable
+@Injectable()
 class UserService {
   @Inject(LoggerService)
   logger!: LoggerService;
@@ -70,7 +70,7 @@ tryGet('依赖注入触发', () => {
 // @Optional 可以避免 BindingNotFoundError
 const container1b = new Container();
 
-@Injectable
+@Injectable()
 class UserServiceOptional {
   @Inject(LoggerService)
   @Optional()

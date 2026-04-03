@@ -98,7 +98,7 @@ inversify 是支持在同一个 token 上绑定多个服务的，最终可以实
 ```ts
 // A和B都是class，并且A依赖B
 class B {}
-@Injectable
+@Injectable()
 class A {
   @Inject(B)
   public b!: B;

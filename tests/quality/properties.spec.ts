@@ -76,7 +76,7 @@ describe('Feature: code-quality-optimization, Property 11: 服务解析行为保
       const VALUE_TOKEN = new Token<string>('value');
       container.bind(VALUE_TOKEN).toConstantValue('injected-value');
 
-      @Injectable
+      @Injectable()
       class ServiceWithInject {
         @Inject(VALUE_TOKEN) myProp!: string;
         initialized = false;
@@ -333,7 +333,7 @@ describe('Feature: code-quality-optimization, Property 7: 重复方法装饰器�
     try {
       const order: string[] = [];
 
-      @Injectable
+      @Injectable()
       class Parent {
         @PostConstruct()
         init() {
@@ -341,7 +341,7 @@ describe('Feature: code-quality-optimization, Property 7: 重复方法装饰器�
         }
       }
 
-      @Injectable
+      @Injectable()
       class Child extends Parent {
         @PostConstruct()
         override init() {

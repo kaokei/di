@@ -13,7 +13,7 @@ const tokenB1 = new Token<number>('b1');
 const tokenC1 = new Token<number>('c1');
 const tokenD1 = new Token<number>('d1');
 
-@Injectable
+@Injectable()
 class D {
   public name = 'D';
   public id = 4;
@@ -22,7 +22,7 @@ class D {
   public d1!: number;
 }
 
-@Injectable
+@Injectable()
 class C extends D {
   public name = 'C';
   public id = 3;
@@ -31,7 +31,7 @@ class C extends D {
   public c1!: number;
 }
 
-@Injectable
+@Injectable()
 class B extends C {
   public name = 'B';
   public id = 2;
@@ -40,7 +40,7 @@ class B extends C {
   public b1!: number;
 }
 
-@Injectable
+@Injectable()
 class A extends B {
   public name = 'A';
   public id = 1;

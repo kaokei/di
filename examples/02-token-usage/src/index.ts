@@ -20,7 +20,7 @@ const CONFIG = new Token<{ debug: boolean; timeout: number }>('CONFIG');
 
 // ==================== 定义服务类 ====================
 
-@Injectable
+@Injectable()
 class LoggerService {
   // 通过 Token 注入字符串类型的依赖
   @Inject(APP_NAME)
@@ -34,7 +34,7 @@ class LoggerService {
   }
 }
 
-@Injectable
+@Injectable()
 class HttpService {
   // 注入数字类型的依赖
   @Inject(MAX_RETRY)

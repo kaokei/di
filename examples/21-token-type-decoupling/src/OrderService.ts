@@ -9,7 +9,7 @@
 import { Inject, Injectable, type TokenType } from '@kaokei/di';
 import { tokenPaymentService } from './token';
 
-@Injectable
+@Injectable()
 export class OrderService {
   // 使用 Token 注入，而不是直接 @Inject(PaymentService)
   // TokenType<typeof tokenPaymentService> 会自动推导出 PaymentService 类型

@@ -14,7 +14,7 @@ import { Container, Inject, Injectable, PostConstruct } from '@kaokei/di';
 
 console.log('=== 场景 1：get vs getAsync 的区别 ===');
 
-@Injectable
+@Injectable()
 class DatabaseService {
   connected = false;
   data: string[] = [];
@@ -55,7 +55,7 @@ console.log('getAsync 返回后查询:', db2.query()); // "查询结果: 用户A
 
 console.log('\n=== 场景 2：依赖链中的异步初始化 ===');
 
-@Injectable
+@Injectable()
 class ConfigService {
   config: Record<string, string> = {};
 
@@ -69,7 +69,7 @@ class ConfigService {
   }
 }
 
-@Injectable
+@Injectable()
 class ApiService {
   @Inject(ConfigService)
   configService!: ConfigService;
@@ -96,7 +96,7 @@ console.log('apiService.baseUrl:', apiService.baseUrl); // "https://api.example.
 
 console.log('\n=== 场景 3：处理初始化失败 ===');
 
-@Injectable
+@Injectable()
 class UnstableService {
   ready = false;
 

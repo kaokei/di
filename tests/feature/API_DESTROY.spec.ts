@@ -16,7 +16,7 @@ interface IB {
   id: number;
 }
 
-@Injectable
+@Injectable()
 class A implements IA {
   public name = 'A';
   public id = 1;
@@ -25,7 +25,7 @@ class A implements IA {
   public b!: IB;
 }
 
-@Injectable
+@Injectable()
 class ABackup implements IA {
   public name = 'ABackup';
   public id = 11;

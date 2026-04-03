@@ -21,7 +21,7 @@ import { Container, Token, Inject, Injectable } from '@kaokei/di';
 
 const DB_URL = new Token<string>('DB_URL');
 
-@Injectable
+@Injectable()
 class DatabaseService {
   @Inject(DB_URL)
   url!: string;
@@ -31,7 +31,7 @@ class DatabaseService {
   }
 }
 
-@Injectable
+@Injectable()
 class UserService {
   @Inject(DatabaseService)
   db!: DatabaseService;

@@ -3,7 +3,7 @@
 // C extends D
 import { PostConstruct, Injectable, Container, Inject } from '@/index';
 
-@Injectable
+@Injectable()
 class D {
   public name = 'D';
   public id = 4;
@@ -15,7 +15,7 @@ class D {
   }
 }
 
-@Injectable
+@Injectable()
 class C {
   public name = 'C';
   public id = 3;
@@ -29,7 +29,7 @@ class C {
   }
 }
 
-@Injectable
+@Injectable()
 class B {
   public name = 'B';
   public id = 2;
@@ -44,7 +44,7 @@ class B {
   }
 }
 
-@Injectable
+@Injectable()
 class A {
   public name = 'A';
   public id = 1;

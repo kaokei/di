@@ -372,7 +372,7 @@ describe('postConstructResult 类型包含 undefined（需求 17.2）', () => {
   test('有 @PostConstruct() 无参数时，postConstructResult 应为 _execute 的返回值', () => {
     // 当 @PostConstruct() 没有参数时，postConstructResult 为 _execute 的返回值
     // 如果方法返回 undefined（非 async），则 postConstructResult 为 undefined
-    @Injectable
+    @Injectable()
     class SyncPostConstructService {
       initialized = false;
 
@@ -392,7 +392,7 @@ describe('postConstructResult 类型包含 undefined（需求 17.2）', () => {
 
   test('有 @PostConstruct() 且方法为 async 时，postConstructResult 应为 Promise', () => {
     // 当 @PostConstruct() 的方法是 async 时，_execute 返回 Promise
-    @Injectable
+    @Injectable()
     class AsyncPostConstructService {
       initialized = false;
 
@@ -424,7 +424,7 @@ describe('前置服务 PostConstruct 失败时错误传播（需求 17.1）', ()
 
     const ERROR_MESSAGE = 'ServiceB 初始化失败';
 
-    @Injectable
+    @Injectable()
     class ServiceB {
       @PostConstruct()
       async init() {
@@ -432,7 +432,7 @@ describe('前置服务 PostConstruct 失败时错误传播（需求 17.1）', ()
       }
     }
 
-    @Injectable
+    @Injectable()
     class ServiceA {
       @Inject(ServiceB) b!: ServiceB;
 
@@ -469,7 +469,7 @@ describe('前置服务 PostConstruct 失败时错误传播（需求 17.1）', ()
     // ServiceB 正常初始化，ServiceC 的 PostConstruct 失败
     // ServiceA 使用 @PostConstruct(true) 等待所有前置服务
 
-    @Injectable
+    @Injectable()
     class ServiceB {
       @PostConstruct()
       async init() {
@@ -477,7 +477,7 @@ describe('前置服务 PostConstruct 失败时错误传播（需求 17.1）', ()
       }
     }
 
-    @Injectable
+    @Injectable()
     class ServiceC {
       @PostConstruct()
       async init() {
@@ -485,7 +485,7 @@ describe('前置服务 PostConstruct 失败时错误传播（需求 17.1）', ()
       }
     }
 
-    @Injectable
+    @Injectable()
     class ServiceA {
       @Inject(ServiceB) b!: ServiceB;
       @Inject(ServiceC) c!: ServiceC;

@@ -10,7 +10,7 @@ describe('PPP5', () => {
 
   const tokenSameProp = new Token<number>('sameProp');
 
-  @Injectable
+  @Injectable()
   class B {
     public name = 'B';
     public id = 2;
@@ -59,7 +59,7 @@ describe('PPP5', () => {
     public sameProp = 1;
   }
 
-  @Injectable
+  @Injectable()
   class A extends B {
     public name = 'A';
     public id = 1;

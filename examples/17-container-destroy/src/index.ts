@@ -11,7 +11,7 @@ import { Container, Inject, PostConstruct, PreDestroy, Injectable } from '@kaoke
 
 // ==================== 定义服务类 ====================
 
-@Injectable
+@Injectable()
 class LoggerService {
   name: string;
 
@@ -30,7 +30,7 @@ class LoggerService {
   }
 }
 
-@Injectable
+@Injectable()
 class DatabaseService {
   @Inject(LoggerService)
   logger!: LoggerService;
@@ -41,7 +41,7 @@ class DatabaseService {
   }
 }
 
-@Injectable
+@Injectable()
 class UserService {
   @Inject(DatabaseService)
   db!: DatabaseService;

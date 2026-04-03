@@ -19,7 +19,7 @@ class LoggerService {
 }
 
 // 计数服务：依赖 LoggerService，通过 @Inject 属性注入
-@Injectable
+@Injectable()
 class CountService {
   // 使用 @Inject 装饰器声明依赖，Stage 3 装饰器只支持属性注入
   @Inject(LoggerService)

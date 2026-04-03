@@ -75,7 +75,7 @@ describe('重复装饰器检测', () => {
   test('子类的 @PostConstruct 在容器解析时正确执行', () => {
     const calls: string[] = [];
 
-    @Injectable
+    @Injectable()
     class Parent {
       @PostConstruct()
       parentInit() {
@@ -83,7 +83,7 @@ describe('重复装饰器检测', () => {
       }
     }
 
-    @Injectable
+    @Injectable()
     class Child extends Parent {
       @PostConstruct()
       childInit() {

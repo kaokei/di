@@ -30,7 +30,7 @@ import { Container, Inject, LazyToken, Injectable } from '@kaokei/di';
 
 // ==================== 深层循环依赖链：A→B→C→D→E→F→G→H→C ====================
 
-@Injectable
+@Injectable()
 class A {
   name = 'A';
   id = 1;
@@ -38,7 +38,7 @@ class A {
   b!: B;
 }
 
-@Injectable
+@Injectable()
 class B {
   name = 'B';
   id = 2;
@@ -46,7 +46,7 @@ class B {
   c!: C;
 }
 
-@Injectable
+@Injectable()
 class C {
   name = 'C';
   id = 3;
@@ -54,7 +54,7 @@ class C {
   d!: D;
 }
 
-@Injectable
+@Injectable()
 class D {
   name = 'D';
   id = 4;
@@ -62,7 +62,7 @@ class D {
   e!: E;
 }
 
-@Injectable
+@Injectable()
 class E {
   name = 'E';
   id = 5;
@@ -70,7 +70,7 @@ class E {
   f!: F;
 }
 
-@Injectable
+@Injectable()
 class F {
   name = 'F';
   id = 6;
@@ -78,7 +78,7 @@ class F {
   g!: G;
 }
 
-@Injectable
+@Injectable()
 class G {
   name = 'G';
   id = 7;
@@ -86,7 +86,7 @@ class G {
   h!: H;
 }
 
-@Injectable
+@Injectable()
 class H {
   name = 'H';
   id = 8;

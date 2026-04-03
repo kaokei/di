@@ -145,7 +145,7 @@ describe('实例映射与属性注入集成', () => {
       value = 'dep';
     }
 
-    @Injectable
+    @Injectable()
     class MyService {
       @Inject(Dep) dep!: Dep;
     }

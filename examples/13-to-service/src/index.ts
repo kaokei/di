@@ -66,7 +66,7 @@ class LocalStorage implements IStorage {
 }
 
 // 业务服务：依赖接口 Token，不依赖具体实现
-@Injectable
+@Injectable()
 class UserService {
   @Inject(LOGGER)
   logger!: ILogger;

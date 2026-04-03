@@ -64,7 +64,7 @@ new LazyToken(() => Token | Newable);
 ```ts
 // a.ts 文件
 import { B } from './b.ts';
-@Injectable
+@Injectable()
 export class A {
   public name = 'A';
   @Inject(new LazyToken(() => B))
@@ -73,7 +73,7 @@ export class A {
 
 // b.ts 文件
 import { A } from './a.ts';
-@Injectable
+@Injectable()
 export class B {
   public name = 'B';
   @Inject(new LazyToken(() => A))
@@ -92,7 +92,7 @@ export class B {
 ## @Injectable
 
 ```ts
-@Injectable
+@Injectable()
 ```
 
 `@Injectable` 是一个无参数的类装饰器，用于在类定义阶段将装饰器元数据关联到类。
@@ -103,12 +103,12 @@ export class B {
 
 使用 `decorate()` 的类不需要 `@Injectable`（`decorate()` 内部已模拟 `@Injectable` 行为）。
 
-`@Injectable` 放在类声明的最外层（最上面的装饰器位置），直接使用 `@Injectable` 而非 `@Injectable()`。
+`@Injectable` 放在类声明的最外层（最上面的装饰器位置），使用 `@Injectable()` 调用形式，与其他装饰器保持一致。
 
 用法：
 
 ```ts
-@Injectable
+@Injectable()
 class DemoService {
   @Inject(LoggerService)
   public loggerService!: LoggerService;
@@ -143,7 +143,7 @@ class CountService {
   }
 }
 
-@Injectable
+@Injectable()
 class DemoService {
   // 使用场景: 指定注入属性的token
   @Inject(LoggerService)
@@ -170,7 +170,7 @@ class LoggerService {
   }
 }
 
-@Injectable
+@Injectable()
 class DemoService {
   @Self()
   @Inject(LoggerService)
@@ -212,7 +212,7 @@ class DemoService {
 示例1：代替原来的`construct`方法
 
 ```ts
-@Injectable
+@Injectable()
 class StudentService {
   public student: StudentVO;
 
@@ -232,7 +232,7 @@ class StudentService {
 示例1：等待依赖注入完成后再初始化自身
 
 ```ts
-@Injectable
+@Injectable()
 class StudentService {
   public student: StudentVO;
 
@@ -242,7 +242,7 @@ class StudentService {
   }
 }
 
-@Injectable
+@Injectable()
 class ScoreService {
   public score: ScoreVO;
 
@@ -273,7 +273,7 @@ class ScoreService {
 示例：
 
 ```ts
-@Injectable
+@Injectable()
 class DatabaseService {
   public db: DatabaseVO;
 

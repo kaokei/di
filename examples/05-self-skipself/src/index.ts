@@ -14,7 +14,7 @@ import { Container, Token, Inject, Self, SkipSelf, Optional, Injectable, Binding
 const LOGGER = new Token<{ log: (msg: string) => void }>('LOGGER');
 
 // 使用 @Self：只在当前容器查找 LOGGER
-@Injectable
+@Injectable()
 class ServiceWithSelf {
   @Inject(LOGGER)
   @Self()
@@ -26,7 +26,7 @@ class ServiceWithSelf {
 }
 
 // 使用 @SkipSelf：跳过当前容器，从父容器查找 LOGGER
-@Injectable
+@Injectable()
 class ServiceWithSkipSelf {
   @Inject(LOGGER)
   @SkipSelf()
@@ -38,7 +38,7 @@ class ServiceWithSkipSelf {
 }
 
 // 组合使用：@Self + @Optional，当前容器找不到时返回 undefined
-@Injectable
+@Injectable()
 class ServiceWithSelfOptional {
   @Inject(LOGGER)
   @Self()

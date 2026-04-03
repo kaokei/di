@@ -13,7 +13,7 @@ interface IB {
 }
 
 // 迁移为属性装饰器：@Inject(Object) 在属性上
-@Injectable
+@Injectable()
 class A {
   public name = 'A';
   public id = 1;

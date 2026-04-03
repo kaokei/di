@@ -24,7 +24,7 @@ interface IC {
   b: IB;
 }
 
-@Injectable
+@Injectable()
 class C {
   public name = 'C';
   public id = 3;
@@ -42,7 +42,7 @@ class B {
   public bId = 2;
 }
 
-@Injectable
+@Injectable()
 class A extends B {
   public name = 'A';
   public id = 1;

@@ -37,56 +37,56 @@ interface IH {
 }
 
 // 使用属性装饰器声明依赖（属性注入可以打破循环依赖）
-@Injectable
+@Injectable()
 class A {
   public name = 'A';
   public id = 1;
   @Inject(new LazyToken(() => B)) b!: IB;
 }
 
-@Injectable
+@Injectable()
 class B {
   public name = 'B';
   public id = 2;
   @Inject(new LazyToken(() => C)) c!: IC;
 }
 
-@Injectable
+@Injectable()
 class C {
   public name = 'C';
   public id = 3;
   @Inject(new LazyToken(() => D)) d!: ID;
 }
 
-@Injectable
+@Injectable()
 class D {
   public name = 'D';
   public id = 4;
   @Inject(new LazyToken(() => E)) e!: IE;
 }
 
-@Injectable
+@Injectable()
 class E {
   public name = 'E';
   public id = 5;
   @Inject(new LazyToken(() => F)) f!: IF;
 }
 
-@Injectable
+@Injectable()
 class F {
   public name = 'F';
   public id = 6;
   @Inject(new LazyToken(() => G)) g!: IG;
 }
 
-@Injectable
+@Injectable()
 class G {
   public name = 'G';
   public id = 7;
   @Inject(new LazyToken(() => H)) h!: IH;
 }
 
-@Injectable
+@Injectable()
 class H {
   public name = 'H';
   public id = 8;

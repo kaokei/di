@@ -12,7 +12,7 @@ import { Container, Inject, PostConstruct, Injectable } from '@kaokei/di';
 
 // ==================== 定义服务类 ====================
 
-@Injectable
+@Injectable()
 class DatabaseService {
   connected = false;
 
@@ -28,7 +28,7 @@ class DatabaseService {
   }
 }
 
-@Injectable
+@Injectable()
 class CacheService {
   initialized = false;
 
@@ -39,7 +39,7 @@ class CacheService {
   }
 }
 
-@Injectable
+@Injectable()
 class UserService {
   @Inject(DatabaseService)
   db!: DatabaseService;

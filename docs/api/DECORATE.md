@@ -43,7 +43,7 @@ decorate(Inject(B), A, 'b');
 
 ```ts
 class B {}
-@Injectable
+@Injectable()
 class A {
   @Inject(B)
   public b!: B;
@@ -66,7 +66,7 @@ decorate([Inject(B), Self(), Optional()], A, 'b');
 
 ```ts
 class B {}
-@Injectable
+@Injectable()
 class A {
   @Inject(B)
   @Self()
@@ -91,7 +91,7 @@ decorate(PostConstruct(), A, 'init');
 上面的例子相当于如下代码：
 
 ```ts
-@Injectable
+@Injectable()
 class A {
   @PostConstruct()
   init() {
@@ -107,13 +107,13 @@ class A {
 **场景一：子类和父类都有 `@PostConstruct`**
 
 ```ts
-@Injectable
+@Injectable()
 class B {
   @PostConstruct()
   init() { console.log('B.init'); }
 }
 
-@Injectable
+@Injectable()
 class A extends B {
   @PostConstruct()
   setup() { console.log('A.setup'); }
@@ -125,7 +125,7 @@ class A extends B {
 **场景二：只有父类有 `@PostConstruct`**
 
 ```ts
-@Injectable
+@Injectable()
 class B {
   @PostConstruct()
   init() { console.log('B.init'); }
@@ -139,7 +139,7 @@ class A extends B {}
 **场景三：多级继承，只有祖先类有 `@PostConstruct`**
 
 ```ts
-@Injectable
+@Injectable()
 class C {
   @PostConstruct()
   init() { console.log('C.init'); }

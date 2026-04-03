@@ -18,7 +18,7 @@ import { Container, Inject, PostConstruct, Injectable } from '@kaokei/di';
 
 console.log('=== 场景一：同步初始化 ===');
 
-@Injectable
+@Injectable()
 class ConfigService {
   config: Record<string, string> = {};
   initialized = false;
@@ -43,7 +43,7 @@ console.log('config.env:', config.config.env);   // production
 
 console.log('\n=== 场景二：异步初始化 ===');
 
-@Injectable
+@Injectable()
 class DatabaseService {
   connected = false;
   data: string[] = [];
@@ -77,7 +77,7 @@ if (dbBinding.postConstructResult instanceof Promise) {
 
 console.log('\n=== 场景三A：子类有 @PostConstruct，父类也有 → 只执行子类的 ===');
 
-@Injectable
+@Injectable()
 class BaseServiceA {
   log: string[] = [];
 
@@ -88,7 +88,7 @@ class BaseServiceA {
   }
 }
 
-@Injectable
+@Injectable()
 class ChildServiceA extends BaseServiceA {
   @PostConstruct()
   childInit() {
@@ -104,7 +104,7 @@ console.log('执行记录:', childA.log); // ['ChildServiceA.childInit']
 
 console.log('\n=== 场景三B：子类没有 @PostConstruct，父类有 → 执行父类的 ===');
 
-@Injectable
+@Injectable()
 class BaseServiceB {
   log: string[] = [];
 

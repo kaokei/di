@@ -3,7 +3,7 @@
 // 默认情况父类的PostConstruct不会自动执行
 import { PostConstruct, Injectable, Container } from '@/index';
 
-@Injectable
+@Injectable()
 class B {
   public name = 'B';
   public id = 2;
@@ -14,7 +14,7 @@ class B {
   }
 }
 
-@Injectable
+@Injectable()
 class A extends B {
   public name = 'A';
   public id = 1;

@@ -185,7 +185,7 @@ describe('destroy 递归销毁所有子容器', () => {
   test('递归销毁触发子容器中 Instance 绑定的 @PreDestroy', () => {
     const destroyedServices: string[] = [];
 
-    @Injectable
+    @Injectable()
     class ChildService {
       @PreDestroy()
       cleanup() {
@@ -193,7 +193,7 @@ describe('destroy 递归销毁所有子容器', () => {
       }
     }
 
-    @Injectable
+    @Injectable()
     class GrandchildService {
       @PreDestroy()
       cleanup() {

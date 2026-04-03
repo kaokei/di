@@ -42,7 +42,7 @@ test('Property 11.1: @Injectable + @Inject(token) → bind → resolve → 注�
           value = 'dep-value';
         }
 
-        @Injectable
+        @Injectable()
         class MainService {
           @Inject(tokenB) dep!: DepService;
         }
@@ -82,7 +82,7 @@ test('Property 11.2: @PostConstruct 在属性注入后被调用，注入属性�
         let postConstructCalled = false;
         let depValueInPostConstruct: string | undefined;
 
-        @Injectable
+        @Injectable()
         class MainService {
           @Inject(tokenB) dep!: DepService;
 
@@ -124,7 +124,7 @@ test('Property 11.3: @PreDestroy 在 container.unbind() 时被调用', () => {
       try {
         let preDestroyCalled = false;
 
-        @Injectable
+        @Injectable()
         class MyService {
           @PreDestroy()
           onDestroy() {
@@ -157,7 +157,7 @@ test('Property 11.4: @PreDestroy 在 container.destroy() 时被调用', () => {
 
       let preDestroyCalled = false;
 
-      @Injectable
+      @Injectable()
       class MyService {
         @PreDestroy()
         onDestroy() {
@@ -200,7 +200,7 @@ test('Property 11.5: 多个 @Inject 属性全部正确注入', () => {
             name = 'depB';
           }
 
-          @Injectable
+          @Injectable()
           class MainService {
             @Inject(tokenDep1) depA!: DepA;
             @Inject(tokenDep2) depB!: DepB;
@@ -236,7 +236,7 @@ test('Property 11.6: @Optional 依赖未绑定时，属性保留默认值', () =
       const container = new Container();
 
       try {
-        @Injectable
+        @Injectable()
         class MainService {
           @Inject(tokenOptional) @Optional() optionalDep: string = 'default-value';
         }

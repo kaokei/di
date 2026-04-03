@@ -42,7 +42,7 @@ describe('getAsync: 无 PostConstruct 的服务', () => {
 // ==================== getAsync 与同步 PostConstruct ====================
 
 describe('getAsync: 同步 @PostConstruct', () => {
-  @Injectable
+  @Injectable()
   class A {
     public name = 'A';
     public id = 1;
@@ -69,7 +69,7 @@ describe('getAsync: 同步 @PostConstruct', () => {
 // ==================== getAsync 与异步 PostConstruct ====================
 
 describe('getAsync: 异步 @PostConstruct（无参数）', () => {
-  @Injectable
+  @Injectable()
   class A {
     public name = 'A';
     public id = 1;
@@ -106,7 +106,7 @@ describe('getAsync: 异步 @PostConstruct（无参数）', () => {
 });
 
 describe('getAsync: 异步 @PostConstruct(true) 等待依赖', () => {
-  @Injectable
+  @Injectable()
   class B {
     public name = 'B';
     public id = 2;
@@ -118,7 +118,7 @@ describe('getAsync: 异步 @PostConstruct(true) 等待依赖', () => {
     }
   }
 
-  @Injectable
+  @Injectable()
   class A {
     public name = 'A';
     public id = 1;
@@ -210,7 +210,7 @@ describe('getAsync: optional 依赖', () => {
 // ==================== getAsync 与层级容器 ====================
 
 describe('getAsync: 层级容器', () => {
-  @Injectable
+  @Injectable()
   class B {
     public id = 2;
 
@@ -221,7 +221,7 @@ describe('getAsync: 层级容器', () => {
     }
   }
 
-  @Injectable
+  @Injectable()
   class A {
     public id = 1;
 
@@ -253,7 +253,7 @@ describe('getAsync: 层级容器', () => {
 // ==================== getAsync 与 PostConstruct 失败 ====================
 
 describe('getAsync: PostConstruct 异步失败', () => {
-  @Injectable
+  @Injectable()
   class A {
     public name = 'A';
 
@@ -277,7 +277,7 @@ describe('getAsync: PostConstruct 异步失败', () => {
 });
 
 describe('getAsync: 前置服务 PostConstruct 失败导致当前服务失败', () => {
-  @Injectable
+  @Injectable()
   class B {
     public name = 'B';
 
@@ -288,7 +288,7 @@ describe('getAsync: 前置服务 PostConstruct 失败导致当前服务失败', 
     }
   }
 
-  @Injectable
+  @Injectable()
   class A {
     public name = 'A';
 
@@ -316,7 +316,7 @@ describe('getAsync: 前置服务 PostConstruct 失败导致当前服务失败', 
 // ==================== getAsync 单例行为 ====================
 
 describe('getAsync: 多次调用返回同一单例', () => {
-  @Injectable
+  @Injectable()
   class A {
     public id = 1;
 
@@ -345,7 +345,7 @@ describe('getAsync: 多次调用返回同一单例', () => {
 // ==================== getAsync 与 Transient ====================
 
 describe('getAsync: 与 Transient 配合使用', () => {
-  @Injectable
+  @Injectable()
   class A {
     public id = 1;
 
@@ -376,7 +376,7 @@ describe('getAsync: 与 Transient 配合使用', () => {
 // ==================== getAsync 与 Token ====================
 
 describe('getAsync: 使用 Token', () => {
-  @Injectable
+  @Injectable()
   class MyService {
     public ready = false;
 
@@ -459,7 +459,7 @@ describe('getAsync: self 选项', () => {
 // ==================== getAsync 复杂依赖链 ====================
 
 describe('getAsync: 复杂依赖链的异步初始化', () => {
-  @Injectable
+  @Injectable()
   class C {
     public id = 3;
 
@@ -470,7 +470,7 @@ describe('getAsync: 复杂依赖链的异步初始化', () => {
     }
   }
 
-  @Injectable
+  @Injectable()
   class B {
     public id = 2;
 
@@ -482,7 +482,7 @@ describe('getAsync: 复杂依赖链的异步初始化', () => {
     }
   }
 
-  @Injectable
+  @Injectable()
   class A {
     public id = 1;
 

@@ -15,7 +15,7 @@ const KEY_B1 = new Token<IB>('KEY_B1');
 const KEY_B2 = new Token<IB>('KEY_B2');
 const KEY_B3 = new Token<IB>('KEY_B3');
 
-@Injectable
+@Injectable()
 class A {
   public name = 'A';
   public id = 1;
