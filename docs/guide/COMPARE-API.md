@@ -60,9 +60,15 @@ inversify 的 postConstruct
 
 **继承行为：** 本库与 inversify 相同，沿继承链向上查找，执行第一个找到的 `@PostConstruct` 方法。
 
+`@PostConstruct` 装饰器所修饰的方法可以返回Promise，代表服务是异步初始化的。其他服务如果依赖这个异步服务，那么可以继续使用`@PostConstruct`来等待前置依赖的服务完成之后再开始初始化自己的服务。
+
 ## @PreDestroy
 
 inversify 的 preDestroy
+
+**激活顺序相同：**
+
+- container handlers --> binding handler --> preDestroy
 
 ## 装饰器采用首字母大写风格
 
