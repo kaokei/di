@@ -214,6 +214,30 @@ export function createLazyInject(container: Container) {
   };
 }
 
+// ==================== autobind 装饰器 ====================
+
+/**
+ * 方法装饰器：自动绑定方法的 this 到实例（Stage 3 Method Decorator）
+ *
+ * 解决方法作为回调传递时丢失 this 的问题，例如：
+ * - Vue 模板中 `@click="service.method"` 丢失 this
+ * - `promise.then(service.method)` 丢失 this
+ *
+ * 通过 context.addInitializer 在实例创建时执行 bind，
+ * 每个实例都会拥有自己的绑定版本，互不影响。
+ *
+ * 使用方式：@autobind（无参数，直接作为装饰器使用）
+ */
+export function autobind<T extends (...args: any[]) => any>(
+  value: T,
+  context: ClassMethodDecoratorContext
+) {
+  const methodName = context.name;
+  context.addInitializer(function (this: any) {
+    this[methodName] = value.bind(this);
+  });
+}
+
 // ==================== 辅助函数 ====================
 
 // 用于在目标类上存储 decorate() 的共享 metadata 对象
