@@ -25,8 +25,8 @@ function createLazyInject(
 3. @LazyInject 可以避免循环依赖问题。
    > 本库是支持属性注入的循环依赖的，不需要通过@LazyInject 来解决循环依赖问题。这里只是说明@LazyInject 有这样的特点。  
    > 但是在 inversify 中则只能借助于@LazyInject 来解决循环依赖问题。
-4. **使用限制**：@LazyInject 的自动容器查找（不传 `container` 参数的用法）只支持 class 服务（通过 `to()` 或 `toSelf()` 绑定的服务）。
-   对于 `toConstantValue` 或 `toDynamicValue` 绑定的服务，因为同一个对象可能被绑定到多个容器，内部的 `_instanceContainerMap` 不会记录这类实例，所以无法自动查找容器，必须显式传入 `container` 参数。
+4. **使用限制**：@LazyInject 的自动容器查找（不传 `container` 参数的用法）要求宿主类（即使用 `@LazyInject` 的那个类）必须通过 `to()` 或 `toSelf()` 注册到容器中，并且通过 `container.get()` 获取实例。
+   如果宿主类不在依赖注入体系内（例如 React 类组件等由第三方框架实例化的类），容器无法自动识别该实例属于哪个容器，此时必须显式传入 `container` 参数。
 
 ## 示例
 
@@ -142,6 +142,6 @@ class A {
 
 ### 容器查找机制
 
-`@LazyInject` 在不传入 `container` 参数时，通过 `Container.getContainerOf(instance)` 查找实例所属的容器。这个查找依赖于 `Container._instanceContainerMap`（WeakMap），该映射仅在 `_resolveInstanceValue` 中通过 `_registerInstance` 注册，即只有通过 `to()` 或 `toSelf()` 绑定的 class 服务才会注册。
+`@LazyInject` 在不传入 `container` 参数时，通过 `Container.getContainerOf(instance)` 查找实例所属的容器。这个查找依赖于 `Container._instanceContainerMap`（WeakMap），该映射仅在 `_resolveInstanceValue` 中通过 `_registerInstance` 注册，即只有宿主类通过 `to()` 或 `toSelf()` 绑定并由 `container.get()` 实例化时，才会建立实例到容器的映射关系。
 
-`toConstantValue` 和 `toDynamicValue` 绑定的服务不会注册到 `_instanceContainerMap`，因为同一个对象可能被绑定到多个容器，WeakMap 只能保留最后一次映射，会导致从错误的容器解析依赖。在这些场景下需要显式传入 `container` 参数。
+如果宿主类不在依赖注入体系内（例如 React 类组件等由第三方框架实例化的类，或者手动 `new` 出来的实例），`Container.getContainerOf` 无法找到对应的容器，会抛出 `ContainerNotFoundError`。在这些场景下需要显式传入 `container` 参数。
