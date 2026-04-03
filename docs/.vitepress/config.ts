@@ -36,8 +36,8 @@ export default defineConfig({
           text: 'API 文档',
           link: '/api/',
           items: [
-            { text: 'Binding 文档', link: '/api/BINDING' },
             { text: 'Container 文档', link: '/api/CONTAINER' },
+            { text: 'Binding 文档', link: '/api/BINDING' },
             { text: 'decorate 文档', link: '/api/DECORATE' },
             { text: 'LazyInject 文档', link: '/api/LAZY_INJECT' },
             { text: '错误类文档', link: '/api/ERRORS' },

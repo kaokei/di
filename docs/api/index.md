@@ -209,7 +209,7 @@ class DemoService {
 @PostConstruct(void | boolean | Array<Token|Newable> | FilterFunction)
 ```
 
-示例：
+示例1：代替原来的`construct`方法
 
 ```ts
 @Injectable
@@ -227,11 +227,45 @@ class StudentService {
 
 只有通过 container 获取实例对象时，此时会在实例对象创建完成之后，自动调用`init`方法，从而自动完成 student 信息的获取。
 
+这里的`@PostConstruct()`相当于是代替原来的`construct()`方法了，之所以这样是因为原来的construct方法执行的时候，依赖注入还没有完成，也就是依赖注入的属性还是空的，那么有些业务逻辑就没有办法在原来的`construct()`方法中实现了，所以必须通过`@PostConstruct()`来定义一个新的方法来代替原来的`construct()`方法。
+
+示例1：等待依赖注入完成后再初始化自身
+
+```ts
+@Injectable
+class StudentService {
+  public student: StudentVO;
+
+  @PostConstruct()
+  init() {
+    return fetch('/api/get-student-info').then(res => (this.student = res));
+  }
+}
+
+@Injectable
+class ScoreService {
+  public score: ScoreVO;
+
+  @Inject(StudentService)
+  public studentService: StudentService;
+
+  @PostConstruct(true)
+  init() {
+    const studentId = this.studentService.student.id;
+    return fetch(`/api/get-score-info?id=${id}`).then(
+      res => (this.score = res)
+    );
+  }
+}
+```
+
+现在这里的 ScoreService 是依赖 StudentService 的，并且在初始化时就需要等待 StudentService 完全初始化完成。
+
+所以需要通过`@PostConstruct(true)`来保证StudentService的init方法已经完成了数据的获取。这样ScoreService的init方法就可以访问到学生id了。
+
 更多高级功能[参考这里](../note/06.异步初始化服务.md)，比如等待异步服务初始化完成之后，再执行自己的初始化服务。
 
 > **Note**
-> `@PostConstruct` 只对 class 服务（通过 `to()` 或 `toSelf()` 绑定）生效，对 `toConstantValue`、`toDynamicValue` 绑定的服务无效。
->
 > 继承行为：沿继承链向上查找，执行第一个找到的 `@PostConstruct` 方法。详细说明参考 [生命周期文档](../note/13.生命周期.md)。
 
 ## @PreDestroy

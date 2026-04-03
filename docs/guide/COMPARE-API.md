@@ -1,7 +1,7 @@
 # 本库 API 和 inversify API 的对比
 
-> **注意**：本库使用 TC39 Stage 3 装饰器规范，不需要 `reflect-metadata`。
-> inversify 依赖 `reflect-metadata` 实现构造函数参数的自动类型推导（`emitDecoratorMetadata`）。
+> **注意**：本库使用 TC39 Stage 3 装饰器规范，不需要 `reflect-metadata`。  
+> inversify 需要依赖 `reflect-metadata` 实现构造函数参数的自动类型推导，同时还需要配置`emitDecoratorMetadata: true`。
 
 ## Container
 
@@ -16,7 +16,7 @@
 
 inversify 中没有对 ServiceIdentifier 类型做太多限制，基本上任何 js 变量都可以作为 ServiceIdentifier，常见的有字符串和 Symbol，以及 class 类。
 
-本库中的 Token 实例基本上对应 inversify 中的字符串和 Symbol。
+本库使用 Token 实例代替 inversify 中的字符串和 Symbol对象。
 
 本库也支持直接把 class 类作为 ServiceIdentifier。
 
@@ -66,7 +66,7 @@ inversify 的 postConstruct
 
 inversify 的 preDestroy
 
-**激活顺序相同：**
+**本库与inversify激活顺序相同：**
 
 - container handlers --> binding handler --> preDestroy
 

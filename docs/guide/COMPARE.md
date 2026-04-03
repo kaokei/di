@@ -6,7 +6,7 @@
 
 ## 不同作用域
 
-inversify 中支持 3 种不同的 scope 模式，但是本库只支持单例模式和inTransientScope。不支持其他 request scope 模式。
+inversify 中支持 3 种不同的 scope 模式，但是本库只支持单例模式和inTransientScope。不支持 request scope 模式。
 
 [inversify 关于不同 scope 的解释](https://github.com/inversify/InversifyJS/blob/develop/v6/wiki/scope.md)
 
@@ -14,7 +14,7 @@ inversify 中支持 3 种不同的 scope 模式，但是本库只支持单例模
 
 本库 Container 只实现了 inversify Container 的部分基础 API。
 
-本库没有实现 inversify Container 中异步相关方法，name 相关方法，tag 相关方法，applyMiddleware 方法，resolve 方法等其他方法。
+本库没有实现 inversify Container 中name 相关方法，tag 相关方法，applyMiddleware 方法，resolve 方法等其他方法。
 
 ## onActivation 和 onDeactivation
 
@@ -75,9 +75,11 @@ inversify 默认是[不支持循环依赖的](https://github.com/inversify/Inver
 
 在 inversify 中 `@injectable()` 装饰器主要是收集构造函数的参数的元数据，以用于构造函数的默认依赖注入，如果参数的类型是类，那么就不需要明确使用 `@Inject` 来指定依赖的 token。
 
-本库的 `@Injectable` 装饰器用途不同：它用于在类定义阶段将装饰器元数据（`context.metadata`）关联到类。使用了 `@Inject`、`@PostConstruct`、`@PreDestroy` 的类必须添加 `@Injectable`。
+本库的 `@Injectable` 装饰器用途不同：它用于在类定义阶段将装饰器元数据（`context.metadata`）关联到类。
 
-本库不支持通过参数类型信息完成自动注入，不管是属性注入还是构造函数注入都需要明确通过 `@Inject` 指定依赖的 token。
+所以使用了 `@Inject`、`@PostConstruct`、`@PreDestroy` 的类必须添加 `@Injectable`。否则装饰器功能不会生效。
+
+本库不支持通过参数类型信息完成自动注入，属性注入必须明确通过 `@Inject` 指定依赖的 token。
 
 根本原因是不期望依赖 typescript 的 emitDecoratorMetadata 选项。
 
@@ -105,11 +107,12 @@ const parent = new Container();
 const child = parent.createChild();
 parent.bind(A).toSelf();
 child.bind(B).toSelf();
+const a = child.get(A);
 ```
 
 #### inversify 的处理逻辑
 
-首先 child 容器没有 A，所有从 parent 容器中去找 A，在实例化 A 时，发现又依赖 B。此时需要寻找 B。
+首先 child 容器没有 A，所以从 parent 容器中去找 A，在实例化 A 时，发现又依赖 B。此时需要寻找 B。
 inversify 的处理逻辑是又重新开始从 child 容器开始寻找，因为 child 中存在 B 的绑定，所以就使用 child 容器中的 B。
 最终 a 对象存储在 parent 容器中，b 对象存储在 child 容器中。
 
