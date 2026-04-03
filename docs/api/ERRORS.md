@@ -133,7 +133,7 @@ try {
 
 继承自 `BaseError`。
 
-触发场景：使用 `@LazyInject` 装饰器时，无法从实例反查其所属容器。通常是因为该实例不是通过 `to()` 或 `toSelf()` 绑定的 class 服务（例如通过 `toConstantValue` 注册的普通对象）。
+触发场景：使用 `@LazyInject` 装饰器时，无法从实例反查其所属容器。通常是因为该实例所属类是第三方的类，比如react类组件的实例化不在依赖注入体系内。
 
 错误消息格式：
 
@@ -145,7 +145,7 @@ try {
 import { Container, Token, ContainerNotFoundError, LazyInject } from '@kaokei/di';
 
 try {
-  // 在非 class 服务实例上使用 @LazyInject 时触发
+  // 在第三方 class 上使用 @LazyInject 时触发
 } catch (error) {
   if (error instanceof ContainerNotFoundError) {
     console.error('找不到容器：', error.message);

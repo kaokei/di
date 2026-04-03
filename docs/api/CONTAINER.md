@@ -256,7 +256,8 @@ static getContainerOf(instance: object): Container | undefined;
 
 静态方法，用于获取某个服务实例所属的容器。
 
-- 只有通过 `to()` 或 `toSelf()` 绑定的 class 服务实例才会被记录；`toConstantValue` 和 `toDynamicValue` 的值不会被记录
+- 只有通过 `to()` 或 `toSelf()` 绑定的 class 服务实例才会被记录；
+- `toConstantValue` 和 `toDynamicValue` 的值不会被记录
 - 主要用于 `@LazyInject` 内部实现：当 `@LazyInject` 没有显式指定 container 时，通过此方法从实例反查所属容器
 
 ```ts
