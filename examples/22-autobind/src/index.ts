@@ -49,19 +49,9 @@ try {
   console.log('greetUnsafe 解构后调用报错：', (e as Error).message);
 }
 
-// ==================== 场景 2：作为回调传递 ====================
+// ==================== 场景 2：不同实例互不影响 ====================
 
-console.log('\n--- 场景 2：作为回调传递（Promise.then）---');
-
-Promise.resolve()
-  .then(service.greet)
-  .then((result) => {
-    console.log('Promise 回调结果：', result); // "Hello, Alice" ✅
-  });
-
-// ==================== 场景 3：不同实例互不影响 ====================
-
-console.log('\n--- 场景 3：不同实例互不影响 ---');
+console.log('\n--- 场景 2：不同实例互不影响 ---');
 
 // 使用瞬态作用域创建不同实例
 const container2 = new Container();
@@ -76,3 +66,15 @@ const { greet: greet2 } = user2;
 
 console.log(greet1()); // "Hello, Alice"
 console.log(greet2()); // "Hello, Bob"
+
+// ==================== 场景 3：作为回调传递 ====================
+
+console.log('\n--- 场景 3：作为回调传递（Promise.then）---');
+
+Promise.resolve()
+  .then(service.greet)
+  .then((result) => {
+    console.log('Promise 回调结果：', result); // "Hello, Alice" ✅
+  });
+
+
