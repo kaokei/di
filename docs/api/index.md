@@ -297,6 +297,44 @@ class DatabaseService {
 
 [具体文档参考这里。](./LAZY_INJECT.md)
 
+## @autobind
+
+```ts
+@autobind
+```
+
+`@autobind` 是一个无参数的方法装饰器，用于自动绑定方法的 `this` 到实例。
+
+解决 `服务的方法` 作为回调传递时丢失 `this` 的问题，例如 Vue 模板中 `@click="service.method"` 或 `promise.then(service.method)` 等场景。
+
+通过 `context.addInitializer` 在实例创建时执行 `bind(this)`，每个实例都会拥有自己的绑定版本，互不影响。
+
+用法：
+
+```ts
+import { autobind, Injectable } from '@kaokei/di';
+
+@Injectable()
+class UserService {
+  public name = 'Alice';
+
+  @autobind
+  public greet() {
+    return `Hello, ${this.name}`;
+  }
+}
+```
+
+绑定后的方法即使解构使用也不会丢失 `this`：
+
+```ts
+const service = container.get(UserService);
+const { greet } = service;
+greet(); // "Hello, Alice"  ✅ 不会报错
+```
+
+[更多说明参考这里。](../note/07.AUTOBIND.md)
+
 ## decorate
 
 [具体文档参考这里。](./DECORATE.md)
