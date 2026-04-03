@@ -26,5 +26,6 @@ URL 格式：`https://codesandbox.io/p/sandbox/github/kaokei/di/tree/main/exampl
 | 18-deep-circular-dependency | 深层循环依赖：属性注入支持深层循环链，以及循环依赖检测 | [打开](https://codesandbox.io/p/sandbox/github/kaokei/di/tree/main/examples/18-deep-circular-dependency) |
 | 19-transient-scope          | 瞬态作用域：每次 get 返回新实例，对比单例模式          | [打开](https://codesandbox.io/p/sandbox/github/kaokei/di/tree/main/examples/19-transient-scope)          |
 | 20-get-async                | 异步获取服务：使用 getAsync 等待 PostConstruct 完成    | [打开](https://codesandbox.io/p/sandbox/github/kaokei/di/tree/main/examples/20-get-async)                |
+| 21-token-type-decoupling    | TokenType 解耦：使用 Token + TokenType 实现服务间解耦  | [打开](https://codesandbox.io/p/sandbox/github/kaokei/di/tree/main/examples/21-token-type-decoupling)    |
 
 每个示例目录包含独立的 `package.json`（依赖已发布的 `@kaokei/di` 版本）和 `tsconfig.json`，与主包构建流程完全隔离，可直接在 CodeSandbox 中运行。

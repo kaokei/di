@@ -70,6 +70,14 @@ export default defineConfig({
               text: 'inversify使用条件',
               link: '/note/15.inversify使用条件',
             },
+            {
+              text: '未来改进方向',
+              link: '/note/16.未来改进方向',
+            },
+            {
+              text: 'TokenType的使用场景',
+              link: '/note/17.TokenType的使用场景',
+            },
           ],
         },
       ],

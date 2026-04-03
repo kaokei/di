@@ -60,6 +60,8 @@ const myToken = new Token<string>('myToken');
 type ServiceType = TokenType<typeof myToken>; // string
 ```
 
+- [使用 Token + TokenType 实现服务间解耦](https://codesandbox.io/p/sandbox/github/kaokei/di/tree/main/examples/21-token-type-decoupling)
+
 ## LazyTokenCallback\<T\>
 
 ```ts
