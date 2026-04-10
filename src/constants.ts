@@ -51,6 +51,13 @@ export const ERRORS = {
     '@LazyInject requires a valid token, but received null or undefined.',
 } as const;
 
+// 未初始化哨兵值，用于标记 PostConstruct 尚未执行
+export const UNINITIALIZED = Symbol('UNINITIALIZED');
+
+// 从 as const 对象中提取联合类型
+export type BindingType = (typeof BINDING)[keyof typeof BINDING];
+export type StatusType = (typeof STATUS)[keyof typeof STATUS];
+
 /**
  * Object.hasOwn 的兼容性替代函数
  * Object.hasOwn 在部分旧版浏览器和运行时中不可用（ES2022+），
@@ -60,9 +67,6 @@ export function hasOwn(obj: object, key: PropertyKey): boolean {
   return Object.prototype.hasOwnProperty.call(obj, key);
 }
 
-// 未初始化哨兵值，用于标记 PostConstruct 尚未执行
-export const UNINITIALIZED = Symbol('UNINITIALIZED');
-
-// 从 as const 对象中提取联合类型
-export type BindingType = (typeof BINDING)[keyof typeof BINDING];
-export type StatusType = (typeof STATUS)[keyof typeof STATUS];
+export function isObject(val: unknown): val is object {
+  return val !== null && typeof val === 'object';
+}
