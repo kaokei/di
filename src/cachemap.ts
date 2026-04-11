@@ -99,10 +99,7 @@ export function getInjectedProps(
   const parentProps = getInjectedProps(Object.getPrototypeOf(target));
 
   if (parentProps || ownProps) {
-    return {
-      ...(parentProps || {}),
-      ...(ownProps || {}),
-    };
+    return Object.assign({}, parentProps, ownProps);
   }
 
   return undefined;
