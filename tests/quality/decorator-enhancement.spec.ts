@@ -31,6 +31,13 @@ const RESERVED_PROPERTY_NAMES = [
   'caller',
   'callee',
   'arguments',
+  // Function.prototype 上的只读属性
+  'name',
+  'length',
+  'prototype',
+  'apply',
+  'bind',
+  'call',
 ];
 
 // 公共的合法方法名 arbitrary，过滤掉所有保留属性名
@@ -58,10 +65,15 @@ describe('Feature: 05.decorator-enhancement, Property 1: decorate() metadata 共
         // 生成 2~10 次 decorate() 调用次数
         fc.integer({ min: 2, max: 10 }),
         // 生成不同的方法名列表，确保每次 decorate 调用使用不同的方法名
-        fc.array(fc.string({ minLength: 1, maxLength: 20, unit: 'grapheme' }), {
-          minLength: 10,
-          maxLength: 20,
-        }),
+        fc.array(
+          fc.string({ minLength: 1, maxLength: 20, unit: 'grapheme' }).filter(
+            (name) => !RESERVED_PROPERTY_NAMES.includes(name)
+          ),
+          {
+            minLength: 10,
+            maxLength: 20,
+          }
+        ),
         (callCount, methodNames) => {
           // 动态创建一个新类，确保每次属性测试迭代使用独立的类
           const TestClass = class {} as any;

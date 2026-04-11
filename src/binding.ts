@@ -291,17 +291,17 @@ export class Binding<T = unknown> {
     const binding: Binding[] = [];
     for (let i = 0; i < propKeys.length; i++) {
       const prop = propKeys[i];
-      const meta = props[prop];
-      const { inject, ...rest } = meta;
-      rest.parent = options;
+      const m = props[prop];
+      const meta = Object.assign({}, m);
+      meta.parent = options;
       const ret = this.container.get(
-        resolveToken(inject as GenericToken),
-        rest
+        resolveToken(meta.inject as GenericToken),
+        meta
       );
       if (!(ret === void 0 && meta.optional)) {
         result[prop] = ret;
       }
-      binding.push(rest.binding as Binding);
+      binding.push(meta.binding as Binding);
     }
     return { properties: result, bindings: binding };
   }

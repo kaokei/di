@@ -110,28 +110,33 @@ export class Container {
   }
 
   // 异步版本的 get，等待 PostConstruct 完成后再返回实例
-  async getAsync<T>(
+  getAsync<T>(
     token: CommonToken<T>,
     options: Options<T> & { optional: true }
   ): Promise<T | void>;
-  async getAsync<T>(
+  getAsync<T>(
     token: CommonToken<T>,
     options?: Options<T> & { optional?: false }
   ): Promise<T>;
-  async getAsync<T>(
+  getAsync<T>(
     token: CommonToken<T>,
     options?: Options<T>
   ): Promise<T | void>;
-  async getAsync<T>(
+  getAsync<T>(
     token: CommonToken<T>,
     options: Options<T> = {}
   ): Promise<T | void> {
-    const instance = this.get(token, options);
+    let instance: T | void;
+    try {
+      instance = this.get(token, options);
+    } catch (e) {
+      return Promise.reject(e);
+    }
     const binding = options.binding;
     if (binding?.postConstructResult instanceof Promise) {
-      await binding.postConstructResult;
+      return binding.postConstructResult.then(() => instance);
     }
-    return instance;
+    return Promise.resolve(instance);
   }
 
   // 处理 skipSelf 选项：跳过当前容器，委托父容器解析
