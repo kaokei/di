@@ -166,25 +166,30 @@ function defineLazyProperty<T>(
   if (token == null) {
     throw new Error(ERRORS.LAZY_INJECT_INVALID_TOKEN);
   }
-  const cacheKey = Symbol.for(key);
+  // 使用闭包存储缓存值，避免在 instance 上挂载额外的 Symbol 属性
+  let cachedValue: any;
+  let resolved = false;
+
   Object.defineProperty(instance, key, {
     configurable: true,
     enumerable: true,
     get() {
-      if (!hasOwn(instance, cacheKey)) {
+      if (!resolved) {
         const con = container || Container.getContainerOf(instance);
         const Ctor = instance.constructor;
         if (!con) {
           throw new ContainerNotFoundError(resolveToken(token), Ctor);
         }
-        instance[cacheKey] = con.get(resolveToken(token), {
+        cachedValue = con.get(resolveToken(token), {
           parent: { token: Ctor },
         });
+        resolved = true;
       }
-      return instance[cacheKey];
+      return cachedValue;
     },
     set(newVal: any) {
-      instance[cacheKey] = newVal;
+      cachedValue = newVal;
+      resolved = true;
     },
   });
 }
