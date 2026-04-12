@@ -247,9 +247,9 @@ export function autobind<T extends (...args: any[]) => any>(
 
 // ==================== 辅助函数 ====================
 
-// 用于在目标类上存储 decorate() 的共享 metadata 对象
-// 与 TC39 规范中 Symbol.metadata 的设计保持一致
-const DECORATE_METADATA = Symbol('decorate.metadata');
+// 用于存储 decorate() 的共享 metadata 对象
+// 使用 WeakMap 闭包替代在 target 上挂 Symbol 属性，保持 target 干净
+const decorateMetadataMap = new WeakMap<object, Record<string, any>>();
 
 export function decorate(decorator: any, target: any, key: string): void {
   const decorators = Array.isArray(decorator) ? decorator : [decorator];
@@ -279,12 +279,12 @@ export function decorate(decorator: any, target: any, key: string): void {
   //       set(obj: any, value: any) { obj[key] = value; },
   //       has(obj: any) { return key in obj; },
   //     },
-  // 从目标类的 Symbol 属性获取或创建共享 metadata 对象
-  // 使用 hasOwn 确保只读取 target 自身的属性，不读取原型链上父类的
-  if (!hasOwn(target, DECORATE_METADATA)) {
-    (target as any)[DECORATE_METADATA] = {};
+  // 从 WeakMap 获取或创建共享 metadata 对象
+  // WeakMap 天然不存在原型链问题，子类和父类各自独立
+  if (!decorateMetadataMap.has(target)) {
+    decorateMetadataMap.set(target, {});
   }
-  const metadata = (target as any)[DECORATE_METADATA];
+  const metadata = decorateMetadataMap.get(target)!;
 
   const context = {
     kind: isMethod ? 'method' : 'field',
@@ -313,7 +313,7 @@ export function decorate(decorator: any, target: any, key: string): void {
 
   // 模拟 @Injectable() 的行为：直接关联 target 和 metadata
   // 由于 defineMetadata 存储的是 metadata 对象引用，
-  // 多次调用 decorate() 时 metadata 是同一个引用（通过 DECORATE_METADATA Symbol 保证），
+  // 多次调用 decorate() 时 metadata 是同一个引用（通过 WeakMap 保证），
   // 后续调用会自动累积数据
   defineMetadata(target, metadata);
 
