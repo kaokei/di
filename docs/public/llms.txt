@@ -1,0 +1,103 @@
+# @kaokei/di
+
+> 轻量级 TypeScript 依赖注入库，基于 TC39 Stage 3 装饰器规范，不依赖 `reflect-metadata`，支持属性注入循环依赖。
+
+## 核心特点
+
+- **不依赖 `reflect-metadata`**，无需安装该包
+- **使用 TC39 Stage 3 装饰器**（不需要 `experimentalDecorators: true`，不需要 `emitDecoratorMetadata: true`）
+- **只支持属性注入**（Field Decorator），不支持构造函数参数注入（Parameter Decorator）
+- **原生支持属性注入的循环依赖**，无需借助 `@LazyInject`（这与 InversifyJS 不同）
+- **默认单例模式**，可通过 `inTransientScope()` 切换为瞬态模式
+- **生命周期顺序与 InversifyJS 不同**（见下方说明）
+
+## 安装
+
+```sh
+npm install @kaokei/di
+```
+
+## 快速示例
+
+```ts
+import { Container, Inject, Injectable } from '@kaokei/di';
+
+class LoggerService {
+  log(...msg: any[]) { console.log(...msg); }
+}
+
+@Injectable()
+class CountService {
+  count = 0;
+
+  @Inject(LoggerService)
+  private logger: LoggerService;
+
+  addOne() {
+    this.count++;
+    this.logger.log('count:', this.count);
+  }
+}
+
+const container = new Container();
+container.bind(LoggerService).toSelf();
+container.bind(CountService).toSelf();
+
+const service = container.get(CountService);
+service.addOne();
+```
+
+## 关于循环依赖
+
+本库原生支持属性注入的循环依赖，不需要任何额外处理。
+
+`LazyToken` 解决的是另一个问题：当类 A 和类 B 通过类名互相 `@Inject` 时，TypeScript 模块加载阶段会产生循环 import，导致其中一个类为 `undefined`。此时需要用 `LazyToken` 延迟求值：
+
+```ts
+// a.ts
+@Injectable()
+export class A {
+  @Inject(new LazyToken(() => B)) // 延迟到运行时再求值
+  public b!: B;
+}
+```
+
+如果通过 `Token` 实例（而非类名）来绑定服务，则不存在循环 import 问题，也不需要 `LazyToken`。
+
+## @LazyInject 的两个核心特性
+
+1. **延迟初始化**：不访问属性就不触发依赖解析，比 `@Inject` 更懒
+2. **支持第三方类注入**：宿主类不在 DI 体系内时（如 React 类组件由框架实例化），可通过显式传入 `container` 参数完成注入
+
+## 主要 API
+
+- [Container](https://di.kaokei.com/api/CONTAINER.html) — 容器，核心类
+- [Binding](https://di.kaokei.com/api/BINDING.html) — 绑定配置（`to` / `toSelf` / `toConstantValue` / `toDynamicValue` / `toService`）
+- [Token & LazyToken](https://di.kaokei.com/api/) — Token 类型定义
+- [@Injectable / @Inject / @Self / @SkipSelf / @Optional](https://di.kaokei.com/api/) — 装饰器
+- [@PostConstruct / @PreDestroy](https://di.kaokei.com/api/) — 生命周期装饰器
+- [@LazyInject / createLazyInject](https://di.kaokei.com/api/LAZY_INJECT.html) — 懒注入
+- [decorate](https://di.kaokei.com/api/DECORATE.html) — 无装饰器语法时的替代方案
+- [错误类](https://di.kaokei.com/api/ERRORS.html) — 7 个错误类，支持 `instanceof` 判断
+- [类型导出](https://di.kaokei.com/api/TYPES.html) — TypeScript 类型
+
+## 生命周期顺序（与 InversifyJS 不同）
+
+激活顺序：
+1. `Binding#onActivation`
+2. `Container#onActivation`
+3. `@PostConstruct`
+
+销毁顺序：
+1. `Container#onDeactivation`
+2. `Binding#onDeactivation`
+3. `@PreDestroy`
+
+## 文档
+
+- 完整文档：https://di.kaokei.com
+- 快速开始：https://di.kaokei.com/guide/
+- API 文档：https://di.kaokei.com/api/
+- 示例代码：https://di.kaokei.com/examples/
+- GitHub：https://github.com/kaokei/di
+- npm：https://www.npmjs.com/package/@kaokei/di
