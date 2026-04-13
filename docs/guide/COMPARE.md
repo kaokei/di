@@ -134,6 +134,23 @@ inversify 的处理逻辑是又重新开始从 child 容器开始寻找，因为
 
 另一点原因是上面的例子中，如果是先调用`child.get(A)`，再调用`parent.get(A)`，此时是没有问题的，但是如果是反过来，是先调用的`parent.get(A)`，那么 inversify 也是会抛出异常，同样的 container 绑定关系，只是因为调用顺序不一样，从而导致不同的结果，这也是本库不能接受的。
 
+本库也有一个容易理解出错的地方。假设有如下关系：
+
+```
+parent component <-> parent container [A, B]
+child component <-> child container [B]
+```
+
+当我们在子组件中使用如下代码时：
+
+```
+const b = useService(B);
+const a = useService(A);
+那么会有`a.b !== b`
+```
+
+这是因为`a.b`对象属于`parent container`，但是b则属于`child container`。所以是两个不同的对象。
+
 相关单元测试[请关注这里](../../tests/special/DI_HIERARCHY_1.spec.ts)
 
 ## 本库对比 inversify 的特性差异

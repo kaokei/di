@@ -10,7 +10,7 @@
 
 开发本库的最初目的是作为[use-vue-service](https://github.com/kaokei/use-vue-service)的基础依赖，提供轻量级依赖注入能力。
 
-本项目默认是单例模式，可以配置为`inTransientScope`模式。没有inversify的`inRequestScope`模式。
+本项目默认是单例模式，可以配置为`inTransientScope`模式。但没有inversify的`inRequestScope`模式。
 
 ## 安装
 
