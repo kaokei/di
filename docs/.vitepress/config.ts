@@ -10,6 +10,7 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/' },
       { text: 'API', link: '/api/' },
+      { text: 'Example', link: '/examples/' },
       { text: 'Note', link: '/note/01.什么是Token' },
     ],
 
@@ -24,10 +25,7 @@ export default defineConfig({
               text: '本库 API 和 inversify API 的对比',
               link: '/guide/COMPARE-API',
             },
-            {
-              text: 'CodeSandbox 在线示例',
-              link: '/guide/EXAMPLES',
-            },
+
           ],
         },
       ],
@@ -43,6 +41,12 @@ export default defineConfig({
             { text: '错误类文档', link: '/api/ERRORS' },
             { text: '类型导出文档', link: '/api/TYPES' },
           ],
+        },
+      ],
+      '/examples/': [
+        {
+          text: 'CodeSandbox 在线示例',
+          link: '/examples/',
         },
       ],
       '/note/': [
@@ -77,6 +81,22 @@ export default defineConfig({
             {
               text: 'TokenType的使用场景',
               link: '/note/17.TokenType的使用场景',
+            },
+            {
+              text: 'toDynamicValue异步支持分析',
+              link: '/note/18.toDynamicValue异步支持分析',
+            },
+            {
+              text: 'TC39-Stage3-装饰器类型详解',
+              link: '/note/19.TC39-Stage3-装饰器类型详解',
+            },
+            {
+              text: 'Legacy-experimentalDecorators-装饰器类型详解',
+              link: '/note/20.Legacy-experimentalDecorators-装饰器类型详解',
+            },
+            {
+              text: 'PostConstruct执行时属性注入完整性分析',
+              link: '/note/21.PostConstruct执行时属性注入完整性分析',
             },
           ],
         },
