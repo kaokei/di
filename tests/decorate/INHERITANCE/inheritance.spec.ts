@@ -197,3 +197,45 @@ describe('场景 5：PreDestroy 被子类继承（子类无自身元数据）', 
     expect(child.destroyed).toBe(true);
   });
 });
+
+describe('decorate 继承边界：子类有 decorate 调用时不继承父类 PostConstruct', () => {
+  // 这是一个反直觉的边界行为：
+  // 当子类有任何 decorate 调用（哪怕只是属性注入），
+  // getPostConstruct 不再递归父类，导致父类的 @PostConstruct 不在子类实例上执行。
+  class DepForChild { name = 'DepForChild'; }
+
+  class ParentWithPC {
+    initialized = false;
+    init() { this.initialized = true; }
+  }
+
+  class ChildWithInject extends ParentWithPC {}
+
+  beforeAll(() => {
+    // 父类注册 PostConstruct（decorate 调用末尾会自动调用 defineMetadata，无需 Injectable）
+    decorate(PostConstruct(), ParentWithPC, 'init');
+    // 子类只注册属性注入（触发子类在 CacheMap 中注册），不注册 PostConstruct
+    decorate(Inject(DepForChild), ChildWithInject, 'dep');
+  });
+
+  test('父类实例的 PostConstruct 正常执行', () => {
+    const container = new Container();
+    container.bind(ParentWithPC).toSelf();
+    const parent = container.get(ParentWithPC);
+    expect(parent.initialized).toBe(true);
+  });
+
+  test('子类有属性注入时，父类的 PostConstruct 不会在子类实例上执行（设计决策）', () => {
+    const container = new Container();
+    container.bind(ChildWithInject).toSelf();
+    container.bind(DepForChild).toSelf();
+
+    const child = container.get(ChildWithInject);
+    // 子类被注册进 CacheMap（因为有 decorate 调用），
+    // getPostConstruct 找到子类的 metadata 但其中无 PostConstruct，直接返回 undefined，
+    // 不再递归查找父类。因此 initialized 仍为 false。
+    expect((child as any).initialized).toBe(false);
+    // 但属性注入正常工作
+    expect((child as any).dep).toBeInstanceOf(DepForChild);
+  });
+});
