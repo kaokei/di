@@ -26,6 +26,7 @@ export class Container {
   parent?: Container;
   children?: Set<Container>;
   _bindings: Map<CommonToken, Binding> = new Map();
+  _destroyed = false;
   _onActivationHandler?: ActivationHandler;
   _onDeactivationHandler?: DeactivationHandler;
 
@@ -78,6 +79,11 @@ export class Container {
   }
 
   destroy() {
+    // 先标记容器已销毁，这样：
+    // 1. 后续 get() 调用将抛出明确的 destroyed 错误
+    // 2. preDestroy() 中可检测此标志，保留 _instanceContainerMap 映射，
+    //    使 @LazyInject 首次访问时能获得明确的 destroyed 错误（而非 ContainerNotFoundError）
+    this._destroyed = true;
     // 递归销毁所有子容器（先创建快照数组，避免遍历过程中修改 Set）
     if (this.children) {
       const childrenSnapshot = Array.from(this.children);
@@ -101,6 +107,11 @@ export class Container {
   get<T>(token: CommonToken<T>, options?: Options<T> & { optional?: false }): T;
   get<T>(token: CommonToken<T>, options?: Options<T>): T | void;
   get<T>(token: CommonToken<T>, options: Options<T> = {}): T | void {
+    if (this._destroyed) {
+      throw new Error(
+        `Container has been destroyed. Cannot call get() for token: ${(token as any)?.name ?? String(token)}`
+      );
+    }
     if (options.skipSelf) {
       return this._resolveSkipSelf(token, options);
     }

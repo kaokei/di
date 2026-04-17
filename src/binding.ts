@@ -224,7 +224,13 @@ export class Binding<T = unknown> {
         this._execute(key);
       }
     }
-    Container._instanceContainerMap.delete(this.cache as object);
+    // 仅在普通 unbind 场景下删除 WeakMap 映射（container._destroyed 为 false）。
+    // 在 destroy() 流程中（container._destroyed 已为 true），保留映射，
+    // 这样 @LazyInject 首次访问时能通过 container.get() 获取明确的 destroyed 错误，而不是 ContainerNotFoundError。
+    // 注意：需要先检查 this.container 是否为 null（可能被手动调用多次）
+    if (this.container && !this.container._destroyed) {
+      Container._instanceContainerMap.delete(this.cache as object);
+    }
     this.container = null as unknown as Container;
     this.context = null as unknown as Context;
     this.classValue = undefined;
