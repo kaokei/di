@@ -531,3 +531,124 @@ describe('getAsync: 返回类型正确', () => {
     expect(result).toBeInstanceOf(Promise);
   });
 });
+
+// ==================== 并发调用相关服务类（模块顶层定义） ====================
+
+let singletonInitCount = 0;
+
+@Injectable()
+class SingletonService {
+  public id = 0;
+
+  @PostConstruct()
+  async init() {
+    await new Promise(resolve => setTimeout(resolve, 50));
+    singletonInitCount++;
+    this.id = singletonInitCount;
+  }
+}
+
+@Injectable()
+class FailingService {
+  @PostConstruct()
+  async init() {
+    await new Promise(resolve => setTimeout(resolve, 30));
+    throw new Error('并发初始化失败');
+  }
+}
+
+let asyncServiceInitCount = 0;
+
+@Injectable()
+class AsyncService {
+  public ready = false;
+
+  @PostConstruct()
+  async init() {
+    await new Promise(resolve => setTimeout(resolve, 60));
+    this.ready = true;
+    asyncServiceInitCount++;
+  }
+}
+
+// ==================== getAsync 并发调用 ====================
+
+describe('getAsync: 并发调用', () => {
+  describe('场景 A：单例服务并发调用，PostConstruct 只执行一次', () => {
+    let container: Container;
+
+    beforeEach(() => {
+      singletonInitCount = 0;
+      container = new Container();
+      container.bind(SingletonService).toSelf();
+    });
+
+    test('Promise.all 并发 5 次 getAsync 返回同一实例，PostConstruct 只执行一次', async () => {
+      const results = await Promise.all([
+        container.getAsync(SingletonService),
+        container.getAsync(SingletonService),
+        container.getAsync(SingletonService),
+        container.getAsync(SingletonService),
+        container.getAsync(SingletonService),
+      ]);
+
+      const first = results[0];
+      for (const result of results) {
+        expect(result).toBe(first);
+      }
+      expect(singletonInitCount).toBe(1);
+      expect(first.id).toBe(1);
+    });
+  });
+
+  describe('场景 B：PostConstruct 失败时并发调用', () => {
+    let container: Container;
+
+    beforeEach(() => {
+      container = new Container();
+      container.bind(FailingService).toSelf();
+    });
+
+    test('单次 getAsync 因 PostConstruct 失败而 reject', async () => {
+      await expect(container.getAsync(FailingService)).rejects.toThrow(
+        '并发初始化失败'
+      );
+    });
+
+    test('第一次 getAsync 失败后，再次 getAsync 仍然 reject', async () => {
+      // 第一次调用，触发 PostConstruct，失败
+      await expect(container.getAsync(FailingService)).rejects.toThrow(
+        '并发初始化失败'
+      );
+      // 第二次调用，实例已被缓存但 postConstructResult 是 rejected promise
+      await expect(container.getAsync(FailingService)).rejects.toThrow(
+        '并发初始化失败'
+      );
+    });
+  });
+
+  describe('场景 C：异步 PostConstruct 完成后所有并发调用都 resolve', () => {
+    let container: Container;
+
+    beforeEach(() => {
+      asyncServiceInitCount = 0;
+      container = new Container();
+      container.bind(AsyncService).toSelf();
+    });
+
+    test('Promise.all 并发 3 次 getAsync，所有结果 ready 为 true，都是同一实例，初始化只执行一次', async () => {
+      const results = await Promise.all([
+        container.getAsync(AsyncService),
+        container.getAsync(AsyncService),
+        container.getAsync(AsyncService),
+      ]);
+
+      const first = results[0];
+      for (const result of results) {
+        expect(result).toBe(first);
+        expect(result.ready).toBe(true);
+      }
+      expect(asyncServiceInitCount).toBe(1);
+    });
+  });
+});
