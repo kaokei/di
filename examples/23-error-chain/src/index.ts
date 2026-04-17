@@ -24,7 +24,11 @@ function tryGet(label: string, fn: () => void) {
     fn();
     console.log(`${label}：成功（无异常）`);
   } catch (err) {
-    console.log(`${label}：`);
+    if (err instanceof BindingNotFoundError) {
+      console.log(`${label}（BindingNotFoundError）：`);
+    } else {
+      console.log(`${label}：`);
+    }
     console.log(`  ${(err as Error).message.replace(/\n/g, '\n  ')}`);
   }
 }
