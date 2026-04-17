@@ -30,12 +30,19 @@ export class Container {
   _onActivationHandler?: ActivationHandler;
   _onDeactivationHandler?: DeactivationHandler;
 
-  bind<T>(token: CommonToken<T>) {
-    if (this._bindings.has(token)) {
-      throw new DuplicateBindingError(token);
+  /**
+   * @deprecated 请使用类构造函数或 Token<T> 实例作为 token。
+   * 示例：`container.bind(new Token('myToken'))`
+   */
+  bind(token: string | number | symbol): never;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  bind<T>(token: CommonToken<T> | any) {
+    const t = token as CommonToken<T>;
+    if (this._bindings.has(t)) {
+      throw new DuplicateBindingError(t);
     }
-    const binding = this._buildBinding(token);
-    this._bindings.set(token, binding as Binding);
+    const binding = this._buildBinding(t);
+    this._bindings.set(t, binding as Binding);
     return binding;
   }
 
@@ -100,13 +107,19 @@ export class Container {
     this._onDeactivationHandler = undefined;
   }
 
+  /**
+   * @deprecated 请使用类构造函数或 Token<T> 实例作为 token。
+   * 示例：`container.get(new Token('myToken'))`
+   */
+  get(token: string | number | symbol): never;
   get<T>(
     token: CommonToken<T>,
     options: Options<T> & { optional: true }
   ): T | void;
   get<T>(token: CommonToken<T>, options?: Options<T> & { optional?: false }): T;
   get<T>(token: CommonToken<T>, options?: Options<T>): T | void;
-  get<T>(token: CommonToken<T>, options: Options<T> = {}): T | void {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  get<T>(token: CommonToken<T> | any, options: Options<T> = {}): T | void {
     if (this._destroyed) {
       throw new Error(
         `Container has been destroyed. Cannot call get() for token: ${(token as any)?.name ?? String(token)}`
