@@ -35,6 +35,7 @@ export class Container {
    * 示例：`container.bind(new Token('myToken'))`
    */
   bind(token: string | number | symbol): never;
+  bind<T>(token: CommonToken<T>): Binding<T>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   bind<T>(token: CommonToken<T> | any) {
     const t = token as CommonToken<T>;
