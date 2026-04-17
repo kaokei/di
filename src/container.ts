@@ -210,7 +210,7 @@ export class Container {
 
   _checkBindingNotFoundError<T>(token: CommonToken, options: Options<T>) {
     if (!options.optional) {
-      throw new BindingNotFoundError(token);
+      throw new BindingNotFoundError(token, options);
     }
   }
 }
