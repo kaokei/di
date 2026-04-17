@@ -48,18 +48,24 @@ describe('Unbind all', () => {
     container.bind(B).toSelf();
   });
 
-  test('container.get(A) should throw BindingNotFoundError', async () => {
+  test('container.get(A) should throw destroyed error after destroy()', async () => {
     container.destroy();
     expect(() => {
       container.get(A);
-    }).toThrowError(BindingNotFoundError);
+    }).toThrow(/destroyed/i);
+    expect(() => {
+      container.get(A);
+    }).not.toThrowError(BindingNotFoundError);
   });
 
-  test('container.get(B) should throw BindingNotFoundError', async () => {
+  test('container.get(B) should throw destroyed error after destroy()', async () => {
     container.destroy();
     expect(() => {
       container.get(B);
-    }).toThrowError(BindingNotFoundError);
+    }).toThrow(/destroyed/i);
+    expect(() => {
+      container.get(B);
+    }).not.toThrowError(BindingNotFoundError);
   });
 });
 
@@ -76,25 +82,34 @@ describe('Unbind all with hierarchical container', () => {
     child.bind(B).toSelf();
   });
 
-  test('container.get(A) should work correctly', async () => {
+  test('container.get(A) should throw destroyed error after child.destroy()', async () => {
     child.destroy();
     expect(() => {
       child.get(A);
-    }).toThrowError(BindingNotFoundError);
+    }).toThrow(/destroyed/i);
+    expect(() => {
+      child.get(A);
+    }).not.toThrowError(BindingNotFoundError);
   });
 
-  test('container.get(B) should work correctly', async () => {
-    // 递归销毁：父容器 destroy 后子容器也被销毁，绑定被清空
+  test('container.get(B) should throw destroyed error after parent.destroy()', async () => {
+    // 递归销毁：父容器 destroy 后子容器也被销毁
     parent.destroy();
     expect(() => {
       child.get(A);
-    }).toThrowError(BindingNotFoundError);
+    }).toThrow(/destroyed/i);
+    expect(() => {
+      child.get(A);
+    }).not.toThrowError(BindingNotFoundError);
   });
 
-  test('container.get(A) should throw BindingNotFoundError', async () => {
+  test('container.get(A) should throw destroyed error after parent.destroy()', async () => {
     parent.destroy();
     expect(() => {
       parent.get(A);
-    }).toThrowError(BindingNotFoundError);
+    }).toThrow(/destroyed/i);
+    expect(() => {
+      parent.get(A);
+    }).not.toThrowError(BindingNotFoundError);
   });
 });
