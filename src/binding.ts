@@ -32,9 +32,9 @@ export class Binding<T = unknown> {
     [BINDING.DYNAMIC, function (this: Binding, _options: Options) { return this._resolveDynamicValue(); }],
   ]);
 
-  container!: Container;
+  container?: Container;
 
-  context!: Context;
+  context?: Context;
 
   token!: CommonToken<T>;
 
@@ -81,9 +81,9 @@ export class Binding<T = unknown> {
 
   activate(input: T) {
     const output = this.onActivationHandler
-      ? this.onActivationHandler(this.context, input)
+      ? this.onActivationHandler(this.context!, input)
       : input;
-    return this.container.activate(output, this.token);
+    return this.container!.activate(output, this.token);
   }
 
   deactivate() {
@@ -154,13 +154,14 @@ export class Binding<T = unknown> {
   ): Binding[] {
     if (filter === true) {
       return bindings;
-    } else if (Array.isArray(filter)) {
-      return bindings.filter(item => filter.includes(item.token));
-    } else if (typeof filter === 'function') {
-      return bindings.filter(filter);
-    } else {
-      return [];
     }
+    if (Array.isArray(filter)) {
+      return bindings.filter(item => filter.includes(item.token));
+    }
+    if (typeof filter === 'function') {
+      return bindings.filter(filter);
+    }
+    return [];
   }
 
   /**
@@ -227,12 +228,11 @@ export class Binding<T = unknown> {
     // 仅在普通 unbind 场景下删除 WeakMap 映射（container._destroyed 为 false）。
     // 在 destroy() 流程中（container._destroyed 已为 true），保留映射，
     // 这样 @LazyInject 首次访问时能通过 container.get() 获取明确的 destroyed 错误，而不是 ContainerNotFoundError。
-    // 注意：需要先检查 this.container 是否为 null（可能被手动调用多次）
     if (this.container && !this.container._destroyed) {
       Container._instanceContainerMap.delete(this.cache as object);
     }
-    this.container = null as unknown as Container;
-    this.context = null as unknown as Context;
+    this.container = undefined;
+    this.context = undefined;
     this.classValue = undefined;
     this.constantValue = undefined;
     this.dynamicValue = undefined;
@@ -273,7 +273,7 @@ export class Binding<T = unknown> {
 
   // 注册实例与容器的映射关系
   _registerInstance() {
-    Container._instanceContainerMap.set(this.cache as object, this.container);
+    Container._instanceContainerMap.set(this.cache as object, this.container!);
   }
 
   // 将解析后的属性注入到实例上
@@ -290,7 +290,7 @@ export class Binding<T = unknown> {
 
   _resolveDynamicValue() {
     this.status = STATUS.INITING;
-    const dynamicValue = this.dynamicValue!(this.context);
+    const dynamicValue = this.dynamicValue!(this.context!);
     this.cache = this.activate(dynamicValue);
     this.status = STATUS.ACTIVATED;
     return this.cache;
@@ -306,7 +306,7 @@ export class Binding<T = unknown> {
       const m = props[prop];
       const meta = Object.assign({}, m);
       meta.parent = options;
-      const ret = this.container._resolveWithInternalOpts(
+      const ret = this.container!._resolveWithInternalOpts(
         resolveToken(meta.inject as GenericToken),
         meta
       );
