@@ -51,6 +51,17 @@ export class Container {
     }
   }
 
+  tryGet<T>(token: CommonToken<T>): T | undefined {
+    return this.get(token, { optional: true }) as T | undefined;
+  }
+
+  rebind<T>(token: CommonToken<T>) {
+    if (this._bindings.has(token)) {
+      this.unbind(token);
+    }
+    return this.bind(token);
+  }
+
   unbindAll() {
     // 先创建 keys 快照数组，避免遍历过程中 unbind 调用 _bindings.delete 导致迭代安全问题
     const tokens = Array.from(this._bindings.keys());

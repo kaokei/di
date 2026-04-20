@@ -219,7 +219,7 @@ export class Binding<T = unknown> {
   }
 
   preDestroy() {
-    if (BINDING.INSTANCE === this.type) {
+    if (BINDING.INSTANCE === this.type && this.cache !== undefined) {
       const { key } = getPreDestroy(this.classValue!) || {};
       if (key) {
         this._execute(key);
