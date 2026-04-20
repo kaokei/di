@@ -125,29 +125,41 @@ export type RecordObject = Record<string, unknown>;
 
 通用对象类型，等价于 `Record<string, unknown>`，用于描述键为字符串、值类型未知的普通对象。
 
-## Options\<T\>
+## GetOptions
 
 ```ts
-export interface Options<T = unknown> {
-  inject?: GenericToken<T>;
+export interface GetOptions {
   optional?: boolean;
   self?: boolean;
   skipSelf?: boolean;
+}
+```
+
+`container.get` 和 `container.getAsync` 的公开选项类型，各字段说明：
+
+- `optional`：为 `true` 时，找不到绑定返回 `undefined` 而非抛出错误
+- `self`：为 `true` 时，只在当前容器中查找，不向上查找父容器
+- `skipSelf`：为 `true` 时，跳过当前容器，只在父容器中查找
+
+## Options\<T\>
+
+```ts
+export interface Options<T = unknown> extends GetOptions {
+  inject?: GenericToken<T>;
   token?: CommonToken<T>;
   binding?: Binding<T>;
   parent?: Options<any>;
 }
 ```
 
-`container.get` 的选项类型，各字段说明：
+内部解析时传递的完整选项类型，继承自 `GetOptions`，新增字段均为内部使用：
 
 - `inject`：指定要注入的 token
-- `optional`：为 `true` 时，找不到绑定返回 `undefined` 而非抛出错误
-- `self`：为 `true` 时，只在当前容器中查找，不向上查找父容器
-- `skipSelf`：为 `true` 时，跳过当前容器，只在父容器中查找
 - `token`：内部使用，记录当前解析的 token
 - `binding`：内部使用，记录当前解析的 binding
-- `parent`：内部使用，记录父级 Options，用于循环依赖检测
+- `parent`：内部使用，记录父级 Options，用于循环依赖检测和错误链路展示
+
+通常不需要直接使用 `Options`，调用 `container.get` 时只需传入 `GetOptions` 即可。
 
 ## ActivationHandler\<T\>
 

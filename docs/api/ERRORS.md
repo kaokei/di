@@ -1,6 +1,6 @@
 # 错误类文档
 
-本库从 `@kaokei/di` 公开导出了 7 个错误类，可以通过 `instanceof` 判断错误类型，从而对不同的 DI 错误进行精确处理。
+本库从 `@kaokei/di` 公开导出了 8 个错误类，可以通过 `instanceof` 判断错误类型，从而对不同的 DI 错误进行精确处理。
 
 ## 继承关系
 
@@ -11,6 +11,7 @@ Error
     ├── BindingNotValidError
     ├── DuplicateBindingError
     ├── ContainerNotFoundError
+    ├── ContainerDestroyedError
     └── CircularDependencyError
         └── PostConstructError
 ```
@@ -53,7 +54,11 @@ try {
 
 ```
 No matching binding found for token: <tokenName>
+  required by: <parentTokenName>
+  required by: <grandParentTokenName>
 ```
+
+当错误发生在依赖注入链路中时（例如 `ServiceA` 依赖 `ServiceB`，`ServiceB` 依赖未绑定的 `ServiceC`），错误消息会附加完整的依赖链路，方便定位问题。
 
 ```ts
 import { Container, Token, BindingNotFoundError } from '@kaokei/di';
@@ -80,7 +85,7 @@ try {
 错误消息格式：
 
 ```
-Invalid binding: <tokenName>
+Binding is not configured (missing .to() / .toSelf() / .toConstantValue() / .toDynamicValue()): <tokenName>
 ```
 
 ```ts
@@ -95,7 +100,7 @@ try {
 } catch (error) {
   if (error instanceof BindingNotValidError) {
     console.error('无效绑定：', error.message);
-    // 输出：Invalid binding: myToken
+    // 输出：Binding is not configured (missing .to() / .toSelf() / .toConstantValue() / .toDynamicValue()): myToken
   }
 }
 ```
@@ -153,6 +158,35 @@ try {
 }
 ```
 
+## ContainerDestroyedError
+
+继承自 `BaseError`。
+
+触发场景：调用 `container.destroy()` 后，再对该容器调用 `get()` 或 `getAsync()`。
+
+错误消息格式：
+
+```
+Container has been destroyed. Cannot call get() for token: <tokenName>
+```
+
+```ts
+import { Container, ContainerDestroyedError } from '@kaokei/di';
+
+const container = new Container();
+container.bind(MyService).toSelf();
+container.destroy();
+
+try {
+  container.get(MyService); // 容器已销毁，抛出错误
+} catch (error) {
+  if (error instanceof ContainerDestroyedError) {
+    console.error('容器已销毁：', error.message);
+    // 输出：Container has been destroyed. Cannot call get() for token: MyService
+  }
+}
+```
+
 ## CircularDependencyError
 
 继承自 `BaseError`。
@@ -203,6 +237,7 @@ import {
   Container,
   BindingNotFoundError,
   DuplicateBindingError,
+  ContainerDestroyedError,
   CircularDependencyError,
   PostConstructError,
   BaseError
@@ -213,7 +248,9 @@ const container = new Container();
 try {
   container.get(SomeService);
 } catch (error) {
-  if (error instanceof BindingNotFoundError) {
+  if (error instanceof ContainerDestroyedError) {
+    console.error('容器已销毁：', error.message);
+  } else if (error instanceof BindingNotFoundError) {
     console.error('找不到绑定：', error.message);
   } else if (error instanceof DuplicateBindingError) {
     console.error('重复绑定：', error.message);
