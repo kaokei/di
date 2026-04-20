@@ -121,7 +121,7 @@ export class Binding<T = unknown> {
 
   toService(token: CommonToken<T>) {
     return this.toDynamicValue((context: Context) =>
-      context.container.get(token, { parent: { token: this.token } })
+      context.container._resolveWithInternalOpts(token, { parent: { token: this.token } }) as T
     );
   }
 
@@ -306,7 +306,7 @@ export class Binding<T = unknown> {
       const m = props[prop];
       const meta = Object.assign({}, m);
       meta.parent = options;
-      const ret = this.container.get(
+      const ret = this.container._resolveWithInternalOpts(
         resolveToken(meta.inject as GenericToken),
         meta
       );

@@ -180,7 +180,7 @@ function defineLazyProperty<T>(
         if (!con) {
           throw new ContainerNotFoundError(resolveToken(token), Ctor);
         }
-        cachedValue = con.get(resolveToken(token), {
+        cachedValue = con._resolveWithInternalOpts(resolveToken(token), {
           parent: { token: Ctor },
         });
         resolved = true;
