@@ -101,10 +101,19 @@ describe('errors -> INJECT_FAILED: Property miss @Inject and use interface', () 
     expect(initASpy).not.toHaveBeenCalled();
     expect(initBSpy).toHaveBeenCalledOnce();
 
+    // 提前注册对 B 和 A 的 postConstructResult 的捕获，避免 unhandled rejection
+    const bindingB = container._bindings.get(B);
+    const bindingA = container._bindings.get(A);
+    const rejectionB = expect(bindingB!.postConstructResult).rejects.toBe('test error 001');
+    const rejectionA = expect(bindingA!.postConstructResult).rejects.toBe('test error 001');
+
     await delay(500);
     expect(a.id).toBe(1);
     expect(initASpy).not.toHaveBeenCalled();
     expect(initBSpy).toHaveBeenCalledOnce();
+
+    await rejectionB;
+    await rejectionA;
   });
 });
 
@@ -184,10 +193,19 @@ describe('errors -> INJECT_FAILED: Property miss @Inject and use interface', () 
     expect(initBSpy).toHaveBeenCalledOnce();
     expect(initCSpy).toHaveBeenCalledOnce();
 
+    // 提前注册对 B 和 A 的 postConstructResult 的捕获，避免 unhandled rejection
+    const bindingB = container._bindings.get(B);
+    const bindingA = container._bindings.get(A);
+    const rejectionB = expect(bindingB!.postConstructResult).rejects.toBe('test error 002');
+    const rejectionA = expect(bindingA!.postConstructResult).rejects.toBe('test error 002');
+
     await delay(800);
     expect(a.id).toBe(1);
     expect(initASpy).not.toHaveBeenCalled();
     expect(initBSpy).toHaveBeenCalledOnce();
     expect(initCSpy).toHaveBeenCalledOnce();
+
+    await rejectionB;
+    await rejectionA;
   });
 });

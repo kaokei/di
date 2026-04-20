@@ -66,6 +66,15 @@ describe('PostConstruct 异步失败 - 场景 1：前置服务 PostConstruct 异
     // A 的 init 不应被调用
     expect(initASpy).not.toHaveBeenCalled();
 
+    // 获取 Binding 对象，提前注册 rejection handler，避免 unhandled rejection
+    const bindingA = container._bindings.get(A);
+    const bindingB = container._bindings.get(B);
+    expect(bindingA).toBeDefined();
+    expect(bindingA!.postConstructResult).toBeInstanceOf(Promise);
+
+    const rejectionB = expect(bindingB!.postConstructResult).rejects.toThrow('B 初始化失败');
+    const rejectionA = expect(bindingA!.postConstructResult).rejects.toThrow('B 初始化失败');
+
     // 等待足够时间让 B 的异步初始化完成（并失败）
     await delay(300);
 
@@ -74,15 +83,10 @@ describe('PostConstruct 异步失败 - 场景 1：前置服务 PostConstruct 异
     // A 的 id 保持初始值，未被 PostConstruct 修改
     expect(a.id).toBe(1);
 
-    // 获取 A 的 Binding 对象，验证 postConstructResult
-    const bindingA = container._bindings.get(A);
-    expect(bindingA).toBeDefined();
-
-    // postConstructResult 应该是一个 Promise
-    expect(bindingA!.postConstructResult).toBeInstanceOf(Promise);
-
-    // 该 Promise 应该被 reject，错误为原始错误自然传播（不再包装为 PostConstructError）
-    await expect(bindingA!.postConstructResult).rejects.toThrow('B 初始化失败');
+    // B 的 postConstructResult 本身也是 rejected promise
+    await rejectionB;
+    // A 的 postConstructResult：错误为原始错误自然传播
+    await rejectionA;
   });
 });
 
