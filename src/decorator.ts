@@ -134,17 +134,6 @@ export function Injectable() {
   };
 }
 
-/**
- * 手动应用装饰器的辅助函数（适配 Stage 3 规范）
- *
- * 用于在不支持装饰器语法的 JavaScript 项目中手动应用装饰器。
- * 内部构造符合 Stage 3 规范的 context 对象，并在执行完所有装饰器后
- * 创建 fakeInstance 来触发 addInitializer 回调。
- *
- * @param decorator 单个装饰器或装饰器数组
- * @param target 目标类（构造函数）
- * @param key 属性名或方法名（仅支持字符串类型）
- */
 // ==================== 延迟注入装饰器 ====================
 
 /**
@@ -317,7 +306,8 @@ export function decorate(decorator: any, target: any, key: string): void {
   // 后续调用会自动累积数据
   defineMetadata(target, metadata);
 
-  // 执行 initializers（仅用于 @LazyInject 等需要实例化操作的装饰器）
+  // 执行 initializers（当前库的装饰器均直接写 metadata，不使用 addInitializer，
+  // 此分支为空，保留以兼容未来可能依赖 addInitializer 的装饰器）
   if (initializers.length > 0) {
     const fakeInstance = Object.create(proto);
     for (const init of initializers) {

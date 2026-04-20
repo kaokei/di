@@ -156,7 +156,7 @@ export class Container {
     return Promise.resolve(instance);
   }
 
-  // 内部解析入口，接受完整 Options，供 getAsync 使用
+  // 内部解析入口，接受完整 Options；被 getAsync、toService、_getInjectProperties 等内部路径调用
   _resolveWithInternalOpts<T>(token: CommonToken<T>, options: Options<T>): T | void {
     if (this._destroyed) {
       throw new ContainerDestroyedError(token);

@@ -138,7 +138,7 @@ export class Binding<T = unknown> {
     if (resolver) {
       return resolver.call(this as unknown as Binding, options as Options);
     }
-    // 未找到解析方法，说明 binding 未绑定有效服务
+    // 未找到对应解析函数，说明 type 仍为 BINDING.INVALID（未调用任何 to*() 方法）
     throw new BindingNotValidError(this.token);
   }
 
