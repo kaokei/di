@@ -76,7 +76,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -92,7 +92,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -108,7 +108,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -124,7 +124,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -140,7 +140,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -156,7 +156,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -172,7 +172,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -188,7 +188,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -204,7 +204,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -220,7 +220,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -236,7 +236,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -252,7 +252,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -268,7 +268,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -284,7 +284,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -300,7 +300,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -316,7 +316,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -332,7 +332,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -348,7 +348,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -364,7 +364,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -380,7 +380,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -396,7 +396,7 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -412,7 +412,23 @@ importers:
     dependencies:
       '@kaokei/di':
         specifier: ^5.0.0
-        version: 5.0.3
+        version: 5.0.5
+    devDependencies:
+      '@babel/plugin-proposal-decorators':
+        specifier: ^7.29.0
+        version: 7.29.0(@babel/core@7.29.0)
+      '@rollup/plugin-babel':
+        specifier: ^7.0.0
+        version: 7.0.0(@babel/core@7.29.0)(rollup@4.60.1)
+      vite:
+        specifier: ^6.0.0
+        version: 6.4.2(@types/node@22.19.17)
+
+  examples/23-error-chain:
+    dependencies:
+      '@kaokei/di':
+        specifier: ^5.0.0
+        version: 5.0.5
     devDependencies:
       '@babel/plugin-proposal-decorators':
         specifier: ^7.29.0
@@ -1014,8 +1030,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@kaokei/di@5.0.3':
-    resolution: {integrity: sha512-n1p0LW6Ntk90UL9d9nqCosuDNPMH+PdjqKgoOZnbIAQGJMwFxFMocgCBK76ISswNYZWTTUJAq8XHruPdRRypdw==}
+  '@kaokei/di@5.0.5':
+    resolution: {integrity: sha512-I6UGwMgPWxlxWsCA74OeoaXvqmk8SZWsoY5zTFWMh1PKGhRd2E+bI7bdF0T5ijZET347dVYnvyjgDz4r/MKajw==}
 
   '@microsoft/api-extractor-model@7.33.6':
     resolution: {integrity: sha512-E9iI4yGEVVusbTAqSLetVFxDuBVCVqCigcoQwdJuOjsLq5Hry3MkBgUQhSZNzLCu17pgjk58MI80GRDJLht/1A==}
@@ -1648,8 +1664,8 @@ packages:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
 
-  baseline-browser-mapping@2.10.18:
-    resolution: {integrity: sha512-VSnGQAOLtP5mib/DPyg2/t+Tlv65NTBz83BJBJvmLVHHuKJVaDOBvJJykiT5TR++em5nfAySPccDZDa4oSrn8A==}
+  baseline-browser-mapping@2.10.20:
+    resolution: {integrity: sha512-1AaXxEPfXT+GvTBJFuy4yXVHWJBXa4OdbIebGN/wX5DlsIkU0+wzGnd2lOzokSk51d5LUmqjgBLRLlypLUqInQ==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -1690,8 +1706,8 @@ packages:
     resolution: {integrity: sha512-L28STB170nwWS63UjtlEOE3dldQApaJXZkOI1uMFfzf3rRuPegHaHesyee+YxQ+W6SvRDQV6UrdOdRiR153wJg==}
     engines: {node: '>=6'}
 
-  caniuse-lite@1.0.30001787:
-    resolution: {integrity: sha512-mNcrMN9KeI68u7muanUpEejSLghOKlVhRqS/Za2IeyGllJ9I9otGpR9g3nsw7n4W378TE/LyIteA0+/FOZm4Kg==}
+  caniuse-lite@1.0.30001788:
+    resolution: {integrity: sha512-6q8HFp+lOQtcf7wBK+uEenxymVWkGKkjFpCvw5W25cmMwEDU45p1xQFBQv8JDlMMry7eNxyBaR+qxgmTUZkIRQ==}
 
   ccount@2.0.1:
     resolution: {integrity: sha512-eyrF0jiFpY+3drT6383f1qhkbGsLSifNAjA61IUjZjmLCWjItY6LB9ft9YhoDgwfmclB2zhu51Lc7+95b8NRAg==}
@@ -1935,8 +1951,8 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
 
-  electron-to-chromium@1.5.335:
-    resolution: {integrity: sha512-q9n5T4BR4Xwa2cwbrwcsDJtHD/enpQ5S1xF1IAtdqf5AAgqDFmR/aakqH3ChFdqd/QXJhS3rnnXFtexU7rax6Q==}
+  electron-to-chromium@1.5.340:
+    resolution: {integrity: sha512-908qahOGocRMinT2nM3ajCEM99H4iPdv84eagPP3FfZy/1ZGeOy2CZYzjhms81ckOPCXPlW7LkY4XpxD8r1DrA==}
 
   emoji-regex-xs@1.0.0:
     resolution: {integrity: sha512-LRlerrMYoIDrT6jgpeZ2YYl/L8EulRTt5hQcYjy5AInh7HWXKimpqx68aknBFpGL2+/IcogTcaydJEgaTmOpDg==}
@@ -3817,7 +3833,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@kaokei/di@5.0.3': {}
+  '@kaokei/di@5.0.5': {}
 
   '@microsoft/api-extractor-model@7.33.6(@types/node@22.19.17)':
     dependencies:
@@ -4460,7 +4476,7 @@ snapshots:
 
   balanced-match@4.0.4: {}
 
-  baseline-browser-mapping@2.10.18: {}
+  baseline-browser-mapping@2.10.20: {}
 
   birpc@2.9.0: {}
 
@@ -4479,9 +4495,9 @@ snapshots:
 
   browserslist@4.28.2:
     dependencies:
-      baseline-browser-mapping: 2.10.18
-      caniuse-lite: 1.0.30001787
-      electron-to-chromium: 1.5.335
+      baseline-browser-mapping: 2.10.20
+      caniuse-lite: 1.0.30001788
+      electron-to-chromium: 1.5.340
       node-releases: 2.0.37
       update-browserslist-db: 1.2.3(browserslist@4.28.2)
 
@@ -4502,7 +4518,7 @@ snapshots:
 
   camelcase@5.3.1: {}
 
-  caniuse-lite@1.0.30001787: {}
+  caniuse-lite@1.0.30001788: {}
 
   ccount@2.0.1: {}
 
@@ -4774,7 +4790,7 @@ snapshots:
       minimatch: 9.0.9
       semver: 7.7.4
 
-  electron-to-chromium@1.5.335: {}
+  electron-to-chromium@1.5.340: {}
 
   emoji-regex-xs@1.0.0: {}
 
