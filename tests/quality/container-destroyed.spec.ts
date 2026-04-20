@@ -1,5 +1,7 @@
 import { Container, Token, LazyInject } from '@/index';
 import { BindingNotFoundError } from '@/errors/BindingNotFoundError';
+import { ContainerDestroyedError } from '@/errors/ContainerDestroyedError';
+import { BaseError } from '@/errors/BaseError';
 
 describe('container.destroy() 后调用 get()', () => {
   test('destroy 后 get 已绑定的 token 应抛出包含 destroyed 信息的错误', () => {
@@ -61,6 +63,26 @@ describe('container.destroy() 后 @LazyInject 首次访问', () => {
     container.destroy();
 
     expect(() => host.lazy).toThrow(/destroyed/i);
+  });
+});
+
+describe('ContainerDestroyedError 类型检查', () => {
+  test('容器销毁后调用 get 应抛出 ContainerDestroyedError', () => {
+    const container = new Container();
+    const token = new Token<string>('test');
+    container.bind(token).toConstantValue('value');
+    container.destroy();
+
+    let error: unknown;
+    try {
+      container.get(token);
+    } catch (e) {
+      error = e;
+    }
+    expect(error).toBeInstanceOf(ContainerDestroyedError);
+    expect(error).toBeInstanceOf(BaseError);
+    expect((error as any).message).toContain('test');
+    expect((error as any).token).toBe(token);
   });
 });
 

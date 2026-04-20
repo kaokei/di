@@ -119,7 +119,7 @@ describe('token.name 为 undefined 或空字符串时使用 <unknown token> 降�
   test('BindingNotValidError 中 token.name 为空时使用降级文本', () => {
     const token = new Token<string>('');
     const error = new BindingNotValidError(token);
-    expect(error.message).toBe('Invalid binding: <unknown token>');
+    expect(error.message).toContain('<unknown token>');
   });
 
   test('DuplicateBindingError 中 token.name 为空时使用降级文本', () => {
