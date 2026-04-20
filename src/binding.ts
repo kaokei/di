@@ -1,4 +1,4 @@
-import { BINDING, STATUS, UNINITIALIZED, ERRORS } from './constants';
+import { BINDING, STATUS, UNINITIALIZED } from './constants';
 import type { BindingType, StatusType } from './constants';
 import { Container } from './container';
 import { getPostConstruct, getPreDestroy, getInjectedProps } from './cachemap';
@@ -66,16 +66,10 @@ export class Binding<T = unknown> {
   }
 
   onActivation(handler: ActivationHandler<T>) {
-    if (this.onActivationHandler !== undefined) {
-      throw new Error(ERRORS.DUPLICATE_ACTIVATION_HANDLER);
-    }
     this.onActivationHandler = handler;
   }
 
   onDeactivation(handler: DeactivationHandler<T>) {
-    if (this.onDeactivationHandler !== undefined) {
-      throw new Error(ERRORS.DUPLICATE_DEACTIVATION_HANDLER);
-    }
     this.onDeactivationHandler = handler;
   }
 

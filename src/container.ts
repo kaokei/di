@@ -2,7 +2,6 @@ import { Binding } from './binding';
 import { BindingNotFoundError } from './errors/BindingNotFoundError';
 import { DuplicateBindingError } from './errors/DuplicateBindingError';
 import { ContainerDestroyedError } from './errors/ContainerDestroyedError';
-import { ERRORS } from './constants';
 import type {
   GetOptions,
   Options,
@@ -207,16 +206,10 @@ export class Container {
   }
 
   onActivation(handler: ActivationHandler) {
-    if (this._onActivationHandler !== undefined) {
-      throw new Error(ERRORS.DUPLICATE_ACTIVATION_HANDLER);
-    }
     this._onActivationHandler = handler;
   }
 
   onDeactivation(handler: DeactivationHandler) {
-    if (this._onDeactivationHandler !== undefined) {
-      throw new Error(ERRORS.DUPLICATE_DEACTIVATION_HANDLER);
-    }
     this._onDeactivationHandler = handler;
   }
 
