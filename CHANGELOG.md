@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.0.5](https://github.com/kaokei/di/compare/v5.0.4...v5.0.5) (2026-04-20)
+
+
+### Features
+
+* add example 23-error-chain for BindingNotFoundError dependency path ([2dad27f](https://github.com/kaokei/di/commit/2dad27f82b3da023909aad2e90f55aa302afb55b))
+* add never overloads for illegal token types in Container.bind/get ([7ceec64](https://github.com/kaokei/di/commit/7ceec64636554edc6e16783bf7aeec8cdd719f01))
+* add tryGet/rebind to Container, fix preDestroy on unresolved binding ([17f9918](https://github.com/kaokei/di/commit/17f9918ff3d6cfc9ac03a23411e69ab3b03c809e))
+* BindingNotFoundError 展示完整依赖链路径 ([358df59](https://github.com/kaokei/di/commit/358df59895a8bfc6f20ab44a012c0e1aa4edf179))
+* **errors:** Task 1 - 错误类改造 ([fe60b5a](https://github.com/kaokei/di/commit/fe60b5a7b4130fbb317a1faf8a8122def49531ac))
+* export ContainerDestroyedError, update exports tests ([082d72f](https://github.com/kaokei/di/commit/082d72f88e831b2ed04699298fc4b5668df1fec9))
+* onActivation/onDeactivation 重复注册时抛出明确错误 ([b49b2ab](https://github.com/kaokei/di/commit/b49b2ab61cc4dd858006b85ae2e01b1d737906bb))
+* **types:** Task 2 - Options 类型拆分 ([abcdb18](https://github.com/kaokei/di/commit/abcdb18e4ba8536bd914a032e8be8153cc8f147d))
+* 容器销毁后 get() 抛出明确的 destroyed 错误 ([6ed9ea0](https://github.com/kaokei/di/commit/6ed9ea0c7af1d93e89904deb0233f2caa314d257))
+
+
+### Bug Fixes
+
+* add explicit overload signature for bind and ts-expect-error type checks ([ce2ee0a](https://github.com/kaokei/di/commit/ce2ee0ad76ef0bd46a2af04dd2c3112a0ddff484))
+* use BindingNotFoundError import in tryGet for better error labeling ([d608830](https://github.com/kaokei/di/commit/d608830cac8ef87356fff4dd0ab2e2ebaf23a3ac))
+
 ### [5.0.4](https://github.com/kaokei/di/compare/v5.0.3...v5.0.4) (2026-04-12)
 
 ### [5.0.3](https://github.com/kaokei/di/compare/v5.0.2...v5.0.3) (2026-04-11)
