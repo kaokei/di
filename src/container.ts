@@ -1,6 +1,7 @@
 import { Binding } from './binding';
 import { BindingNotFoundError } from './errors/BindingNotFoundError';
 import { DuplicateBindingError } from './errors/DuplicateBindingError';
+import { ContainerDestroyedError } from './errors/ContainerDestroyedError';
 import { ERRORS } from './constants';
 import type {
   Options,
@@ -108,9 +109,7 @@ export class Container {
   get<T>(token: CommonToken<T>, options?: Options<T>): T | void;
   get<T>(token: CommonToken<T>, options: Options<T> = {}): T | void {
     if (this._destroyed) {
-      throw new Error(
-        `Container has been destroyed. Cannot call get() for token: ${(token as any)?.name ?? String(token)}`
-      );
+      throw new ContainerDestroyedError(token);
     }
     if (options.skipSelf) {
       return this._resolveSkipSelf(token, options);
