@@ -179,11 +179,20 @@ describe('导出分组正确', () => {
       'CircularDependencyError',
       'DuplicateBindingError',
       'PostConstructError',
+      'ContainerDestroyedError',
     ];
     for (const name of errorClasses) {
       expect(mod).toHaveProperty(name);
       expect(typeof (mod as any)[name]).toBe('function');
     }
+  });
+
+  test('Container 实例具有 tryGet 和 rebind 方法', async () => {
+    const mod = await import('@/index');
+    const container = new mod.Container();
+    expect(typeof container.tryGet).toBe('function');
+    expect(typeof container.rebind).toBe('function');
+    container.destroy();
   });
 
   test('所有装饰器函数均已导出', async () => {
