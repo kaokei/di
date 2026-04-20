@@ -50,11 +50,6 @@ export const ERRORS = {
   LAZY_INJECT_INVALID_TOKEN:
     '@LazyInject requires a valid token, but received null or undefined.',
 
-  // 用于 container.ts 和 binding.ts —— 重复注册 handler 检测
-  DUPLICATE_ACTIVATION_HANDLER:
-    'onActivation handler is already registered. Only one handler is allowed.',
-  DUPLICATE_DEACTIVATION_HANDLER:
-    'onDeactivation handler is already registered. Only one handler is allowed.',
 } as const;
 
 // 未初始化哨兵值，用于标记 PostConstruct 尚未执行
