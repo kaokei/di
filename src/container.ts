@@ -176,7 +176,7 @@ export class Container {
     if (binding) {
       options.token = token;
       options.binding = binding;
-      return binding.get(options);
+      return binding.get(options) as T | void;
     }
     return this._checkBindingNotFoundError(token, options);
   }
@@ -187,7 +187,7 @@ export class Container {
     if (binding) {
       options.token = token;
       options.binding = binding;
-      return binding.get(options);
+      return binding.get(options) as T | void;
     }
     if (this.parent) {
       return this.parent._resolveWithInternalOpts(token, options);

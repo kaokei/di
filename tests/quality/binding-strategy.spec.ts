@@ -16,9 +16,9 @@ import { BINDING, STATUS } from '@/constants';
 import { BindingNotValidError } from '@/errors/BindingNotValidError';
 import { CircularDependencyError } from '@/errors/CircularDependencyError';
 
-// 类型辅助：_resolvers 是重构后新增的静态属性，使用类型断言访问
+// 类型辅助：_resolvers 使用类型断言访问
 const BindingClass = Binding as typeof Binding & {
-  _resolvers: Record<string, string>;
+  _resolvers: Map<string, Function>;
 };
 
 // 类型辅助：_instanceContainerMap 是重构后重命名的静态属性
@@ -29,32 +29,32 @@ const ContainerClass = Container as typeof Container & {
 // ==================== 策略映射表结构验证（需求 3.1、3.3） ====================
 
 describe('Binding._resolvers 策略映射表', () => {
-  test('_resolvers 是 Binding 类的静态属性', () => {
+  test('_resolvers 是 Binding 类的静态属性，且为 Map 实例', () => {
     expect(BindingClass).toHaveProperty('_resolvers');
-    expect(typeof BindingClass._resolvers).toBe('object');
+    expect(BindingClass._resolvers).toBeInstanceOf(Map);
   });
 
-  test('_resolvers 包含 Instance 键，映射到 _resolveInstanceValue 方法名', () => {
-    expect(BindingClass._resolvers).toHaveProperty(BINDING.INSTANCE);
-    expect(BindingClass._resolvers[BINDING.INSTANCE]).toBe('_resolveInstanceValue');
+  test('_resolvers 包含 Instance 键，值为函数', () => {
+    expect(BindingClass._resolvers.has(BINDING.INSTANCE)).toBe(true);
+    expect(typeof BindingClass._resolvers.get(BINDING.INSTANCE)).toBe('function');
   });
 
-  test('_resolvers 包含 ConstantValue 键，映射到 _resolveConstantValue 方法名', () => {
-    expect(BindingClass._resolvers).toHaveProperty(BINDING.CONSTANT);
-    expect(BindingClass._resolvers[BINDING.CONSTANT]).toBe('_resolveConstantValue');
+  test('_resolvers 包含 ConstantValue 键，值为函数', () => {
+    expect(BindingClass._resolvers.has(BINDING.CONSTANT)).toBe(true);
+    expect(typeof BindingClass._resolvers.get(BINDING.CONSTANT)).toBe('function');
   });
 
-  test('_resolvers 包含 DynamicValue 键，映射到 _resolveDynamicValue 方法名', () => {
-    expect(BindingClass._resolvers).toHaveProperty(BINDING.DYNAMIC);
-    expect(BindingClass._resolvers[BINDING.DYNAMIC]).toBe('_resolveDynamicValue');
+  test('_resolvers 包含 DynamicValue 键，值为函数', () => {
+    expect(BindingClass._resolvers.has(BINDING.DYNAMIC)).toBe(true);
+    expect(typeof BindingClass._resolvers.get(BINDING.DYNAMIC)).toBe('function');
   });
 
   test('_resolvers 不包含 Invalid 键', () => {
-    expect(BindingClass._resolvers).not.toHaveProperty(BINDING.INVALID);
+    expect(BindingClass._resolvers.has(BINDING.INVALID)).toBe(false);
   });
 
   test('_resolvers 恰好包含三个键', () => {
-    expect(Object.keys(BindingClass._resolvers)).toHaveLength(3);
+    expect(BindingClass._resolvers.size).toBe(3);
   });
 });
 

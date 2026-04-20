@@ -25,12 +25,12 @@ export interface InjectPropertiesResult {
 }
 
 export class Binding<T = unknown> {
-  // 类型到解析方法的静态映射表，用于替代 get 方法中的 if-else 链
-  static _resolvers: Record<string, string> = {
-    [BINDING.INSTANCE]: '_resolveInstanceValue',
-    [BINDING.CONSTANT]: '_resolveConstantValue',
-    [BINDING.DYNAMIC]: '_resolveDynamicValue',
-  };
+  // 类型到解析函数的静态映射表，直接存储函数引用，消除字符串查表和 as any 间接调用
+  static _resolvers: Map<string, (this: Binding, options: Options) => unknown> = new Map([
+    [BINDING.INSTANCE, function (this: Binding, options: Options) { return this._resolveInstanceValue(options); }],
+    [BINDING.CONSTANT, function (this: Binding, _options: Options) { return this._resolveConstantValue(); }],
+    [BINDING.DYNAMIC, function (this: Binding, _options: Options) { return this._resolveDynamicValue(); }],
+  ]);
 
   container!: Container;
 
@@ -139,10 +139,10 @@ export class Binding<T = unknown> {
         return this.cache;
       }
     }
-    // 通过映射表查找对应的解析方法
-    const resolver = Binding._resolvers[this.type];
+    // 通过映射表查找对应的解析函数
+    const resolver = Binding._resolvers.get(this.type);
     if (resolver) {
-      return (this as any)[resolver](options);
+      return resolver.call(this as unknown as Binding, options as Options);
     }
     // 未找到解析方法，说明 binding 未绑定有效服务
     throw new BindingNotValidError(this.token);
