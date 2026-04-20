@@ -1,8 +1,14 @@
 import type { CommonToken, PostConstructParam } from './interfaces';
 import { KEYS, hasOwn } from './constants';
 
-// 简化为 target → metadata 的直接映射
+// target → metadata 的映射
 const map = new WeakMap<CommonToken, Record<string, unknown>>();
+
+// getInjectedProps 合并结果缓存，defineMetadata 调用时失效
+const injectedPropsCache = new WeakMap<
+  CommonToken,
+  Record<string, Record<string, unknown>> | undefined
+>();
 
 function hasParentClass(cls: CommonToken) {
   return (
@@ -20,6 +26,8 @@ export function defineMetadata(
   metadata: Record<string, unknown>
 ): void {
   map.set(target, metadata);
+  // 使当前类的缓存失效
+  injectedPropsCache.delete(target);
 }
 
 /**
@@ -78,6 +86,24 @@ export function getPreDestroy(
  * 子类同名属性覆盖父类。
  */
 export function getInjectedProps(
+  target: CommonToken
+): Record<string, Record<string, unknown>> | undefined {
+  // 检查缓存（包括缓存的 undefined，避免对无注入属性的类重复遍历原型链）
+  if (injectedPropsCache.has(target)) {
+    const cached = injectedPropsCache.get(target);
+    // 返回浅拷贝，防止调用方修改污染缓存
+    return cached ? Object.assign({}, cached) : cached;
+  }
+
+  const result = _computeInjectedProps(target);
+
+  injectedPropsCache.set(target, result);
+
+  // 返回浅拷贝
+  return result ? Object.assign({}, result) : result;
+}
+
+function _computeInjectedProps(
   target: CommonToken
 ): Record<string, Record<string, unknown>> | undefined {
   const metadata = map.get(target);
