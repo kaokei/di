@@ -4,6 +4,7 @@ import { DuplicateBindingError } from './errors/DuplicateBindingError';
 import { ContainerDestroyedError } from './errors/ContainerDestroyedError';
 import { ERRORS } from './constants';
 import type {
+  GetOptions,
   Options,
   CommonToken,
   ActivationHandler,
@@ -103,11 +104,50 @@ export class Container {
 
   get<T>(
     token: CommonToken<T>,
-    options: Options<T> & { optional: true }
+    options: GetOptions & { optional: true }
   ): T | void;
-  get<T>(token: CommonToken<T>, options?: Options<T> & { optional?: false }): T;
-  get<T>(token: CommonToken<T>, options?: Options<T>): T | void;
-  get<T>(token: CommonToken<T>, options: Options<T> = {}): T | void {
+  get<T>(token: CommonToken<T>, options?: GetOptions & { optional?: false }): T;
+  get<T>(token: CommonToken<T>, options?: GetOptions): T | void;
+  get<T>(token: CommonToken<T>, options: GetOptions = {}): T | void {
+    // 将公共 options 转为内部 options（创建新对象，不修改传入的参数）
+    const internalOpts: Options<T> = Object.assign({}, options);
+    return this._resolveWithInternalOpts(token, internalOpts);
+  }
+
+  // 异步版本的 get，等待 PostConstruct 完成后再返回实例
+  getAsync<T>(
+    token: CommonToken<T>,
+    options: GetOptions & { optional: true }
+  ): Promise<T | void>;
+  getAsync<T>(
+    token: CommonToken<T>,
+    options?: GetOptions & { optional?: false }
+  ): Promise<T>;
+  getAsync<T>(
+    token: CommonToken<T>,
+    options?: GetOptions
+  ): Promise<T | void>;
+  getAsync<T>(
+    token: CommonToken<T>,
+    options: GetOptions = {}
+  ): Promise<T | void> {
+    // 创建内部 options，用于在 get 解析后取出 binding
+    const internalOpts: Options<T> = Object.assign({}, options);
+    let instance: T | void;
+    try {
+      instance = this._resolveWithInternalOpts(token, internalOpts);
+    } catch (e) {
+      return Promise.reject(e);
+    }
+    const binding = internalOpts.binding;
+    if (binding?.postConstructResult instanceof Promise) {
+      return binding.postConstructResult.then(() => instance);
+    }
+    return Promise.resolve(instance);
+  }
+
+  // 内部解析入口，接受完整 Options，供 getAsync 使用
+  _resolveWithInternalOpts<T>(token: CommonToken<T>, options: Options<T>): T | void {
     if (this._destroyed) {
       throw new ContainerDestroyedError(token);
     }
@@ -120,41 +160,12 @@ export class Container {
     return this._resolveDefault(token, options);
   }
 
-  // 异步版本的 get，等待 PostConstruct 完成后再返回实例
-  getAsync<T>(
-    token: CommonToken<T>,
-    options: Options<T> & { optional: true }
-  ): Promise<T | void>;
-  getAsync<T>(
-    token: CommonToken<T>,
-    options?: Options<T> & { optional?: false }
-  ): Promise<T>;
-  getAsync<T>(
-    token: CommonToken<T>,
-    options?: Options<T>
-  ): Promise<T | void>;
-  getAsync<T>(
-    token: CommonToken<T>,
-    options: Options<T> = {}
-  ): Promise<T | void> {
-    let instance: T | void;
-    try {
-      instance = this.get(token, options);
-    } catch (e) {
-      return Promise.reject(e);
-    }
-    const binding = options.binding;
-    if (binding?.postConstructResult instanceof Promise) {
-      return binding.postConstructResult.then(() => instance);
-    }
-    return Promise.resolve(instance);
-  }
-
   // 处理 skipSelf 选项：跳过当前容器，委托父容器解析
   _resolveSkipSelf<T>(token: CommonToken<T>, options: Options<T>): T | void {
     if (this.parent) {
-      options.skipSelf = false;
-      return this.parent.get(token, options);
+      // 创建新对象，不修改传入的 options（E5），内部链式调用走 _resolveWithInternalOpts
+      const parentOpts: Options<T> = Object.assign({}, options, { skipSelf: false });
+      return this.parent._resolveWithInternalOpts(token, parentOpts);
     }
     return this._checkBindingNotFoundError(token, options);
   }
@@ -179,7 +190,7 @@ export class Container {
       return binding.get(options);
     }
     if (this.parent) {
-      return this.parent.get(token, options);
+      return this.parent._resolveWithInternalOpts(token, options);
     }
     return this._checkBindingNotFoundError(token, options);
   }
@@ -220,7 +231,7 @@ export class Container {
 
   _checkBindingNotFoundError<T>(token: CommonToken, options: Options<T>) {
     if (!options.optional) {
-      throw new BindingNotFoundError(token, options);
+      throw new BindingNotFoundError(token, options as Options<unknown>);
     }
   }
 }

@@ -25,11 +25,16 @@ export type DynamicValue<T> = (ctx: Context) => T;
 
 export type RecordObject = Record<string, unknown>;
 
-export interface Options<T = unknown> {
-  inject?: GenericToken<T>;
+// 用户可见的公共选项（container.get() / container.getAsync() 的第二参数）
+export interface GetOptions {
   optional?: boolean;
   self?: boolean;
   skipSelf?: boolean;
+}
+
+// 内部解析时传递的完整选项（含解析链追踪字段）
+export interface Options<T = unknown> extends GetOptions {
+  inject?: GenericToken<T>;
   token?: CommonToken<T>;
   binding?: Binding<T>;
   parent?: Options<any>;

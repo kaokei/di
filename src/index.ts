@@ -9,6 +9,7 @@ export type {
   Context,
   DynamicValue,
   RecordObject,
+  GetOptions,
   Options,
   ActivationHandler,
   DeactivationHandler,
