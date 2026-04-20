@@ -44,6 +44,7 @@ export { CircularDependencyError } from './errors/CircularDependencyError';
 export { DuplicateBindingError } from './errors/DuplicateBindingError';
 export { PostConstructError } from './errors/PostConstructError';
 export { ContainerNotFoundError } from './errors/ContainerNotFoundError';
+export { ContainerDestroyedError } from './errors/ContainerDestroyedError';
 
 // 常量和工具方法
 export { hasOwn, isObject, ERRORS } from './constants';
