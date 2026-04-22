@@ -109,7 +109,7 @@ export type DynamicValue<T> = (ctx: Context) => T;
 ```ts
 import type { DynamicValue } from '@kaokei/di';
 
-const factory: DynamicValue<string> = (ctx) => {
+const factory: DynamicValue<string> = ctx => {
   const config = ctx.container.get(ConfigService);
   return config.getValue('key');
 };
@@ -167,11 +167,11 @@ export interface Options<T = unknown> extends GetOptions {
 export type ActivationHandler<T = unknown> = (
   ctx: Context,
   input: T,
-  token?: CommonToken<T>
+  token: CommonToken<T>
 ) => T;
 ```
 
-激活处理器类型，在服务首次被获取时执行。接收上下文、服务实例和 token，返回（可能经过处理的）服务实例。
+容器级激活处理器类型，用于 `container.onActivation`。接收上下文、服务实例和 token，返回（可能经过处理的）服务实例。`token` 参数可用于在同一个 handler 中对不同服务实现差异化逻辑。
 
 ```ts
 import type { ActivationHandler } from '@kaokei/di';
@@ -184,16 +184,38 @@ const handler: ActivationHandler<MyService> = (ctx, instance, token) => {
 container.onActivation(handler);
 ```
 
+## BindingActivationHandler\<T\>
+
+```ts
+export type BindingActivationHandler<T = unknown> = (
+  ctx: Context,
+  input: T
+) => T;
+```
+
+Binding 级激活处理器类型，用于 `binding.onActivation`。与 `ActivationHandler` 的区别在于没有 `token` 参数——因为 Binding 本身已与特定 token 绑定，无需通过 token 做区分。
+
+```ts
+import type { BindingActivationHandler } from '@kaokei/di';
+
+const handler: BindingActivationHandler<MyService> = (ctx, instance) => {
+  instance.initialize();
+  return instance;
+};
+
+container.bind(MyService).toSelf().onActivation(handler);
+```
+
 ## DeactivationHandler\<T\>
 
 ```ts
 export type DeactivationHandler<T = unknown> = (
   input: T,
-  token?: CommonToken<T>
+  token: CommonToken<T>
 ) => void;
 ```
 
-销毁处理器类型，在调用 `container.unbind` 或 `container.dispose` 时执行。接收服务实例和 token，用于执行清理逻辑，无返回值。
+容器级销毁处理器类型，用于 `container.onDeactivation`。接收服务实例和 token，用于执行清理逻辑，无返回值。`token` 参数可用于在同一个 handler 中对不同服务实现差异化逻辑。
 
 ```ts
 import type { DeactivationHandler } from '@kaokei/di';
@@ -203,6 +225,24 @@ const handler: DeactivationHandler<MyService> = (instance, token) => {
 };
 
 container.onDeactivation(handler);
+```
+
+## BindingDeactivationHandler\<T\>
+
+```ts
+export type BindingDeactivationHandler<T = unknown> = (input: T) => void;
+```
+
+Binding 级销毁处理器类型，用于 `binding.onDeactivation`。与 `DeactivationHandler` 的区别在于没有 `token` 参数——因为 Binding 本身已与特定 token 绑定，无需通过 token 做区分。
+
+```ts
+import type { BindingDeactivationHandler } from '@kaokei/di';
+
+const handler: BindingDeactivationHandler<MyService> = instance => {
+  instance.cleanup();
+};
+
+container.bind(MyService).toSelf().onDeactivation(handler);
 ```
 
 ## PostConstructParam
@@ -217,10 +257,10 @@ export type PostConstructParam =
 
 `@PostConstruct` 装饰器的参数类型，控制异步初始化的等待行为：
 
-- `void`（不传参数）：不等待任何异步依赖
-- `true`：等待所有绑定的异步初始化完成
-- `CommonToken[]`：等待指定 token 列表对应服务的异步初始化完成
-- `FilterFunction`：通过过滤函数自定义需要等待的绑定
+- `void`（不传参数）：不等待任何异步依赖，只控制当前服务在实例化之后自动执行`@PostConstruct`修饰的方法。
+- `true`：等待所有绑定的异步初始化完成。
+- `CommonToken[]`：等待指定 token 列表对应服务的异步初始化完成。
+- `FilterFunction`：通过过滤函数自定义需要等待的绑定。
 
 ```ts
 import { PostConstruct } from '@kaokei/di';
@@ -246,7 +286,7 @@ export type InjectFunction<R extends (...args: any) => any> = (
 ```ts
 import type { InjectFunction, DynamicValue } from '@kaokei/di';
 
-const factory: DynamicValue<MyService> = (ctx) => {
+const factory: DynamicValue<MyService> = ctx => {
   // ctx.container.get 本质上就是一个 InjectFunction
   const dep = ctx.container.get(DepService);
   return new MyService(dep);

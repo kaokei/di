@@ -34,31 +34,26 @@ if (binding.postConstructResult instanceof Promise) {
 ## Binding#onActivation
 
 ```ts
-function onActivation<T>(handler: ActivationHandler<T>): this;
-// ActivationHandler: (ctx: Context, input: T, token?: CommonToken<T>) => T
+function onActivation<T>(handler: BindingActivationHandler<T>): this;
+// BindingActivationHandler: (ctx: Context, input: T) => T
 ```
 
 注册一个 Activation 函数，会在 get 方法首次执行过程中被执行。
 
 注意只能注册一个 Activation 函数，重复注册，只会覆盖前一个函数。
 
-这个 Activation 函数是当前 token 专属的，只会被当前 token 使用。
+这个 Activation 函数是当前 token 专属的，只会被当前 token 使用。由于已与特定 token 绑定，handler 不需要 `token` 参数。
 
 token 绑定的原始服务对象会作为 `Binding#onActivation` 函数的输入参数。
 `Binding#onActivation` 函数的返回值会作为 `Container#onActivation` 函数的输入参数。
 `Container#onActivation` 函数的返回值会作为最终结果存入缓存中。
 
-通过 `token` 参数可以在同一个 handler 中实现差异化逻辑：
-
 ```ts
 container
   .bind(ServiceA)
   .toSelf()
-  .onActivation((ctx, instance, token) => {
-    if (token === ServiceA) {
-      // 针对 ServiceA 的特殊处理
-      instance.init();
-    }
+  .onActivation((ctx, instance) => {
+    instance.init();
     return instance;
   });
 ```
@@ -66,27 +61,22 @@ container
 ## Binding#onDeactivation
 
 ```ts
-function onDeactivation<T>(handler: DeactivationHandler<T>): this;
-// DeactivationHandler: (input: T, token?: CommonToken<T>) => void
+function onDeactivation<T>(handler: BindingDeactivationHandler<T>): this;
+// BindingDeactivationHandler: (input: T) => void
 ```
 
 注册一个 Deactivation 函数，会在 unbind 方法执行过程中被执行。
 
 注意只能注册一个 Deactivation 函数，重复注册，只会覆盖前一个函数。
 
-这个 Deactivation 函数是当前 token 专属的，只会被当前 token 使用。
-
-通过 `token` 参数可以在同一个 handler 中实现差异化逻辑：
+这个 Deactivation 函数是当前 token 专属的，只会被当前 token 使用。由于已与特定 token 绑定，handler 不需要 `token` 参数。
 
 ```ts
 container
   .bind(ServiceA)
   .toSelf()
-  .onDeactivation((instance, token) => {
-    if (token === ServiceA) {
-      // 针对 ServiceA 的清理逻辑
-      instance.dispose();
-    }
+  .onDeactivation(instance => {
+    instance.dispose();
   });
 ```
 
@@ -206,7 +196,7 @@ console.log(b1 === b2); // false
 
 ### 销毁顺序
 
-调用 `container.unbind` 或 `container.dispose` 时，按以下顺序执行：
+调用 `container.unbind` 时，按以下顺序执行：
 
 1. `Container#onDeactivation` —— 容器级别的销毁处理器
 2. `Binding#onDeactivation` —— 当前 token 专属的销毁处理器

@@ -12,7 +12,9 @@ export type {
   GetOptions,
   Options,
   ActivationHandler,
+  BindingActivationHandler,
   DeactivationHandler,
+  BindingDeactivationHandler,
   PostConstructParam,
 } from './interfaces';
 

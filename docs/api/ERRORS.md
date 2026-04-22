@@ -85,7 +85,7 @@ try {
 错误消息格式：
 
 ```
-Binding is not configured (missing .to() / .toSelf() / .toConstantValue() / .toDynamicValue()): <tokenName>
+Binding is incomplete: container.bind(<tokenName>) was called but missing to/toSelf/toConstantValue/toDynamicValue method. <tokenName>
 ```
 
 ```ts
@@ -100,7 +100,7 @@ try {
 } catch (error) {
   if (error instanceof BindingNotValidError) {
     console.error('无效绑定：', error.message);
-    // 输出：Binding is not configured (missing .to() / .toSelf() / .toConstantValue() / .toDynamicValue()): myToken
+    // 输出：Binding is incomplete: container.bind(myToken) was called but missing to/toSelf/toConstantValue/toDynamicValue method. myToken
   }
 }
 ```
