@@ -173,7 +173,7 @@ class A extends B {}
 
 ### 不支持的装饰器
 
-以下装饰器内部依赖 `context.addInitializer`，需要在每次 `new ClassName()` 时对真实实例执行初始化逻辑。`decorate` 无法介入实例化流程，因此这类装饰器通过 `decorate` 调用后会**静默失效**：
+以下装饰器内部依赖 `context.addInitializer`，需要在每次 `new ClassName()` 时对真实实例执行初始化逻辑。`decorate` 无法介入实例化流程，因此这类装饰器通过 `decorate` 调用后会**抛出错误**：
 
 | 装饰器 | 原因 |
 |--------|------|

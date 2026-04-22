@@ -1,7 +1,43 @@
+import path from 'path';
 import { defineConfig } from 'vitepress';
+
+const REPO_ROOT = path.resolve(__dirname, '../..');
+const GITHUB_BASE =
+  'https://github.com/kaokei/di/blob/main';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  markdown: {
+    config(md) {
+      // 将 docs/ 之外的相对路径链接转换为 GitHub URL
+      const defaultRender =
+        md.renderer.rules.link_open ||
+        function (tokens, idx, options, _env, self) {
+          return self.renderToken(tokens, idx, options);
+        };
+
+      md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
+        const token = tokens[idx];
+        const hrefIndex = token.attrIndex('href');
+        if (hrefIndex >= 0) {
+          const href = token.attrs![hrefIndex][1];
+          // 只处理相对路径，且解析后落在 docs/ 目录之外
+          // filePath 是绝对路径（VitePress 构建时注入）
+          const filePath: string | undefined = env.filePath ?? env.realPath;
+          if (href && !href.startsWith('http') && !href.startsWith('#') && filePath) {
+            const mdDir = path.dirname(filePath);
+            const resolved = path.resolve(mdDir, href);
+            const docsDir = path.resolve(REPO_ROOT, 'docs');
+            if (!resolved.startsWith(docsDir + path.sep) && !resolved.startsWith(docsDir + '/')) {
+              const repoRelative = path.relative(REPO_ROOT, resolved);
+              token.attrs![hrefIndex][1] = `${GITHUB_BASE}/${repoRelative}`;
+            }
+          }
+        }
+        return defaultRender(tokens, idx, options, env, self);
+      };
+    },
+  },
   title: '@kaokei/di',
   description: 'Tiny di library depends on typescript decorator.',
   themeConfig: {
