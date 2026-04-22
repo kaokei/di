@@ -153,3 +153,31 @@ class A extends B {}
 `A` 和 `B` 都没有 `@PostConstruct`，执行 `C` 的 `init()`。
 
 **规则总结**：容器在实例化时沿继承链向上查找，执行第一个找到的 `@PostConstruct` 方法，找到即停止，不会继续向上执行。
+
+## 装饰器兼容性
+
+`decorate` 对装饰器的支持取决于装饰器的内部实现方式。
+
+### 支持的装饰器
+
+以下装饰器内部只使用 `context.name` 和 `context.metadata` 写入元数据，与实例无关，`decorate` 可以完整模拟其行为：
+
+| 装饰器 | 类型 |
+|--------|------|
+| `@Inject(token)` | 属性装饰器 |
+| `@Self()` | 属性装饰器 |
+| `@SkipSelf()` | 属性装饰器 |
+| `@Optional()` | 属性装饰器 |
+| `@PostConstruct()` | 方法装饰器 |
+| `@PreDestroy()` | 方法装饰器 |
+
+### 不支持的装饰器
+
+以下装饰器内部依赖 `context.addInitializer`，需要在每次 `new ClassName()` 时对真实实例执行初始化逻辑。`decorate` 无法介入实例化流程，因此这类装饰器通过 `decorate` 调用后会**静默失效**：
+
+| 装饰器 | 原因 |
+|--------|------|
+| `@LazyInject(token)` | 依赖 `addInitializer` 在实例上定义 getter/setter |
+| `@autobind` | 依赖 `addInitializer` 在实例上绑定 `this` |
+
+> **注意**：`@Injectable` 无需也不应通过 `decorate` 调用，`decorate` 内部已自动模拟其行为。
