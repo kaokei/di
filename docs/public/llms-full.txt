@@ -75,7 +75,7 @@ const container = new Container();
 public parent?: Container;
 ```
 
-指向父级容器，`container.get` 找不到 token 时会自动向父级容器查找。
+指向父级容器，`container.get` 找不到 token 时会自动向父级容器查找，一直重复直到父级容器不存在为止。
 
 ### container.children
 
@@ -83,24 +83,39 @@ public parent?: Container;
 public children?: Set<Container>;
 ```
 
-记录所有直接子容器，初始为 `undefined`，首次调用 `createChild()` 后初始化。
+记录所有直接子容器，初始为 `undefined`，首次调用 `createChild()` 后初始化为 `Set`。当子容器调用 `destroy()` 时，会自动从父容器的 `children` 中移除。
 
 ### container.get
 
 ```ts
-container.get<T>(token: CommonToken<T>, options?: Options<T>): T
-container.get<T>(token: CommonToken<T>, options: { optional: true }): T | undefined
+container.get<T>(token: CommonToken<T>, options?: GetOptions): T
+container.get<T>(token: CommonToken<T>, options: GetOptions & { optional: true }): T | void
 ```
 
-获取指定 token 对应的服务实例。options 支持：
+获取指定 token 对应的服务实例。options（类型 `GetOptions`）支持：
 - `self: true` — 只在当前容器查找
 - `skipSelf: true` — 跳过当前容器，从父容器开始查找
 - `optional: true` — 找不到时返回 `undefined` 而非抛出异常
 
+### container.tryGet
+
+```ts
+container.tryGet<T>(token: CommonToken<T>): T | undefined
+```
+
+`get` 的便捷封装，等价于 `container.get(token, { optional: true })`。找不到绑定时返回 `undefined`，省去每次传 `optional: true` 的繁琐写法。
+
+```ts
+const service = container.tryGet(MyService);
+if (service) {
+  service.doSomething();
+}
+```
+
 ### container.getAsync
 
 ```ts
-container.getAsync<T>(token: CommonToken<T>, options?: Options<T>): Promise<T>
+container.getAsync<T>(token: CommonToken<T>, options?: GetOptions): Promise<T>
 ```
 
 `get` 的异步版本，等待 `@PostConstruct` 异步方法执行完成后再返回实例。
@@ -120,7 +135,21 @@ db.query(); // 安全，初始化已完成
 container.bind<T>(token: CommonToken<T>): Binding<T>
 ```
 
-绑定 token，返回 Binding 对象用于配置服务类型。`container.bind` 只接受 Class 或 Token 实例，不接受字符串或 Symbol。
+绑定 token，返回 Binding 对象用于配置服务类型。只接受 Class 或 Token 实例，不接受字符串或 Symbol。
+
+### container.rebind
+
+```ts
+container.rebind<T>(token: CommonToken<T>): Binding<T>
+```
+
+重新绑定 token：若已有绑定，先执行 `unbind`（触发 deactivation 生命周期），再执行 `bind`，返回新的 `Binding` 对象。若尚未绑定，则直接调用 `bind`。适用于需要替换现有绑定的场景（例如测试中替换服务实现）。
+
+```ts
+container.bind(LoggerService).toSelf();
+// 测试中替换为 mock
+container.rebind(LoggerService).toConstantValue(mockLogger);
+```
 
 ### container.unbind
 
@@ -159,7 +188,13 @@ container.createChild(): Container
 container.destroy(): void
 ```
 
-销毁容器及所有子容器（递归），并从父容器的 `children` 中移除自身。InversifyJS 没有此方法。
+递归销毁容器及所有子容器，并从父容器的 `children` 中移除自身。**容器销毁后，任何 `get()` 或 `getAsync()` 调用都会抛出 `ContainerDestroyedError`**。InversifyJS 没有此方法。
+
+```ts
+const parent = new Container();
+const child1 = parent.createChild();
+parent.destroy(); // 递归销毁 parent 及 child1
+```
 
 ### container.onActivation
 
@@ -168,7 +203,7 @@ container.onActivation<T>(handler: ActivationHandler<T>): void
 // ActivationHandler: (ctx: Context, input: T, token?: CommonToken<T>) => T
 ```
 
-注册容器级激活处理器，对所有 token 生效。重复注册会覆盖前一个。
+注册容器级激活处理器，对所有 token 生效。重复注册会覆盖前一个。可选的 `token` 参数可用于区分不同 token 实现差异化逻辑。
 
 ### container.onDeactivation
 
@@ -177,7 +212,7 @@ container.onDeactivation<T>(handler: DeactivationHandler<T>): void
 // DeactivationHandler: (input: T, token?: CommonToken<T>) => void
 ```
 
-注册容器级销毁处理器。
+注册容器级销毁处理器。重复注册会覆盖前一个。
 
 ### Container.getContainerOf（静态方法）
 
@@ -185,13 +220,13 @@ container.onDeactivation<T>(handler: DeactivationHandler<T>): void
 Container.getContainerOf(instance: object): Container | undefined
 ```
 
-从服务实例反查其所属容器。仅对通过 `to()` 或 `toSelf()` 注册并由 `container.get()` 实例化的对象有效。
+从服务实例反查其所属容器。仅对通过 `to()` 或 `toSelf()` 注册并由 `container.get()` 实例化的对象有效（`toConstantValue` 和 `toDynamicValue` 不记录）。主要用于 `@LazyInject` 内部实现。
 
 ---
 
 ## Binding
 
-`container.bind(token)` 返回 Binding 对象，支持链式调用。
+`container.bind(token)` 返回 Binding 对象，支持链式调用。`Binding` 类从 `@kaokei/di` 公开导出，可用于类型标注。
 
 ### binding.to
 
@@ -220,7 +255,8 @@ binding.toConstantValue(value: T): this
 ### binding.toDynamicValue
 
 ```ts
-binding.toDynamicValue(func: (ctx: Context) => T): this
+binding.toDynamicValue(func: DynamicValue<T>): this
+// DynamicValue: (ctx: Context) => T
 ```
 
 关联到工厂函数，默认单例（首次执行后缓存结果）。
@@ -239,20 +275,26 @@ binding.toService(token: CommonToken<T>): this
 binding.inTransientScope(): this
 ```
 
-切换为瞬态模式，每次 `get` 都创建新实例。
+切换为瞬态模式，每次 `get` 都创建新实例。支持 `to()`、`toSelf()`、`toDynamicValue()` 之后链式调用：
+
+```ts
+container.bind(MyService).toSelf().inTransientScope();
+```
 
 ### binding.onActivation
 
 ```ts
-binding.onActivation(handler: ActivationHandler<T>): this
+binding.onActivation(handler: BindingActivationHandler<T>): this
+// BindingActivationHandler: (ctx: Context, input: T) => T
 ```
 
-注册 token 专属激活处理器，只对当前 token 生效。
+注册 token 专属激活处理器，只对当前 token 生效。由于已与特定 token 绑定，handler 不需要 `token` 参数。其返回值会作为 `Container#onActivation` 的输入参数。
 
 ### binding.onDeactivation
 
 ```ts
-binding.onDeactivation(handler: DeactivationHandler<T>): this
+binding.onDeactivation(handler: BindingDeactivationHandler<T>): this
+// BindingDeactivationHandler: (input: T) => void
 ```
 
 注册 token 专属销毁处理器。
@@ -260,9 +302,17 @@ binding.onDeactivation(handler: DeactivationHandler<T>): this
 ### binding.postConstructResult
 
 反映 `@PostConstruct` 执行状态：
-- `UNINITIALIZED`（Symbol）：尚未执行
+- `UNINITIALIZED`（Symbol）：尚未执行（服务还未被 `container.get` 获取过）
 - `undefined`：无 `@PostConstruct` 或已同步完成
 - `Promise<void>`：异步执行中
+
+```ts
+const binding = container.bind(StudentService).toSelf();
+const service = container.get(StudentService);
+if (binding.postConstructResult instanceof Promise) {
+  await binding.postConstructResult; // 等待异步初始化完成
+}
+```
 
 ---
 
@@ -272,7 +322,7 @@ binding.onDeactivation(handler: DeactivationHandler<T>): this
 const token = new Token<ServiceType>('token-name');
 ```
 
-用于标识服务的令牌对象，支持 TypeScript 类型推导。
+用于标识服务的令牌对象，支持 TypeScript 类型推导。`container.bind` 只接受 Class 或 Token 实例，不接受字符串或 Symbol。
 
 ```ts
 const loggerToken = new Token<LoggerService>('logger');
@@ -297,7 +347,7 @@ export class A {
 }
 ```
 
-注意：`LazyToken` 只解决模块加载时的循环 import 问题，不解决实例化时的循环依赖。本库原生支持属性注入的循环依赖，通常不需要 `LazyToken`。如果通过独立的 `Token` 实例绑定服务（而非直接用类名），也不需要 `LazyToken`。
+注意：`LazyToken` 只解决模块加载时的循环 import 问题，不解决实例化时的循环依赖。本库原生支持属性注入的循环依赖。如果通过独立的 `Token` 实例绑定服务（而非直接用类名），也不需要 `LazyToken`。
 
 ---
 
@@ -310,7 +360,7 @@ export class A {
 class MyService { ... }
 ```
 
-类装饰器，必须放在最外层（最上方）。使用了 `@Inject`、`@PostConstruct`、`@PreDestroy` 的类必须添加 `@Injectable`。仅使用 `@LazyInject` 的类不需要。
+类装饰器，必须放在最外层（最上方）。使用了 `@Inject`、`@PostConstruct`、`@PreDestroy` 的类必须添加 `@Injectable`。仅使用 `@LazyInject` 的类不需要。使用 `decorate()` 的类也不需要（内部已模拟）。
 
 ### @Inject
 
@@ -333,7 +383,7 @@ class DemoService {
 
 ### @Self / @SkipSelf / @Optional
 
-控制容器查找范围，必须与 `@Inject` 配合使用：
+控制容器查找范围，必须与 `@Inject` 配合使用（单独使用 `@Self`/`@Optional`/`@SkipSelf` 而不配合 `@Inject` 会抛出错误）：
 
 ```ts
 @Injectable()
@@ -351,6 +401,8 @@ class DemoService {
   logger3!: LoggerService; // 找不到时返回 undefined 而非抛出异常
 }
 ```
+
+这 3 个装饰器来源于 Angular 的 API。
 
 ### @PostConstruct
 
@@ -375,12 +427,16 @@ class StudentService {
 ```
 
 参数控制异步等待行为：
-- 不传：不等待任何依赖的异步初始化
-- `true`：等待所有依赖的 `@PostConstruct` 完成
+- 不传：不等待任何依赖的异步初始化，只控制在实例化之后自动执行该方法
+- `true`：等待所有 `INSTANCE` 类型依赖（`to()`/`toSelf()` 绑定）的 `@PostConstruct` 完成
 - `CommonToken[]`：等待指定 token 的 `@PostConstruct` 完成
 - `FilterFunction`：自定义过滤逻辑
 
+**注意**：`@PostConstruct(true)` 始终是异步执行的（即使没有需要等待的依赖），因为底层使用 `Promise.all([]).then(...)` 实现。`@PostConstruct(true)` 只等待 `INSTANCE` 类型依赖，不等待 `toConstantValue` 和 `toDynamicValue` 绑定的依赖。
+
 继承行为：沿继承链向上查找，执行第一个找到的 `@PostConstruct` 方法，找到即停止。
+
+循环依赖中的限制：`@PostConstruct(true)` 只能由"先被解析的一方"等待"后被解析的一方"，反向等待会触发 `PostConstructError`（因为被等待方的 `postConstructResult` 还是 `UNINITIALIZED`）。
 
 ### @PreDestroy
 
@@ -396,7 +452,7 @@ class StudentService {
 @autobind
 ```
 
-方法装饰器，自动绑定方法的 `this` 到实例，解决方法作为回调传递时丢失 `this` 的问题。
+方法装饰器（无括号），自动绑定方法的 `this` 到实例，解决方法作为回调传递时丢失 `this` 的问题。通过 `context.addInitializer` 在实例创建时执行 `bind(this)`。
 
 ```ts
 @Injectable()
@@ -447,7 +503,6 @@ class MyReactComponent extends React.Component {
   @LazyInject(MyService, container) // 显式指定 container
   service!: MyService;
 }
-// React 框架实例化组件，业务代码无法控制，但注入仍然有效
 ```
 
 **createLazyInject**：绑定固定 container，避免重复传参：
@@ -464,7 +519,9 @@ class A {
 }
 ```
 
-注意：`@LazyInject` 不能与 `@Self`/`@Optional`/`@SkipSelf` 配合使用。
+**使用限制**：
+- `@LazyInject` 不能与 `@Self`/`@Optional`/`@SkipSelf` 配合使用（实现机制完全不同，彼此独立）
+- 不传 `container` 参数的自动查找，要求宿主类必须通过 `to()` 或 `toSelf()` 注册到容器并通过 `container.get()` 获取实例；否则抛出 `ContainerNotFoundError`
 
 ---
 
@@ -489,26 +546,52 @@ decorate(PostConstruct(), A, 'init');
 
 使用 `decorate()` 的类不需要手动添加 `@Injectable`（内部已模拟）。
 
+支持的装饰器（只使用 `context.name` 和 `context.metadata`）：
+
+| 装饰器 | 类型 |
+|--------|------|
+| `@Inject(token)` | 属性装饰器 |
+| `@Self()` | 属性装饰器 |
+| `@SkipSelf()` | 属性装饰器 |
+| `@Optional()` | 属性装饰器 |
+| `@PostConstruct()` | 方法装饰器 |
+| `@PreDestroy()` | 方法装饰器 |
+
+不支持的装饰器（依赖 `context.addInitializer`，`decorate` 调用后会抛出错误）：
+
+| 装饰器 | 原因 |
+|--------|------|
+| `@LazyInject(token)` | 依赖 `addInitializer` 在实例上定义 getter/setter |
+| `@autobind` | 依赖 `addInitializer` 在实例上绑定 `this` |
+
 ---
 
 ## 错误类
 
+共 8 个错误类，继承关系：
+
 ```
 Error
 └── BaseError
-    ├── BindingNotFoundError   — get 时找不到 token 绑定
-    ├── BindingNotValidError   — bind 后未调用 to/toSelf 等方法
-    ├── DuplicateBindingError  — 同一 token 重复 bind
-    ├── ContainerNotFoundError — @LazyInject 无法反查容器
+    ├── BindingNotFoundError    — get 时找不到 token 绑定（含依赖链路信息）
+    ├── BindingNotValidError    — bind 后未调用 to/toSelf 等方法
+    ├── DuplicateBindingError   — 同一 token 重复 bind
+    ├── ContainerNotFoundError  — @LazyInject 无法反查容器
+    ├── ContainerDestroyedError — 容器已销毁后调用 get/getAsync
     └── CircularDependencyError — activation 阶段循环依赖
-        └── PostConstructError — @PostConstruct 内部抛出异常
+        └── PostConstructError  — @PostConstruct 内部抛出异常
 ```
+
+`BaseError` 的 `token` 属性记录触发错误的 token：
 
 ```ts
 import {
   BaseError,
   BindingNotFoundError,
+  BindingNotValidError,
   DuplicateBindingError,
+  ContainerNotFoundError,
+  ContainerDestroyedError,
   CircularDependencyError,
   PostConstructError
 } from '@kaokei/di';
@@ -516,8 +599,10 @@ import {
 try {
   container.get(SomeService);
 } catch (error) {
-  if (error instanceof BindingNotFoundError) {
-    // 找不到绑定
+  if (error instanceof ContainerDestroyedError) {
+    // 容器已销毁
+  } else if (error instanceof BindingNotFoundError) {
+    // 找不到绑定，error.message 含依赖链路
   } else if (error instanceof PostConstructError) {
     // 初始化失败
   } else if (error instanceof BaseError) {
@@ -530,19 +615,69 @@ try {
 
 ## 生命周期顺序
 
-### 激活（首次 container.get）
+### 激活（首次 container.get）完整流程
 
-1. `Binding#onActivation`
-2. `Container#onActivation`
-3. `@PostConstruct`
+```
+1. new ClassName()                     — 无参构造
+2. Binding#onActivation                — binding 级别激活（返回值传入下一步）
+3. Container#onActivation              — container 级别激活（返回值存入缓存）
+4. 存入缓存
+5. 注册实例到容器映射（_registerInstance）
+6. 属性注入（_getInjectProperties，处理 @Inject）
+7. @PostConstruct
+```
 
 > ⚠️ 与 InversifyJS 不同：InversifyJS 先执行 `@PostConstruct`，本库将其放在最后，确保执行时注入属性已完整。
+>
+> 已知限制：activation handler（步骤 2、3）中不能访问注入的属性，因为属性注入（步骤 6）还未完成。
 
-### 销毁（container.unbind / destroy）
+### 销毁（container.unbind / unbindAll / destroy）
 
-1. `Container#onDeactivation`
-2. `Binding#onDeactivation`
-3. `@PreDestroy`
+```
+1. Container#onDeactivation
+2. Binding#onDeactivation
+3. @PreDestroy
+4. 清除缓存和绑定
+```
+
+### @PostConstruct 继承行为
+
+沿继承链向上查找，执行第一个找到的 `@PostConstruct` 方法，找到即停止：
+- 子类和父类都有 `@PostConstruct`：只执行子类的
+- 只有父类有 `@PostConstruct`：执行父类的
+- 多级继承，只有祖先类有 `@PostConstruct`：执行祖先类的
+
+---
+
+## 异步初始化
+
+```ts
+@Injectable()
+class B {
+  id = 2;
+
+  @PostConstruct()
+  async init() {
+    const res = await fetch('/api/b');
+    this.id = res.id;
+  }
+}
+
+@Injectable()
+class A {
+  @Inject(B) b: B;
+
+  @PostConstruct(true) // 等待 B 的 PostConstruct 完成后再执行
+  async init() {
+    // 此时 this.b.id 已是最终值
+    this.id = this.b.id + 1;
+  }
+}
+```
+
+多级链式等待同样支持（C → B → A 均使用 `@PostConstruct(true)`）。
+
+循环依赖下的方向限制：`@PostConstruct(true)` 只能由"先被解析的一方"等待"后被解析的一方"，反向等待抛出 `PostConstructError`。
 
 ---
 
@@ -550,18 +685,36 @@ try {
 
 ```ts
 import type {
-  Newable,             // new () => T，可实例化的类类型
-  CommonToken,         // Token<T> | Newable<T>
-  GenericToken,        // Token<T> | Newable<T> | LazyToken<T>
-  TokenType,           // 从 token 推导服务类型：TokenType<typeof myToken>
-  Context,             // { container: Container }，activation handler 的上下文
-  DynamicValue,        // (ctx: Context) => T，toDynamicValue 的工厂函数类型
-  ActivationHandler,   // (ctx, input, token?) => T
-  DeactivationHandler, // (input, token?) => void
-  Options,             // container.get 的选项类型
-  PostConstructParam   // @PostConstruct 的参数类型
+  Newable,                    // new () => T，可实例化的类类型（无参构造）
+  CommonToken,                // Token<T> | Newable<T>
+  GenericToken,               // Token<T> | Newable<T> | LazyToken<T>
+  TokenType,                  // 从 token 推导服务类型：TokenType<typeof myToken>
+  LazyTokenCallback,          // () => CommonToken<T>，LazyToken 的回调类型
+  Context,                    // { container: Container }，activation handler 的上下文
+  DynamicValue,               // (ctx: Context) => T，toDynamicValue 的工厂函数类型
+  RecordObject,               // Record<string, unknown>
+  GetOptions,                 // { optional?, self?, skipSelf? }，container.get 选项
+  Options,                    // GetOptions 的内部扩展类型（含 inject/token/binding/parent）
+  ActivationHandler,          // (ctx, input, token?) => T，容器级激活处理器
+  BindingActivationHandler,   // (ctx, input) => T，Binding 级激活处理器（无 token 参数）
+  DeactivationHandler,        // (input, token?) => void，容器级销毁处理器
+  BindingDeactivationHandler, // (input) => void，Binding 级销毁处理器（无 token 参数）
+  PostConstructParam,         // void | true | CommonToken[] | FilterFunction
+  InjectFunction              // toDynamicValue 场景下的注入函数类型
 } from '@kaokei/di';
 ```
+
+`TokenType` 使用示例：
+
+```ts
+const myToken = new Token<string>('myToken');
+type ServiceType = TokenType<typeof myToken>; // string
+```
+
+`GetOptions` 各字段：
+- `optional`：为 `true` 时，找不到绑定返回 `undefined` 而非抛出错误
+- `self`：为 `true` 时，只在当前容器中查找
+- `skipSelf`：为 `true` 时，跳过当前容器，只在父容器中查找
 
 ---
 
@@ -572,10 +725,18 @@ import type {
 | reflect-metadata | 不需要 | 需要 |
 | 装饰器规范 | TC39 Stage 3 | Legacy experimentalDecorators |
 | 注入方式 | 仅属性注入 | 属性注入 + 构造函数参数注入 |
-| 属性循环依赖 | 原生支持 | 需要 @LazyInject |
+| 属性循环依赖 | 原生支持 | 需要第三方 lazyInject |
 | @PostConstruct 时机 | activation 之后（注入属性已完整） | activation 之前 |
+| container.rebind | 支持 | 不支持（需手动 unbind + bind）|
+| container.tryGet | 支持 | 不支持 |
 | container.destroy | 支持（递归销毁子容器） | 不支持 |
+| ContainerDestroyedError | 支持 | 不支持 |
+| onActivation/onDeactivation | 全局共享，单个回调 | 按 token 分别注册，支持多个 |
+| hierarchical DI 查找 | 在绑定所在容器查找依赖 | 从调用容器重新开始查找 |
+| 重复绑定 | 抛出 DuplicateBindingError | 支持多重绑定 |
 | 包体积 | 更小 | 较大 |
+
+不支持的 InversifyJS 特性：`inRequestScope`、多重绑定（getAll/tagged/named）、中间件、模块（ContainerModule）、快照（snapshot）、Symbol 直接作为 token。
 
 ---
 
