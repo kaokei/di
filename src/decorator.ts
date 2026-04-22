@@ -245,29 +245,6 @@ export function decorate(decorator: any, target: any, key: string): void {
   const proto = target.prototype;
   const isMethod = typeof proto[key] === 'function';
 
-  // 收集所有 addInitializer 注册的回调
-  const initializers: Array<() => void> = [];
-
-  // 构造符合 Stage 3 规范的 context 对象
-  //
-  // 关于 access 属性：
-  // Stage 3 规范要求 context 包含 access 对象（get/set/has 方法），
-  // 用于对被装饰成员进行编程式访问。但当前库的所有装饰器（@Inject、
-  // @PostConstruct 等）内部只使用 context.name 和 context.addInitializer，
-  // 没有任何装饰器会调用 context.access。
-  //
-  // 如果未来需要支持依赖 access 的第三方装饰器，可取消以下注释：
-  //
-  // access: isMethod
-  //   ? {
-  //       get(obj: any) { return obj[key]; },
-  //       has(obj: any) { return key in obj; },
-  //     }
-  //   : {
-  //       get(obj: any) { return obj[key]; },
-  //       set(obj: any, value: any) { obj[key] = value; },
-  //       has(obj: any) { return key in obj; },
-  //     },
   // 从 WeakMap 获取或创建共享 metadata 对象
   // WeakMap 天然不存在原型链问题，子类和父类各自独立
   if (!decorateMetadataMap.has(target)) {
@@ -280,8 +257,8 @@ export function decorate(decorator: any, target: any, key: string): void {
     name: key,
     static: false,
     private: false,
-    addInitializer(fn: () => void) {
-      initializers.push(fn);
+    addInitializer(_fn: () => void) {
+      throw new Error(ERRORS.DECORATE_NOT_SUPPORT_INITIALIZER);
     },
     metadata,
   };
@@ -305,13 +282,4 @@ export function decorate(decorator: any, target: any, key: string): void {
   // 多次调用 decorate() 时 metadata 是同一个引用（通过 WeakMap 保证），
   // 后续调用会自动累积数据
   defineMetadata(target, metadata);
-
-  // 执行 initializers（当前库的装饰器均直接写 metadata，不使用 addInitializer，
-  // 此分支为空，保留以兼容未来可能依赖 addInitializer 的装饰器）
-  if (initializers.length > 0) {
-    const fakeInstance = Object.create(proto);
-    for (const init of initializers) {
-      init.call(fakeInstance);
-    }
-  }
 }

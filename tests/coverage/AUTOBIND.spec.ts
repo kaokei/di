@@ -8,7 +8,7 @@
  * 1. 基本功能：绑定后方法解构调用仍能正确访问 this
  * 2. 多实例隔离：不同实例的绑定方法互不影响
  * 3. 与 DI 容器集成：通过容器解析的实例也能正确绑定
- * 4. 通过 decorate() 辅助函数手动应用 autobind
+ * 4. autobind 不支持通过 decorate() 调用（依赖 addInitializer，会抛出错误）
  */
 import { Container, Injectable, autobind } from '@/index';
 

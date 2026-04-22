@@ -49,6 +49,10 @@ export const ERRORS = {
   // 用于 decorator.ts 的 defineLazyProperty —— 无效 token
   LAZY_INJECT_INVALID_TOKEN:
     '@LazyInject requires a valid token, but received null or undefined.',
+
+  // 用于 decorator.ts 的 decorate —— 不支持 addInitializer 的装饰器
+  DECORATE_NOT_SUPPORT_INITIALIZER:
+    'decorate does not support decorators that rely on context.addInitializer (e.g. @LazyInject, @autobind).',
 } as const;
 
 // 未初始化哨兵值，用于标记 PostConstruct 尚未执行
