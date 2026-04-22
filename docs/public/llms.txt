@@ -69,29 +69,50 @@ export class A {
 1. **延迟初始化**：不访问属性就不触发依赖解析，比 `@Inject` 更懒
 2. **支持第三方类注入**：宿主类不在 DI 体系内时（如 React 类组件由框架实例化），可通过显式传入 `container` 参数完成注入
 
+注意：`@LazyInject` 不能与 `@Self`/`@Optional`/`@SkipSelf` 配合使用。
+
 ## 主要 API
 
-- [Container](https://di.kaokei.com/api/CONTAINER.html) — 容器，核心类
+- [Container](https://di.kaokei.com/api/CONTAINER.html) — 容器，核心类（含 `tryGet`、`rebind` 等）
 - [Binding](https://di.kaokei.com/api/BINDING.html) — 绑定配置（`to` / `toSelf` / `toConstantValue` / `toDynamicValue` / `toService`）
 - [Token & LazyToken](https://di.kaokei.com/api/) — Token 类型定义
 - [@Injectable / @Inject / @Self / @SkipSelf / @Optional](https://di.kaokei.com/api/) — 装饰器
 - [@PostConstruct / @PreDestroy](https://di.kaokei.com/api/) — 生命周期装饰器
 - [@LazyInject / createLazyInject](https://di.kaokei.com/api/LAZY_INJECT.html) — 懒注入
 - [decorate](https://di.kaokei.com/api/DECORATE.html) — 无装饰器语法时的替代方案
-- [错误类](https://di.kaokei.com/api/ERRORS.html) — 7 个错误类，支持 `instanceof` 判断
+- [错误类](https://di.kaokei.com/api/ERRORS.html) — 8 个错误类，支持 `instanceof` 判断
 - [类型导出](https://di.kaokei.com/api/TYPES.html) — TypeScript 类型
 
 ## 生命周期顺序（与 InversifyJS 不同）
 
-激活顺序：
-1. `Binding#onActivation`
-2. `Container#onActivation`
-3. `@PostConstruct`
+container.get 首次调用完整流程：
+1. `new ClassName()`
+2. `Binding#onActivation`
+3. `Container#onActivation`
+4. 存入缓存
+5. 注册实例到容器映射
+6. 属性注入（`@Inject` 装饰的属性）
+7. `@PostConstruct`
 
-销毁顺序：
+销毁顺序（与 InversifyJS 相同）：
 1. `Container#onDeactivation`
 2. `Binding#onDeactivation`
 3. `@PreDestroy`
+
+> 注意：activation handler 中不能访问注入属性，因为属性注入发生在 activation 之后。
+
+## 错误类（共 8 个）
+
+```
+BaseError
+├── BindingNotFoundError   — get 时找不到 token 绑定
+├── BindingNotValidError   — bind 后未调用 to/toSelf 等方法
+├── DuplicateBindingError  — 同一 token 重复 bind
+├── ContainerNotFoundError — @LazyInject 无法反查容器
+├── ContainerDestroyedError — 容器已销毁后调用 get/getAsync
+└── CircularDependencyError — activation 阶段循环依赖
+    └── PostConstructError — @PostConstruct 内部抛出异常
+```
 
 ## 文档
 
