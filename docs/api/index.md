@@ -6,13 +6,13 @@
 const container = new Container();
 ```
 
-[具体文档参考这里。](./CONTAINER.md)
+[详细说明参考 Container 文档。](./CONTAINER.md)
 
 ## Binding
 
 `container.bind(token)` 返回一个 `Binding` 对象，通过 `Binding` 可以配置 token 对应的服务类型（`toSelf()`、`to()`、`toConstantValue()`、`toDynamicValue()`、`toService()`）以及生命周期回调（`onActivation()`、`onDeactivation()`）。
 
-详细说明参考 [Binding 文档](./BINDING.md)。
+[详细说明参考 Binding 文档。](./BINDING.md)。
 
 ## Token
 
@@ -325,7 +325,9 @@ class A extends B {}
 
 `A` 和 `B` 都没有 `@PostConstruct`，执行 `C` 的 `init()`。
 
-**规则总结**：容器在实例化时沿继承链向上查找，执行第一个找到的 `@PostConstruct` 方法，找到即停止，不会继续向上执行。详细说明参考 [生命周期文档](../note/13.生命周期.md)。
+**规则总结**：容器在实例化时沿继承链向上查找，执行第一个找到的 `@PostConstruct` 方法，找到即停止，不会继续向上执行。
+
+[详细说明参考生命周期文档](../note/13.生命周期.md)。
 
 ## @PreDestroy
 
@@ -354,7 +356,7 @@ class DatabaseService {
 
 同时还导出了 createLazyInject 高阶函数，可以返回一个绑定指定 container 的 LazyInject 装饰器。
 
-[具体文档参考这里。](./LAZY_INJECT.md)
+[详细文档参考这里。](./LAZY_INJECT.md)
 
 ## @autobind
 
@@ -392,16 +394,42 @@ const { greet } = service;
 greet(); // "Hello, Alice"  ✅ 不会报错
 ```
 
-[更多说明参考这里。](../note/07.AUTOBIND.md)
+[详细说明参考这里。](../note/07.AUTOBIND.md)
 
 ## decorate
 
-[具体文档参考这里。](./DECORATE.md)
+```ts
+// 代表对 A 的实例属性 b 使用 @Inject(B) 装饰器
+decorate(Inject(B), A, 'b');
+```
+
+[详细说明参考这里。](./DECORATE.md)
 
 ## 错误类
 
-本库导出了 8 个错误类（`BaseError`、`BindingNotFoundError`、`BindingNotValidError`、`CircularDependencyError`、`ContainerNotFoundError`、`ContainerDestroyedError`、`DuplicateBindingError`、`PostConstructError`），详细说明参考 [错误类文档](./ERRORS.md)。
+本库导出了 8 个错误类
+
+- BaseError
+- BindingNotFoundError
+- BindingNotValidError
+- CircularDependencyError
+- ContainerNotFoundError
+- ContainerDestroyedError
+- DuplicateBindingError
+- PostConstructError
+
+[详细说明参考错误类文档](./ERRORS.md)。
 
 ## 类型导出
 
-本库导出了多个 TypeScript 类型（`Newable`、`CommonToken`、`ActivationHandler`、`BindingActivationHandler`、`DeactivationHandler`、`BindingDeactivationHandler` 等），详细说明参考 [类型导出文档](./TYPES.md)。
+本库导出了多个 TypeScript 类型
+
+- Newable
+- CommonToken
+- TokenType
+- ActivationHandler
+- BindingActivationHandler
+- DeactivationHandler
+- BindingDeactivationHandler
+
+[详细说明参考类型导出文档](./TYPES.md)。
