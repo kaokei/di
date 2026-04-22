@@ -265,8 +265,67 @@ class ScoreService {
 
 更多高级功能[参考这里](../note/06.异步初始化服务.md)，比如等待异步服务初始化完成之后，再执行自己的初始化服务。
 
-> **Note**
-> 继承行为：沿继承链向上查找，执行第一个找到的 `@PostConstruct` 方法。详细说明参考 [生命周期文档](../note/13.生命周期.md)。
+#### @PostConstruct 继承行为
+
+当类存在继承关系时，`@PostConstruct` 的执行遵循以下规则：沿继承链向上查找，执行第一个找到的 `@PostConstruct` 方法。
+
+**场景一：子类和父类都有 `@PostConstruct`**
+
+```ts
+@Injectable()
+class B {
+  @PostConstruct()
+  init() {
+    console.log('B.init');
+  }
+}
+
+@Injectable()
+class A extends B {
+  @PostConstruct()
+  setup() {
+    console.log('A.setup');
+  }
+}
+```
+
+只执行 `A` 的 `setup()`，`B` 的 `init()` 不执行。
+
+**场景二：只有父类有 `@PostConstruct`**
+
+```ts
+@Injectable()
+class B {
+  @PostConstruct()
+  init() {
+    console.log('B.init');
+  }
+}
+
+class A extends B {}
+```
+
+执行 `B` 的 `init()`。
+
+**场景三：多级继承，只有祖先类有 `@PostConstruct`**
+
+```ts
+@Injectable()
+class C {
+  @PostConstruct()
+  init() {
+    console.log('C.init');
+  }
+}
+
+class B extends C {}
+
+class A extends B {}
+```
+
+`A` 和 `B` 都没有 `@PostConstruct`，执行 `C` 的 `init()`。
+
+**规则总结**：容器在实例化时沿继承链向上查找，执行第一个找到的 `@PostConstruct` 方法，找到即停止，不会继续向上执行。详细说明参考 [生命周期文档](../note/13.生命周期.md)。
 
 ## @PreDestroy
 
