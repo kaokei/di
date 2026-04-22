@@ -341,8 +341,8 @@ greet(); // "Hello, Alice"  ✅ 不会报错
 
 ## 错误类
 
-本库导出了 7 个错误类（`BaseError`、`BindingNotFoundError`、`BindingNotValidError`、`CircularDependencyError`、`ContainerNotFoundError`、`DuplicateBindingError`、`PostConstructError`），详细说明参考 [错误类文档](./ERRORS.md)。
+本库导出了 8 个错误类（`BaseError`、`BindingNotFoundError`、`BindingNotValidError`、`CircularDependencyError`、`ContainerNotFoundError`、`ContainerDestroyedError`、`DuplicateBindingError`、`PostConstructError`），详细说明参考 [错误类文档](./ERRORS.md)。
 
 ## 类型导出
 
-本库导出了多个 TypeScript 类型（`Newable`、`CommonToken`、`ActivationHandler` 等），详细说明参考 [类型导出文档](./TYPES.md)。
+本库导出了多个 TypeScript 类型（`Newable`、`CommonToken`、`ActivationHandler`、`BindingActivationHandler`、`DeactivationHandler`、`BindingDeactivationHandler` 等），详细说明参考 [类型导出文档](./TYPES.md)。

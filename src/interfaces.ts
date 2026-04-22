@@ -43,13 +43,20 @@ export interface Options<T = unknown> extends GetOptions {
 export type ActivationHandler<T = unknown> = (
   ctx: Context,
   input: T,
-  token?: CommonToken<T>
+  token: CommonToken<T>
+) => T;
+
+export type BindingActivationHandler<T = unknown> = (
+  ctx: Context,
+  input: T
 ) => T;
 
 export type DeactivationHandler<T = unknown> = (
   input: T,
-  token?: CommonToken<T>
+  token: CommonToken<T>
 ) => void;
+
+export type BindingDeactivationHandler<T = unknown> = (input: T) => void;
 
 export type PostConstructParam =
   | void

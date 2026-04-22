@@ -15,8 +15,8 @@ import type {
   RecordObject,
   DynamicValue,
   PostConstructParam,
-  ActivationHandler,
-  DeactivationHandler,
+  BindingActivationHandler,
+  BindingDeactivationHandler,
 } from './interfaces';
 
 export interface InjectPropertiesResult {
@@ -55,9 +55,9 @@ export class Binding<T = unknown> {
   // 是否为瞬态作用域，默认 false（单例）
   transient = false;
 
-  onActivationHandler?: ActivationHandler<T>;
+  onActivationHandler?: BindingActivationHandler<T>;
 
-  onDeactivationHandler?: DeactivationHandler<T>;
+  onDeactivationHandler?: BindingDeactivationHandler<T>;
 
   constructor(token: CommonToken<T>, container: Container) {
     this.container = container;
@@ -65,11 +65,11 @@ export class Binding<T = unknown> {
     this.token = token;
   }
 
-  onActivation(handler: ActivationHandler<T>) {
+  onActivation(handler: BindingActivationHandler<T>) {
     this.onActivationHandler = handler;
   }
 
-  onDeactivation(handler: DeactivationHandler<T>) {
+  onDeactivation(handler: BindingDeactivationHandler<T>) {
     this.onDeactivationHandler = handler;
   }
 
