@@ -5,7 +5,7 @@
  *
  * 对于任意 Token、任意属性名、任意装饰器组合，以及任意 @PostConstruct/@PreDestroy 配置，
  * 通过装饰器语法 + @Injectable 应用后，Binding 解析层通过
- * getInjectedProps/getPostConstruct/getPreDestroy 从 CacheMap 读取的元数据应与装饰器写入的数据一致。
+ * getInjectedProps/getMetadata 从 CacheMap 读取的元数据应与装饰器写入的数据一致。
  * 具体而言：容器解析实例时，注入的属性值应正确，PostConstruct 方法应被调用，
  * PreDestroy 方法在 unbind 时应被调用。
  *

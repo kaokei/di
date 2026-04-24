@@ -2,20 +2,21 @@
  * CacheMap 类型安全测试
  *
  * 覆盖范围：
- * - defineMetadata 和 getInjectedProps/getPostConstruct/getPreDestroy 的基本读写
+ * - defineMetadata 和 getInjectedProps/getMetadata 的基本读写
  * - 父子类继承场景下 getInjectedProps 的合并行为
  * - 子类修改 INJECTED_PROPS 元数据后父类元数据不受影响（深拷贝验证）
  *
  * 需求：7.1、7.2、7.3、7.4
  */
 
-import { defineMetadata, getInjectedProps, getPostConstruct, getPreDestroy } from '@/cachemap';
+import { defineMetadata, getInjectedProps, getMetadata } from '@/cachemap';
 import { KEYS } from '@/constants';
+import type { PostConstructParam } from '@/interfaces';
 import { Inject, decorate } from '@/index';
 
 // ==================== 基本读写（需求 7.1、7.2） ====================
 
-describe('defineMetadata 和 getInjectedProps/getPostConstruct/getPreDestroy 基本读写', () => {
+describe('defineMetadata 和 getInjectedProps/getMetadata 基本读写', () => {
   test('defineMetadata 写入后 getInjectedProps 可以读取', () => {
     class Target {}
     const metadata: Record<string, unknown> = { [KEYS.INJECTED_PROPS]: { propA: { inject: Target } } };
@@ -48,7 +49,7 @@ describe('defineMetadata 和 getInjectedProps/getPostConstruct/getPreDestroy 基
     });
 
     expect(getInjectedProps(Target)).toEqual({ prop: {} });
-    expect(getPostConstruct(Target)).toEqual({ key: 'init' });
+    expect(getMetadata(KEYS.POST_CONSTRUCT, Target) as { key: string; value?: PostConstructParam } | undefined).toEqual({ key: 'init' });
   });
 
   test('不同类的元数据互不干扰', () => {
@@ -268,8 +269,8 @@ describe('非 INJECTED_PROPS 元数据的父子类继承合并', () => {
     // 子类自身没有 POST_CONSTRUCT 元数据
     class Child extends Parent {}
 
-    // getPostConstruct 应通过继承链获取父类的 POST_CONSTRUCT
-    const childMeta = getPostConstruct(Child);
+    // getMetadata 应通过继承链获取父类的 POST_CONSTRUCT
+    const childMeta = getMetadata(KEYS.POST_CONSTRUCT, Child) as { key: string; value?: PostConstructParam } | undefined;
     expect(childMeta).toBeDefined();
     expect(childMeta).toHaveProperty('key', 'init');
   });
@@ -286,11 +287,11 @@ describe('非 INJECTED_PROPS 元数据的父子类继承合并', () => {
     defineMetadata(Child, { [KEYS.POST_CONSTRUCT]: { key: 'childInit' } });
 
     // 子类的元数据应覆盖父类的
-    const childMeta = getPostConstruct(Child);
+    const childMeta = getMetadata(KEYS.POST_CONSTRUCT, Child) as { key: string; value?: PostConstructParam } | undefined;
     expect(childMeta).toHaveProperty('key', 'childInit');
 
     // 父类的元数据不受影响
-    const parentMeta = getPostConstruct(Parent);
+    const parentMeta = getMetadata(KEYS.POST_CONSTRUCT, Parent) as { key: string; value?: PostConstructParam } | undefined;
     expect(parentMeta).toHaveProperty('key', 'parentInit');
   });
 
@@ -302,7 +303,7 @@ describe('非 INJECTED_PROPS 元数据的父子类继承合并', () => {
 
     class Child extends Parent {}
 
-    const childMeta = getPreDestroy(Child);
+    const childMeta = getMetadata(KEYS.PRE_DESTROY, Child) as { key: string } | undefined;
     expect(childMeta).toBeDefined();
     expect(childMeta).toHaveProperty('key', 'cleanup');
   });
@@ -315,7 +316,7 @@ describe('非 INJECTED_PROPS 元数据的父子类继承合并', () => {
     }
     defineMetadata(Child, { [KEYS.POST_CONSTRUCT]: { key: 'init' } });
 
-    const childMeta = getPostConstruct(Child);
+    const childMeta = getMetadata(KEYS.POST_CONSTRUCT, Child) as { key: string; value?: PostConstructParam } | undefined;
     expect(childMeta).toHaveProperty('key', 'init');
   });
 });

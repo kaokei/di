@@ -11,7 +11,7 @@
  * - 对于属性装饰器：创建一个使用 @Injectable + @Inject(token) 等装饰器语法的类 A，
  *   和一个使用 decorate() 的类 B，比较两者的 getInjectedProps() 结果
  * - 对于方法装饰器：创建一个使用 @Injectable + @PostConstruct/@PreDestroy 装饰器语法的类 A，
- *   和一个使用 decorate() 的类 B，比较两者的 getPostConstruct()/getPreDestroy() 结果
+ *   和一个使用 decorate() 的类 B，比较两者的 getMetadata(KEYS.POST_CONSTRUCT/PRE_DESTROY) 结果
  * - 使用 fast-check 生成随机 Token 名称和装饰器组合标志
  * - 每个测试至少运行 100 次迭代
  *
@@ -31,8 +31,9 @@ import {
   decorate,
   Container,
 } from '@/index';
-import { getInjectedProps, getPostConstruct, getPreDestroy } from '@/cachemap';
+import { getInjectedProps, getMetadata } from '@/cachemap';
 import { KEYS } from '@/constants';
+import type { PostConstructParam } from '@/interfaces';
 
 // Feature: 07-decorator-refactor-injectable, Property 5: decorate() 与装饰器语法等价性
 
@@ -216,9 +217,9 @@ test('Property 12.4: @PostConstruct 装饰器语法 + @Injectable 与 decorate(P
         }
         decorate(PostConstruct(param), ClassB, 'init');
 
-        // 比较两者的 getPostConstruct() 结果
-        const metaA = getPostConstruct(ClassA);
-        const metaB = getPostConstruct(ClassB);
+        // 比较两者的 getMetadata(KEYS.POST_CONSTRUCT) 结果
+        const metaA = getMetadata(KEYS.POST_CONSTRUCT, ClassA) as { key: string; value?: PostConstructParam } | undefined;
+        const metaB = getMetadata(KEYS.POST_CONSTRUCT, ClassB) as { key: string; value?: PostConstructParam } | undefined;
 
         expect(metaA).toBeDefined();
         expect(metaB).toBeDefined();
@@ -253,9 +254,9 @@ test('Property 12.5: @PreDestroy 装饰器语法 + @Injectable 与 decorate(PreD
       }
       decorate(PreDestroy(), ClassB, 'cleanup');
 
-      // 比较两者的 getPreDestroy() 结果
-      const metaA = getPreDestroy(ClassA);
-      const metaB = getPreDestroy(ClassB);
+      // 比较两者的 getMetadata(KEYS.PRE_DESTROY) 结果
+      const metaA = getMetadata(KEYS.PRE_DESTROY, ClassA) as { key: string } | undefined;
+      const metaB = getMetadata(KEYS.PRE_DESTROY, ClassB) as { key: string } | undefined;
 
       expect(metaA).toBeDefined();
       expect(metaB).toBeDefined();

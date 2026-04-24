@@ -1,7 +1,7 @@
-import { BINDING, STATUS, UNINITIALIZED } from './constants';
+import { BINDING, KEYS, STATUS, UNINITIALIZED } from './constants';
 import type { BindingType, StatusType } from './constants';
 import { Container } from './container';
-import { getPostConstruct, getPreDestroy, getInjectedProps } from './cachemap';
+import { getMetadata, getInjectedProps } from './cachemap';
 import { resolveToken } from './token';
 import { CircularDependencyError } from './errors/CircularDependencyError';
 import { BindingNotValidError } from './errors/BindingNotValidError';
@@ -173,7 +173,7 @@ export class Binding<T = unknown> {
    */
   _postConstruct(options: Options<T>, propertyBindings: Binding[]) {
     if (BINDING.INSTANCE === this.type) {
-      const { key, value } = getPostConstruct(this.classValue!) || {};
+      const { key, value } = (getMetadata(KEYS.POST_CONSTRUCT, this.classValue!) as { key: string; value?: PostConstructParam } | undefined) || {};
       if (key) {
         // 使用了@PostConstruct装饰器
         if (value) {
@@ -214,7 +214,7 @@ export class Binding<T = unknown> {
 
   preDestroy() {
     if (BINDING.INSTANCE === this.type && this.cache !== undefined) {
-      const { key } = getPreDestroy(this.classValue!) || {};
+      const { key } = (getMetadata(KEYS.PRE_DESTROY, this.classValue!) as { key: string } | undefined) || {};
       if (key) {
         this._execute(key);
       }

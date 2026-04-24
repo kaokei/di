@@ -3,7 +3,7 @@
  *
  * 对应原始目录：tests/decorator/（createMetaDecorator-cachemap、lazy-inject-error-constant 等场景测试）
  * 测试目标：验证 decorate(PostConstruct(), Class, 'init') 后，
- *           getPostConstruct(Class).key 严格等于 'init'（元数据 round-trip 属性）
+ *           getMetadata(KEYS.POST_CONSTRUCT, Class).key 严格等于 'init'（元数据 round-trip 属性）
  *
  * 限制说明：由于 PostConstruct 装饰器需要类上存在对应方法，
  *           此处使用固定方法名 'init'，每次迭代动态创建新类以避免
@@ -14,11 +14,13 @@
 
 import fc from 'fast-check';
 import { PostConstruct, decorate } from '@/decorator';
-import { getPostConstruct } from '@/cachemap';
+import { getMetadata } from '@/cachemap';
+import { KEYS } from '@/constants';
+import type { PostConstructParam } from '@/interfaces';
 
 // ==================== 属性 22：decorate PostConstruct 元数据 round-trip ====================
 
-test('Property 22: 对任意类，decorate(PostConstruct(), Class, "init") 后 getPostConstruct(Class).key 严格等于 "init"', () => {
+test('Property 22: 对任意类，decorate(PostConstruct(), Class, "init") 后 getMetadata(KEYS.POST_CONSTRUCT, Class).key 严格等于 "init"', () => {
   // Feature: fast-check-property-tests, Property 22: decorate PostConstruct 元数据 round-trip 属性
   // 由于方法名固定为 'init'，使用 fc.boolean() 作为占位符生成器驱动迭代
   fc.assert(
@@ -30,7 +32,7 @@ test('Property 22: 对任意类，decorate(PostConstruct(), Class, "init") 后 g
 
       decorate(PostConstruct(), TestClass, 'init');
 
-      const meta = getPostConstruct(TestClass);
+      const meta = getMetadata(KEYS.POST_CONSTRUCT, TestClass) as { key: string; value?: PostConstructParam } | undefined;
       expect(meta).toBeDefined();
       expect(meta!.key).toBe('init');
     }),
