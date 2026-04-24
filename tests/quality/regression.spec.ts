@@ -449,9 +449,9 @@ describe('回归测试：父子容器', () => {
   test('destroy 子容器后从父容器的 children 中移除', () => {
     const parent = new Container();
     const child = parent.createChild();
-    expect(parent.children?.has(child)).toBe(true);
+    expect(parent.getChildren()?.has(child)).toBe(true);
     child.destroy();
-    expect(parent.children?.has(child)).toBe(false);
+    expect(parent.getChildren()?.has(child)).toBe(false);
     parent.destroy();
   });
 });

@@ -77,13 +77,13 @@ public parent?: Container;
 
 指向父级容器，`container.get` 找不到 token 时会自动向父级容器查找，一直重复直到父级容器不存在为止。
 
-### container.children
+### container.getChildren
 
 ```ts
-public children?: Set<Container>;
+container.getChildren(): Set<Container> | undefined
 ```
 
-记录所有直接子容器，初始为 `undefined`，首次调用 `createChild()` 后初始化为 `Set`。当子容器调用 `destroy()` 时，会自动从父容器的 `children` 中移除。
+返回当前容器的所有直接子容器集合。若尚未创建任何子容器，返回 `undefined`，需由调用方自行判空。当子容器调用 `destroy()` 时，会自动从该集合中移除。内部通过私有属性 `_children` 存储，请勿直接访问，始终通过 `getChildren()` 获取。
 
 ### container.get
 
@@ -180,7 +180,7 @@ container.isCurrentBound<T>(token: CommonToken<T>): boolean // 仅当前容器
 container.createChild(): Container
 ```
 
-创建子容器，自动设置 `parent` 并加入 `children`。
+创建子容器，自动设置 `parent` 并加入内部子容器集合（可通过 `getChildren()` 访问）。
 
 ### container.destroy
 
@@ -188,7 +188,7 @@ container.createChild(): Container
 container.destroy(): void
 ```
 
-递归销毁容器及所有子容器，并从父容器的 `children` 中移除自身。**容器销毁后，任何 `get()` 或 `getAsync()` 调用都会抛出 `ContainerDestroyedError`**。InversifyJS 没有此方法。
+递归销毁容器及所有子容器，并从父容器的子容器集合中移除自身。**容器销毁后，任何 `get()` 或 `getAsync()` 调用都会抛出 `ContainerDestroyedError`**。InversifyJS 没有此方法。
 
 ```ts
 const parent = new Container();

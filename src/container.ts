@@ -25,7 +25,7 @@ export class Container {
   }
 
   parent?: Container;
-  children?: Set<Container>;
+  _children?: Set<Container>;
   _bindings: Map<CommonToken, Binding> = new Map();
   _destroyed = false;
   _onActivationHandler?: ActivationHandler;
@@ -83,11 +83,15 @@ export class Container {
   createChild() {
     const child = new Container();
     child.parent = this;
-    if (!this.children) {
-      this.children = new Set();
+    if (!this._children) {
+      this._children = new Set();
     }
-    this.children.add(child);
+    this._children.add(child);
     return child;
+  }
+
+  getChildren(): Set<Container> | undefined {
+    return this._children;
   }
 
   destroy() {
@@ -97,17 +101,17 @@ export class Container {
     //    使 @LazyInject 首次访问时能获得明确的 destroyed 错误（而非 ContainerNotFoundError）
     this._destroyed = true;
     // 递归销毁所有子容器（先创建快照数组，避免遍历过程中修改 Set）
-    if (this.children) {
-      const childrenSnapshot = Array.from(this.children);
+    if (this._children) {
+      const childrenSnapshot = Array.from(this._children);
       for (const child of childrenSnapshot) {
         child.destroy();
       }
     }
     this.unbindAll();
     this._bindings.clear();
-    this.parent?.children?.delete(this);
+    this.parent?._children?.delete(this);
     this.parent = undefined;
-    this.children = undefined;
+    this._children = undefined;
     this._onActivationHandler = undefined;
     this._onDeactivationHandler = undefined;
   }
