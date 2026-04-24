@@ -52,7 +52,7 @@ parent.bind(UserService).toSelf();
 
 // 创建子容器
 const child = new Container();
-child.parent = parent; // 等价于 parent.createChild()，但 createChild 会自动维护 children 集合
+child.parent = parent; // 等价于 parent.createChild()，但 createChild 会自动维护内部子容器集合
 
 // 子容器中没有绑定任何服务，但可以从父容器获取
 const userService = child.get(UserService);
@@ -66,7 +66,7 @@ const rootContainer = new Container();
 rootContainer.bind(DB_URL).toConstantValue('mysql://root-server/rootdb');
 rootContainer.bind(DatabaseService).toSelf();
 
-// 使用 createChild() 创建子容器（推荐方式，会自动维护 parent.children 集合）
+// 使用 createChild() 创建子容器（推荐方式，会自动维护内部子容器集合）
 const childContainer = rootContainer.createChild();
 
 // 子容器中覆盖 DB_URL（本库特性：子容器的依赖查找从发起请求的容器开始）
@@ -87,9 +87,9 @@ const c1 = root.createChild();
 const c2 = root.createChild();
 const c3 = c1.createChild();
 
-console.log('root.children 数量：', root.children?.size);   // 2
-console.log('c1.children 数量：', c1.children?.size);       // 1
-console.log('c2.children 数量：', c2.children?.size);       // undefined（无子容器）
+console.log('root.getChildren() 数量：', root.getChildren()?.size);   // 2
+console.log('c1.getChildren() 数量：', c1.getChildren()?.size);       // 1
+console.log('c2.getChildren() 数量：', c2.getChildren()?.size);       // undefined（无子容器）
 console.log('c3.parent === c1：', c3.parent === c1);         // true
 console.log('c1.parent === root：', c1.parent === root);     // true
 
