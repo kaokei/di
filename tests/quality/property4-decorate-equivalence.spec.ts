@@ -30,8 +30,9 @@ import {
   decorate,
   Container,
 } from '@/index';
-import { getInjectedProps, getPostConstruct, getPreDestroy } from '@/cachemap';
+import { getInjectedProps, getMetadata } from '@/cachemap';
 import { KEYS } from '@/constants';
+import type { PostConstructParam } from '@/interfaces';
 
 // Feature: stage3-decorator-migration, Property 4: decorate 函数与装饰器语法等价性
 
@@ -227,8 +228,8 @@ test('Property 4: 对于任意参数，decorate(PostConstruct(param)) 与 @PostC
       decorate(PostConstruct(param), ClassB, 'init');
 
       // 比较两者的 POST_CONSTRUCT 元数据
-      const metaA = getPostConstruct(ClassA);
-      const metaB = getPostConstruct(ClassB);
+      const metaA = getMetadata(KEYS.POST_CONSTRUCT, ClassA) as { key: string; value?: PostConstructParam } | undefined;
+      const metaB = getMetadata(KEYS.POST_CONSTRUCT, ClassB) as { key: string; value?: PostConstructParam } | undefined;
 
       expect(metaA).toBeDefined();
       expect(metaB).toBeDefined();
@@ -263,8 +264,8 @@ test('Property 4: decorate(PreDestroy()) 与 @PreDestroy() 语法应产生相同
       decorate(PreDestroy(), ClassB, 'cleanup');
 
       // 比较两者的 PRE_DESTROY 元数据
-      const metaA = getPreDestroy(ClassA);
-      const metaB = getPreDestroy(ClassB);
+      const metaA = getMetadata(KEYS.PRE_DESTROY, ClassA) as { key: string } | undefined;
+      const metaB = getMetadata(KEYS.PRE_DESTROY, ClassB) as { key: string } | undefined;
 
       expect(metaA).toBeDefined();
       expect(metaB).toBeDefined();

@@ -6,8 +6,8 @@
  * 对于任意继承链（子类 extends 父类），当父类和子类都使用了 @Injectable 并声明了
  * 属性注入和/或生命周期装饰器时：
  * - getInjectedProps(Child) 应包含父类和子类的所有属性声明，子类同名属性覆盖父类
- * - getPostConstruct(Child) 在子类有 @PostConstruct 时返回子类的，否则返回父类的
- * - getPreDestroy(Child) 在子类有 @PreDestroy 时返回子类的，否则返回父类的
+ * - getMetadata(KEYS.POST_CONSTRUCT, Child) 在子类有 @PostConstruct 时返回子类的，否则沿继承链返回父类的
+ * - getMetadata(KEYS.PRE_DESTROY, Child) 在子类有 @PreDestroy 时返回子类的，否则沿继承链返回父类的
  * - 父类的 CacheMap 数据不受子类 @Injectable 的影响
  *
  * 测试策略：
@@ -24,8 +24,9 @@
 
 import fc from 'fast-check';
 import { Token, Inject, PostConstruct, PreDestroy, Injectable, decorate } from '@/index';
-import { getInjectedProps, getPostConstruct, getPreDestroy } from '@/cachemap';
+import { getInjectedProps, getMetadata } from '@/cachemap';
 import { KEYS } from '@/constants';
+import type { PostConstructParam } from '@/interfaces';
 
 // Feature: 07-decorator-refactor-injectable, Property 6: 继承链元数据正确性
 
@@ -105,7 +106,7 @@ test('Property 13.2: 父类有 @Inject(token1) on propX，子类有 @Inject(toke
 
 // ==================== 测试 3：父类有 @PostConstruct，子类没有 → 继承父类的 ====================
 
-test('Property 13.3: 父类有 @PostConstruct，子类没有，getPostConstruct(Child) 应返回父类的 PostConstruct', () => {
+test('Property 13.3: 父类有 @PostConstruct，子类没有，getMetadata(KEYS.POST_CONSTRUCT, Child) 应返回父类的 PostConstruct', () => {
   fc.assert(
     fc.property(arbTokenName, (tokenName) => {
       const token = new Token(tokenName);
@@ -123,13 +124,13 @@ test('Property 13.3: 父类有 @PostConstruct，子类没有，getPostConstruct(
       @Injectable()
       class Child extends Parent {}
 
-      // getPostConstruct(Child) 应返回父类的 PostConstruct
-      const childPC = getPostConstruct(Child);
+      // getMetadata(KEYS.POST_CONSTRUCT, Child) 应返回父类的 PostConstruct
+      const childPC = getMetadata(KEYS.POST_CONSTRUCT, Child) as { key: string; value?: PostConstructParam } | undefined;
       expect(childPC).toBeDefined();
       expect(childPC!.key).toBe('parentInit');
 
       // 父类自身的 PostConstruct 也应正确
-      const parentPC = getPostConstruct(Parent);
+      const parentPC = getMetadata(KEYS.POST_CONSTRUCT, Parent) as { key: string; value?: PostConstructParam } | undefined;
       expect(parentPC).toBeDefined();
       expect(parentPC!.key).toBe('parentInit');
     }),
@@ -139,7 +140,7 @@ test('Property 13.3: 父类有 @PostConstruct，子类没有，getPostConstruct(
 
 // ==================== 测试 4：父子类都有 @PostConstruct → 子类覆盖 ====================
 
-test('Property 13.4: 父类有 @PostConstruct，子类也有 @PostConstruct，getPostConstruct(Child) 应返回子类的', () => {
+test('Property 13.4: 父类有 @PostConstruct，子类也有 @PostConstruct，getMetadata(KEYS.POST_CONSTRUCT, Child) 应返回子类的', () => {
   fc.assert(
     fc.property(arbTokenName, (tokenName) => {
       const token = new Token(tokenName);
@@ -158,13 +159,13 @@ test('Property 13.4: 父类有 @PostConstruct，子类也有 @PostConstruct，ge
         childInit() {}
       }
 
-      // getPostConstruct(Child) 应返回子类的 PostConstruct
-      const childPC = getPostConstruct(Child);
+      // getMetadata(KEYS.POST_CONSTRUCT, Child) 应返回子类的 PostConstruct
+      const childPC = getMetadata(KEYS.POST_CONSTRUCT, Child) as { key: string; value?: PostConstructParam } | undefined;
       expect(childPC).toBeDefined();
       expect(childPC!.key).toBe('childInit');
 
       // 父类自身的 PostConstruct 不受影响
-      const parentPC = getPostConstruct(Parent);
+      const parentPC = getMetadata(KEYS.POST_CONSTRUCT, Parent) as { key: string; value?: PostConstructParam } | undefined;
       expect(parentPC).toBeDefined();
       expect(parentPC!.key).toBe('parentInit');
     }),
@@ -174,7 +175,7 @@ test('Property 13.4: 父类有 @PostConstruct，子类也有 @PostConstruct，ge
 
 // ==================== 测试 5：父类有 @PreDestroy，子类没有 → 继承父类的 ====================
 
-test('Property 13.5: 父类有 @PreDestroy，子类没有，getPreDestroy(Child) 应返回父类的 PreDestroy', () => {
+test('Property 13.5: 父类有 @PreDestroy，子类没有，getMetadata(KEYS.PRE_DESTROY, Child) 应返回父类的 PreDestroy', () => {
   fc.assert(
     fc.property(arbTokenName, (tokenName) => {
       const token = new Token(tokenName);
@@ -190,13 +191,13 @@ test('Property 13.5: 父类有 @PreDestroy，子类没有，getPreDestroy(Child)
       @Injectable()
       class Child extends Parent {}
 
-      // getPreDestroy(Child) 应返回父类的 PreDestroy
-      const childPD = getPreDestroy(Child);
+      // getMetadata(KEYS.PRE_DESTROY, Child) 应返回父类的 PreDestroy
+      const childPD = getMetadata(KEYS.PRE_DESTROY, Child) as { key: string } | undefined;
       expect(childPD).toBeDefined();
       expect(childPD!.key).toBe('parentCleanup');
 
       // 父类自身的 PreDestroy 也应正确
-      const parentPD = getPreDestroy(Parent);
+      const parentPD = getMetadata(KEYS.PRE_DESTROY, Parent) as { key: string } | undefined;
       expect(parentPD).toBeDefined();
       expect(parentPD!.key).toBe('parentCleanup');
     }),
@@ -206,7 +207,7 @@ test('Property 13.5: 父类有 @PreDestroy，子类没有，getPreDestroy(Child)
 
 // ==================== 测试 6：父子类都有 @PreDestroy → 子类覆盖 ====================
 
-test('Property 13.6: 父类有 @PreDestroy，子类也有 @PreDestroy，getPreDestroy(Child) 应返回子类的', () => {
+test('Property 13.6: 父类有 @PreDestroy，子类也有 @PreDestroy，getMetadata(KEYS.PRE_DESTROY, Child) 应返回子类的', () => {
   fc.assert(
     fc.property(arbTokenName, (tokenName) => {
       const token = new Token(tokenName);
@@ -225,13 +226,13 @@ test('Property 13.6: 父类有 @PreDestroy，子类也有 @PreDestroy，getPreDe
         childCleanup() {}
       }
 
-      // getPreDestroy(Child) 应返回子类的 PreDestroy
-      const childPD = getPreDestroy(Child);
+      // getMetadata(KEYS.PRE_DESTROY, Child) 应返回子类的 PreDestroy
+      const childPD = getMetadata(KEYS.PRE_DESTROY, Child) as { key: string } | undefined;
       expect(childPD).toBeDefined();
       expect(childPD!.key).toBe('childCleanup');
 
       // 父类自身的 PreDestroy 不受影响
-      const parentPD = getPreDestroy(Parent);
+      const parentPD = getMetadata(KEYS.PRE_DESTROY, Parent) as { key: string } | undefined;
       expect(parentPD).toBeDefined();
       expect(parentPD!.key).toBe('parentCleanup');
     }),
@@ -259,8 +260,8 @@ test('Property 13.7: 父子类都有 @Injectable，父类的 CacheMap 数据不�
       }
 
       // 记录父类的元数据（在子类定义之前）
-      const parentPCBefore = getPostConstruct(Parent);
-      const parentPDBefore = getPreDestroy(Parent);
+      const parentPCBefore = getMetadata(KEYS.POST_CONSTRUCT, Parent) as { key: string; value?: PostConstructParam } | undefined;
+      const parentPDBefore = getMetadata(KEYS.PRE_DESTROY, Parent) as { key: string } | undefined;
 
       @Injectable()
       class Child extends Parent {
@@ -275,8 +276,8 @@ test('Property 13.7: 父子类都有 @Injectable，父类的 CacheMap 数据不�
 
       // 子类定义后，父类的元数据应保持不变
       const parentPropsAfter = getInjectedProps(Parent);
-      const parentPCAfter = getPostConstruct(Parent);
-      const parentPDAfter = getPreDestroy(Parent);
+      const parentPCAfter = getMetadata(KEYS.POST_CONSTRUCT, Parent) as { key: string; value?: PostConstructParam } | undefined;
+      const parentPDAfter = getMetadata(KEYS.PRE_DESTROY, Parent) as { key: string } | undefined;
 
       // 父类的 injectedProps 应只包含 parentDep
       expect(parentPropsAfter).toBeDefined();
@@ -304,7 +305,7 @@ test('Property 13.7: 父子类都有 @Injectable，父类的 CacheMap 数据不�
 
 // ==================== 测试 8：三层继承链（@Injectable 装饰器语法）====================
 
-test('Property 13.8: 三层继承链 Grandparent → Parent → Child，getInjectedProps/getPostConstruct/getPreDestroy 应逐层合并', () => {
+test('Property 13.8: 三层继承链 Grandparent → Parent → Child，getInjectedProps/getMetadata 应逐层合并', () => {
   fc.assert(
     fc.property(arbTokenName, arbTokenName, arbTokenName, (tokenNameGP, tokenNameP, tokenNameC) => {
       const tokenGP = new Token(tokenNameGP);
@@ -349,12 +350,12 @@ test('Property 13.8: 三层继承链 Grandparent → Parent → Child，getInjec
       expect(childProps!['cDep'][KEYS.INJECT]).toBe(tokenC);
 
       // Child 的 PostConstruct 应为 Parent 的（Child 没有定义自己的，通过原型链继承）
-      const childPC = getPostConstruct(Child);
+      const childPC = getMetadata(KEYS.POST_CONSTRUCT, Child) as { key: string; value?: PostConstructParam } | undefined;
       expect(childPC).toBeDefined();
       expect(childPC!.key).toBe('pInit');
 
       // Child 的 PreDestroy 应为 Child 自己的
-      const childPD = getPreDestroy(Child);
+      const childPD = getMetadata(KEYS.PRE_DESTROY, Child) as { key: string } | undefined;
       expect(childPD).toBeDefined();
       expect(childPD!.key).toBe('cCleanup');
 
@@ -365,11 +366,11 @@ test('Property 13.8: 三层继承链 Grandparent → Parent → Child，getInjec
       expect(parentProps!['pDep'][KEYS.INJECT]).toBe(tokenP);
       expect(parentProps!['cDep']).toBeUndefined();
 
-      const parentPC = getPostConstruct(Parent);
+      const parentPC = getMetadata(KEYS.POST_CONSTRUCT, Parent) as { key: string; value?: PostConstructParam } | undefined;
       expect(parentPC!.key).toBe('pInit');
 
       // Parent 没有自己的 PreDestroy，应继承 GrandParent 的（通过原型链）
-      const parentPD = getPreDestroy(Parent);
+      const parentPD = getMetadata(KEYS.PRE_DESTROY, Parent) as { key: string } | undefined;
       expect(parentPD).toBeDefined();
       expect(parentPD!.key).toBe('gpCleanup');
 
@@ -380,10 +381,10 @@ test('Property 13.8: 三层继承链 Grandparent → Parent → Child，getInjec
       expect(gpProps!['pDep']).toBeUndefined();
       expect(gpProps!['cDep']).toBeUndefined();
 
-      const gpPC = getPostConstruct(GrandParent);
+      const gpPC = getMetadata(KEYS.POST_CONSTRUCT, GrandParent) as { key: string; value?: PostConstructParam } | undefined;
       expect(gpPC!.key).toBe('gpInit');
 
-      const gpPD = getPreDestroy(GrandParent);
+      const gpPD = getMetadata(KEYS.PRE_DESTROY, GrandParent) as { key: string } | undefined;
       expect(gpPD!.key).toBe('gpCleanup');
     }),
     { numRuns: 100 },

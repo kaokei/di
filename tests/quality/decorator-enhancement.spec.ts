@@ -11,9 +11,9 @@
 
 import fc from 'fast-check';
 import { decorate, PostConstruct, PreDestroy } from '@/decorator';
-import { getPostConstruct, getPreDestroy } from '@/cachemap';
-import { ERRORS } from '@/constants';
-import { getInjectedProps } from '@/cachemap';
+import { getMetadata, getInjectedProps } from '@/cachemap';
+import { ERRORS, KEYS } from '@/constants';
+import type { PostConstructParam } from '@/interfaces';
 
 // 需要从随机方法名中过滤掉的特殊属性名
 const RESERVED_PROPERTY_NAMES = [
@@ -280,12 +280,12 @@ describe('Feature: 05.decorator-enhancement, Property 3: decorate() 父子类生
           decorate(PostConstruct(), Child, childMethodName);
 
           // 验证父类的 ownMetadata 独立存在且正确
-          const parentMeta = getPostConstruct(Parent);
+          const parentMeta = getMetadata(KEYS.POST_CONSTRUCT, Parent) as { key: string; value?: PostConstructParam } | undefined;
           expect(parentMeta).toBeDefined();
           expect(parentMeta!.key).toBe(parentMethodName);
 
           // 验证子类的 ownMetadata 独立存在且正确
-          const childMeta = getPostConstruct(Child);
+          const childMeta = getMetadata(KEYS.POST_CONSTRUCT, Child) as { key: string; value?: PostConstructParam } | undefined;
           expect(childMeta).toBeDefined();
           expect(childMeta!.key).toBe(childMethodName);
         }
@@ -314,12 +314,12 @@ describe('Feature: 05.decorator-enhancement, Property 3: decorate() 父子类生
           decorate(PreDestroy(), Child, childMethodName);
 
           // 验证父类的 ownMetadata 独立存在且正确
-          const parentMeta = getPreDestroy(Parent);
+          const parentMeta = getMetadata(KEYS.PRE_DESTROY, Parent) as { key: string } | undefined;
           expect(parentMeta).toBeDefined();
           expect(parentMeta!.key).toBe(parentMethodName);
 
           // 验证子类的 ownMetadata 独立存在且正确
-          const childMeta = getPreDestroy(Child);
+          const childMeta = getMetadata(KEYS.PRE_DESTROY, Child) as { key: string } | undefined;
           expect(childMeta).toBeDefined();
           expect(childMeta!.key).toBe(childMethodName);
         }

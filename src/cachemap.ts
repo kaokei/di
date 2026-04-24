@@ -1,4 +1,4 @@
-import type { CommonToken, PostConstructParam } from './interfaces';
+import type { CommonToken } from './interfaces';
 import { KEYS, hasOwn } from './constants';
 
 // ==================== 底层存储 ====================
@@ -65,20 +65,6 @@ export function getMetadata(
 }
 
 // ==================== 业务语义 API ====================
-
-export function getPostConstruct(
-  target: CommonToken
-): { key: string; value?: PostConstructParam } | undefined {
-  return getMetadata(KEYS.POST_CONSTRUCT, target) as
-    | { key: string; value?: PostConstructParam }
-    | undefined;
-}
-
-export function getPreDestroy(
-  target: CommonToken
-): { key: string } | undefined {
-  return getMetadata(KEYS.PRE_DESTROY, target) as { key: string } | undefined;
-}
 
 /**
  * 获取属性注入元数据，手动合并继承链（原型链无法自动合并嵌套对象）

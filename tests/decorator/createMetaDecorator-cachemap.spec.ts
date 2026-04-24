@@ -14,8 +14,9 @@
  */
 
 import { PostConstruct, decorate } from '@/decorator';
-import { getPostConstruct } from '@/cachemap';
-import { ERRORS } from '@/constants';
+import { getMetadata } from '@/cachemap';
+import { ERRORS, KEYS } from '@/constants';
+import type { PostConstructParam } from '@/interfaces';
 
 describe('Bug 条件探索：createMetaDecorator 重复检测失效', () => {
   test('通过 decorate() 在同一类上应用两个 @PostConstruct 应抛出错误', () => {
@@ -62,7 +63,7 @@ describe('保持性测试：createMetaDecorator 正常装饰器应用行为', ()
     decorate(PostConstruct(), MyService, 'init');
 
     // 验证元数据正确写入到 CacheMap
-    const meta = getPostConstruct(MyService);
+    const meta = getMetadata(KEYS.POST_CONSTRUCT, MyService) as { key: string; value?: PostConstructParam } | undefined;
     expect(meta).toBeDefined();
     expect(meta!.key).toBe('init');
   });
@@ -81,11 +82,11 @@ describe('保持性测试：createMetaDecorator 正常装饰器应用行为', ()
     decorate(PostConstruct(), ServiceB, 'initB');
 
     // 验证各自的元数据独立且正确
-    const metaA = getPostConstruct(ServiceA);
+    const metaA = getMetadata(KEYS.POST_CONSTRUCT, ServiceA) as { key: string; value?: PostConstructParam } | undefined;
     expect(metaA).toBeDefined();
     expect(metaA!.key).toBe('initA');
 
-    const metaB = getPostConstruct(ServiceB);
+    const metaB = getMetadata(KEYS.POST_CONSTRUCT, ServiceB) as { key: string; value?: PostConstructParam } | undefined;
     expect(metaB).toBeDefined();
     expect(metaB!.key).toBe('initB');
   });
@@ -104,12 +105,12 @@ describe('保持性测试：createMetaDecorator 正常装饰器应用行为', ()
     decorate(PostConstruct(), Child, 'childInit');
 
     // 验证父类元数据正确
-    const parentMeta = getPostConstruct(Parent);
+    const parentMeta = getMetadata(KEYS.POST_CONSTRUCT, Parent) as { key: string; value?: PostConstructParam } | undefined;
     expect(parentMeta).toBeDefined();
     expect(parentMeta!.key).toBe('parentInit');
 
     // 验证子类元数据正确，不受父类影响
-    const childMeta = getPostConstruct(Child);
+    const childMeta = getMetadata(KEYS.POST_CONSTRUCT, Child) as { key: string; value?: PostConstructParam } | undefined;
     expect(childMeta).toBeDefined();
     expect(childMeta!.key).toBe('childInit');
   });

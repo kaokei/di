@@ -19,8 +19,9 @@
 
 import fc from 'fast-check';
 import { PostConstruct, PreDestroy, Injectable, decorate } from '@/index';
-import { getPostConstruct, getPreDestroy } from '@/cachemap';
+import { getMetadata } from '@/cachemap';
 import { KEYS, ERRORS } from '@/constants';
+import type { PostConstructParam } from '@/interfaces';
 
 // Feature: stage3-decorator-migration, Property 2: Meta Decorator 元数据存储与唯一性
 
@@ -65,7 +66,7 @@ test('Property 2: 对于任意方法名，@PostConstruct 应将元数据以 { ke
       }
 
       // 验证元数据格式
-      const metadata = getPostConstruct(TestClass);
+      const metadata = getMetadata(KEYS.POST_CONSTRUCT, TestClass) as { key: string; value?: PostConstructParam } | undefined;
       expect(metadata).toBeDefined();
       expect(metadata).toEqual({ key: methodName, value: param });
     }),
@@ -87,7 +88,7 @@ test('Property 2: 对于任意方法名，@PreDestroy 应将元数据以 { key, 
       decorate(PreDestroy(), TestClass, methodName);
 
       // 验证元数据格式（PreDestroy 无参数，value 应为 undefined）
-      const metadata = getPreDestroy(TestClass);
+      const metadata = getMetadata(KEYS.PRE_DESTROY, TestClass) as { key: string } | undefined;
       expect(metadata).toBeDefined();
       expect(metadata).toEqual({ key: methodName, value: undefined });
     }),
@@ -153,7 +154,7 @@ test('Property 2: 使用装饰器语法，@PostConstruct 元数据应正确存�
         init() {}
       }
 
-      const metadata = getPostConstruct(TestClass);
+      const metadata = getMetadata(KEYS.POST_CONSTRUCT, TestClass) as { key: string; value?: PostConstructParam } | undefined;
       expect(metadata).toBeDefined();
       expect(metadata).toEqual({ key: 'init', value: param });
     }),
@@ -171,7 +172,7 @@ test('Property 2: 使用装饰器语法，@PreDestroy 元数据应正确存储',
         cleanup() {}
       }
 
-      const metadata = getPreDestroy(TestClass);
+      const metadata = getMetadata(KEYS.PRE_DESTROY, TestClass) as { key: string } | undefined;
       expect(metadata).toBeDefined();
       expect(metadata).toEqual({ key: 'cleanup', value: undefined });
     }),

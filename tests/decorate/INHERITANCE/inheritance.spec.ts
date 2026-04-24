@@ -112,7 +112,7 @@ class ParentPC {
 decorate(PostConstruct(), ParentPC, 'init');
 
 // ChildPC 没有任何 decorate 调用，其元数据不在 CacheMap 中
-// getPostConstruct(ChildPC) 会递归到父类 ParentPC，找到 PostConstruct 元数据
+// getMetadata(KEYS.POST_CONSTRUCT, ChildPC) 会递归到父类 ParentPC，找到 PostConstruct 元数据
 class ChildPC extends ParentPC {}
 
 describe('场景 3：PostConstruct 被子类继承（子类无自身元数据）', () => {
@@ -178,7 +178,7 @@ class ParentPD {
 decorate(PreDestroy(), ParentPD, 'onDestroy');
 
 // ChildPD 没有任何 decorate 调用，其元数据不在 CacheMap 中
-// getPreDestroy(ChildPD) 会递归到父类 ParentPD，找到 PreDestroy 元数据
+// getMetadata(KEYS.PRE_DESTROY, ChildPD) 会递归到父类 ParentPD，找到 PreDestroy 元数据
 class ChildPD extends ParentPD {}
 
 describe('场景 5：PreDestroy 被子类继承（子类无自身元数据）', () => {
@@ -198,10 +198,7 @@ describe('场景 5：PreDestroy 被子类继承（子类无自身元数据）', 
   });
 });
 
-describe('decorate 继承边界：子类有 decorate 调用时不继承父类 PostConstruct', () => {
-  // 这是一个反直觉的边界行为：
-  // 当子类有任何 decorate 调用（哪怕只是属性注入），
-  // getPostConstruct 不再递归父类，导致父类的 @PostConstruct 不在子类实例上执行。
+describe('decorate 继承边界：子类有 decorate 调用时仍可继承父类 PostConstruct', () => {
   class DepForChild { name = 'DepForChild'; }
 
   class ParentWithPC {
@@ -231,7 +228,7 @@ describe('decorate 继承边界：子类有 decorate 调用时不继承父类 Po
     container.bind(DepForChild).toSelf();
 
     const child = container.get(ChildWithInject);
-    // getPostConstruct 沿继承链向上查找，子类自身没有 PostConstruct，
+    // 沿继承链向上查找，子类自身没有 PostConstruct，
     // 继续查找父类，找到父类的 PostConstruct 并执行。
     expect((child as any).initialized).toBe(true);
     // 属性注入正常工作
