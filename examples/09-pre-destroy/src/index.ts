@@ -117,4 +117,4 @@ child.destroy();
 console.log('\n--- 子容器 destroy 后 ---');
 console.log('childTimer.running（子容器销毁后）:', childTimer.running);     // false
 console.log('parentConn.connected（父容器未受影响）:', parentConn.connected); // true
-console.log('parent.children（子容器已从集合移除）:', parent.children?.size); // 0
+console.log('parent.getChildren()（子容器已从集合移除）:', parent.getChildren()?.size); // 0

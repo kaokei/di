@@ -3,7 +3,7 @@
  *
  * 展示内容：
  * 1. container.destroy() 递归销毁子容器
- * 2. container.children 属性的变化
+ * 2. container.getChildren() 返回值的变化
  * 3. Container.getContainerOf(instance) 获取实例所属容器
  */
 
@@ -76,40 +76,40 @@ root.get(DatabaseService);
 child1.get(UserService);
 
 console.log('\n销毁前的容器层级：');
-console.log('root.children 数量：', root.children?.size);         // 2
-console.log('child1.children 数量：', child1.children?.size);     // 1
-console.log('child2.children 数量：', child2.children?.size);     // undefined
+console.log('root.getChildren() 数量：', root.getChildren()?.size);         // 2
+console.log('child1.getChildren() 数量：', child1.getChildren()?.size);     // 1
+console.log('child2.getChildren() 数量：', child2.getChildren()?.size);     // undefined
 
 console.log('\n--- 执行 root.destroy()（递归销毁所有子容器）---');
 root.destroy();
 
 console.log('\n销毁后的状态：');
-console.log('root.children：', root.children);     // undefined（已清除）
+console.log('root.getChildren()：', root.getChildren());     // undefined（已清除）
 console.log('root.parent：', root.parent);         // undefined
 console.log('child1.parent：', child1.parent);     // undefined（已从父容器断开）
 console.log('child2.parent：', child2.parent);     // undefined
 
-// ==================== 场景二：container.children 属性变化 ====================
+// ==================== 场景二：container.getChildren() 返回值变化 ====================
 
-console.log('\n=== 场景二：container.children 属性变化 ===');
+console.log('\n=== 场景二：container.getChildren() 返回值变化 ===');
 
 const parent = new Container();
-console.log('初始 children：', parent.children); // undefined（未创建子容器时为 undefined）
+console.log('初始 getChildren()：', parent.getChildren()); // undefined（未创建子容器时为 undefined）
 
 const c1 = parent.createChild();
-console.log('创建第一个子容器后 children.size：', parent.children?.size); // 1
+console.log('创建第一个子容器后 getChildren().size：', parent.getChildren()?.size); // 1
 
 const c2 = parent.createChild();
-console.log('创建第二个子容器后 children.size：', parent.children?.size); // 2
+console.log('创建第二个子容器后 getChildren().size：', parent.getChildren()?.size); // 2
 
-// 销毁单个子容器，会从父容器的 children 集合中移除
+// 销毁单个子容器，会从父容器的集合中移除
 c1.destroy();
-console.log('销毁 c1 后 children.size：', parent.children?.size); // 1
-console.log('children 中包含 c2：', parent.children?.has(c2));    // true
-console.log('children 中包含 c1：', parent.children?.has(c1));    // false
+console.log('销毁 c1 后 getChildren().size：', parent.getChildren()?.size); // 1
+console.log('getChildren() 中包含 c2：', parent.getChildren()?.has(c2));    // true
+console.log('getChildren() 中包含 c1：', parent.getChildren()?.has(c1));    // false
 
 c2.destroy();
-console.log('销毁 c2 后 children.size：', parent.children?.size); // 0
+console.log('销毁 c2 后 getChildren().size：', parent.getChildren()?.size); // 0
 
 // ==================== 场景三：Container.getContainerOf 获取实例所属容器 ====================
 

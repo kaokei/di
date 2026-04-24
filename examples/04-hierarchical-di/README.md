@@ -7,7 +7,7 @@
 - **创建子容器**：使用 `parent.createChild()` 创建子容器，子容器自动向父容器查找未绑定的 Token
 - **依赖查找冒泡**：子容器中找不到的服务，会自动向上查找父容器
 - **依赖覆盖**：子容器可以绑定与父容器相同的 Token，从而覆盖父容器的实现
-- **children 集合**：`container.children` 维护所有直接子容器的引用
+- **children 集合**：`container.getChildren()` 返回所有直接子容器的引用
 - **isBound vs isCurrentBound**：`isBound` 会向上查找父容器，`isCurrentBound` 只检查当前容器
 
 ## 与 inversify 的重要差异
