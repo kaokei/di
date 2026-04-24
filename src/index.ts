@@ -50,3 +50,6 @@ export { ContainerDestroyedError } from './errors/ContainerDestroyedError';
 
 // 常量和工具方法
 export { hasOwn, isObject, ERRORS } from './constants';
+
+// 元数据 API
+export { defineMetadata, getOwnMetadata, getMetadata } from './cachemap';

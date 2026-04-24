@@ -3,14 +3,13 @@ import { KEYS, hasOwn } from './constants';
 
 // ==================== 底层存储 ====================
 
-// target → metadata 的映射（由 @Injectable 写入 context.metadata 引用）
-const metaStore = new WeakMap<CommonToken, Record<string, unknown>>();
+interface MetaEntry {
+  metadata: Record<string, unknown>;
+  injectedPropsCache?: Record<string, Record<string, unknown>> | null;
+}
 
-// getInjectedProps 合并结果缓存，defineMetadata 调用时失效
-const injectedPropsCache = new WeakMap<
-  CommonToken,
-  Record<string, Record<string, unknown>> | undefined
->();
+// target → MetaEntry 的映射（由 @Injectable 写入 context.metadata 引用）
+const metaStore = new WeakMap<CommonToken, MetaEntry>();
 
 function hasParentClass(cls: CommonToken) {
   return (
@@ -29,8 +28,7 @@ export function defineMetadata(
   target: CommonToken,
   metadata: Record<string, unknown>
 ): void {
-  metaStore.set(target, metadata);
-  injectedPropsCache.delete(target);
+  metaStore.set(target, { metadata });
 }
 
 /**
@@ -41,9 +39,9 @@ export function getOwnMetadata(
   key: string,
   target: CommonToken
 ): unknown {
-  const metadata = metaStore.get(target);
-  if (!metadata) return undefined;
-  return hasOwn(metadata, key) ? metadata[key] : undefined;
+  const entry = metaStore.get(target);
+  if (!entry) return undefined;
+  return hasOwn(entry.metadata, key) ? entry.metadata[key] : undefined;
 }
 
 /**
@@ -54,9 +52,9 @@ export function getMetadata(
   key: string,
   target: CommonToken
 ): unknown {
-  const metadata = metaStore.get(target);
-  if (metadata && hasOwn(metadata, key)) {
-    return metadata[key];
+  const entry = metaStore.get(target);
+  if (entry && hasOwn(entry.metadata, key)) {
+    return entry.metadata[key];
   }
   if (hasParentClass(target)) {
     return getMetadata(key, Object.getPrototypeOf(target));
@@ -74,13 +72,17 @@ export function getMetadata(
 export function getInjectedProps(
   target: CommonToken
 ): Record<string, Record<string, unknown>> | undefined {
-  if (injectedPropsCache.has(target)) {
-    const cached = injectedPropsCache.get(target);
-    return cached ? Object.assign({}, cached) : cached;
+  const entry = metaStore.get(target);
+  if (entry && entry.injectedPropsCache !== undefined) {
+    const cached = entry.injectedPropsCache;
+    return cached ? Object.assign({}, cached) : undefined;
   }
 
   const result = _computeInjectedProps(target);
-  injectedPropsCache.set(target, result);
+  if (entry) {
+    // null 表示已计算过但结果为 undefined，区分"未计算"状态
+    entry.injectedPropsCache = result ?? null;
+  }
   return result ? Object.assign({}, result) : result;
 }
 
