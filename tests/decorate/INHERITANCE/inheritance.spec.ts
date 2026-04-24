@@ -225,17 +225,16 @@ describe('decorate 继承边界：子类有 decorate 调用时不继承父类 Po
     expect(parent.initialized).toBe(true);
   });
 
-  test('子类有属性注入时，父类的 PostConstruct 不会在子类实例上执行（设计决策）', () => {
+  test('子类有属性注入时，父类的 PostConstruct 会在子类实例上执行（继承链查找）', () => {
     const container = new Container();
     container.bind(ChildWithInject).toSelf();
     container.bind(DepForChild).toSelf();
 
     const child = container.get(ChildWithInject);
-    // 子类被注册进 CacheMap（因为有 decorate 调用），
-    // getPostConstruct 找到子类的 metadata 但其中无 PostConstruct，直接返回 undefined，
-    // 不再递归查找父类。因此 initialized 仍为 false。
-    expect((child as any).initialized).toBe(false);
-    // 但属性注入正常工作
+    // getPostConstruct 沿继承链向上查找，子类自身没有 PostConstruct，
+    // 继续查找父类，找到父类的 PostConstruct 并执行。
+    expect((child as any).initialized).toBe(true);
+    // 属性注入正常工作
     expect((child as any).dep).toBeInstanceOf(DepForChild);
   });
 });

@@ -1,8 +1,10 @@
 import type { CommonToken, PostConstructParam } from './interfaces';
 import { KEYS, hasOwn } from './constants';
 
-// target → metadata 的映射
-const map = new WeakMap<CommonToken, Record<string, unknown>>();
+// ==================== 底层存储 ====================
+
+// target → metadata 的映射（由 @Injectable 写入 context.metadata 引用）
+const metaStore = new WeakMap<CommonToken, Record<string, unknown>>();
 
 // getInjectedProps 合并结果缓存，defineMetadata 调用时失效
 const injectedPropsCache = new WeakMap<
@@ -17,111 +19,96 @@ function hasParentClass(cls: CommonToken) {
   );
 }
 
+// ==================== 通用底层 API ====================
+
 /**
- * 关联 target 和 metadata 对象
- * 由 @Injectable 类装饰器调用，直接存储 context.metadata
+ * 关联 target 和 metadata 对象（由 @Injectable / decorate() 调用）
+ * 存储 context.metadata 引用，后续读取均通过此映射完成。
  */
 export function defineMetadata(
   target: CommonToken,
   metadata: Record<string, unknown>
 ): void {
-  map.set(target, metadata);
-  // 使当前类的缓存失效
+  metaStore.set(target, metadata);
   injectedPropsCache.delete(target);
 }
 
 /**
- * 获取 PostConstruct 元数据
- *
- * 如果 target 在 map 中注册了（使用了 @Injectable），
- * 直接读取 metadata[key]，原型链自动处理继承。
- * 如果 target 未注册但有父类，递归向上查找。
+ * 获取 target 自身的元数据值（不沿继承链查找）
+ * 对应 Reflect.getOwnMetadata(key, target)
  */
+export function getOwnMetadata(
+  key: string,
+  target: CommonToken
+): unknown {
+  const metadata = metaStore.get(target);
+  if (!metadata) return undefined;
+  return hasOwn(metadata, key) ? metadata[key] : undefined;
+}
+
+/**
+ * 获取元数据值，沿继承链向上查找直到找到为止
+ * 对应 Reflect.getMetadata(key, target)
+ */
+export function getMetadata(
+  key: string,
+  target: CommonToken
+): unknown {
+  const metadata = metaStore.get(target);
+  if (metadata && hasOwn(metadata, key)) {
+    return metadata[key];
+  }
+  if (hasParentClass(target)) {
+    return getMetadata(key, Object.getPrototypeOf(target));
+  }
+  return undefined;
+}
+
+// ==================== 业务语义 API ====================
+
 export function getPostConstruct(
   target: CommonToken
 ): { key: string; value?: PostConstructParam } | undefined {
-  const metadata = map.get(target);
-  if (metadata) {
-    return metadata[KEYS.POST_CONSTRUCT] as
-      | { key: string; value?: PostConstructParam }
-      | undefined;
-  }
-  // target 未使用 @Injectable，尝试从父类查找
-  if (hasParentClass(target)) {
-    return getPostConstruct(Object.getPrototypeOf(target));
-  }
-  return undefined;
+  return getMetadata(KEYS.POST_CONSTRUCT, target) as
+    | { key: string; value?: PostConstructParam }
+    | undefined;
 }
 
-/**
- * 获取 PreDestroy 元数据
- *
- * 与 getPostConstruct 同理。
- */
 export function getPreDestroy(
   target: CommonToken
 ): { key: string } | undefined {
-  const metadata = map.get(target);
-  if (metadata) {
-    return metadata[KEYS.PRE_DESTROY] as { key: string } | undefined;
-  }
-  if (hasParentClass(target)) {
-    return getPreDestroy(Object.getPrototypeOf(target));
-  }
-  return undefined;
+  return getMetadata(KEYS.PRE_DESTROY, target) as { key: string } | undefined;
 }
 
 /**
- * 获取属性注入元数据（需要手动处理继承链中嵌套对象的合并）
+ * 获取属性注入元数据，手动合并继承链（原型链无法自动合并嵌套对象）
  *
- * context.metadata 的原型链继承只对第一层属性有效。
- * INJECTED_PROPS 对应的值是一个嵌套对象 { propName: { inject, self, ... } }，
- * 原型链无法自动合并嵌套属性。
- *
- * 例如：父类有 { a: {...}, b: {...} }，子类有 { a: {...} }
- * 通过原型链读取子类的 INJECTED_PROPS 只能拿到子类自己的 { a: {...} }，
- * 无法自动合并父类的 b 属性。
- *
- * 所以需要手动递归处理：合并当前类和父类的 INJECTED_PROPS，
- * 子类同名属性覆盖父类。
+ * 父类 { a, b } + 子类 { a } → 合并结果 { a(子类覆盖), b(继承) }
  */
 export function getInjectedProps(
   target: CommonToken
 ): Record<string, Record<string, unknown>> | undefined {
-  // 检查缓存（包括缓存的 undefined，避免对无注入属性的类重复遍历原型链）
   if (injectedPropsCache.has(target)) {
     const cached = injectedPropsCache.get(target);
-    // 返回浅拷贝，防止调用方修改污染缓存
     return cached ? Object.assign({}, cached) : cached;
   }
 
   const result = _computeInjectedProps(target);
-
   injectedPropsCache.set(target, result);
-
-  // 返回浅拷贝
   return result ? Object.assign({}, result) : result;
 }
 
 function _computeInjectedProps(
   target: CommonToken
 ): Record<string, Record<string, unknown>> | undefined {
-  const metadata = map.get(target);
-
-  // 获取当前类自身的 INJECTED_PROPS（使用 hasOwn 避免读取原型链上的）
-  const ownProps =
-    metadata && hasOwn(metadata, KEYS.INJECTED_PROPS)
-      ? (metadata[KEYS.INJECTED_PROPS] as Record<
-          string,
-          Record<string, unknown>
-        >)
-      : undefined;
+  const ownProps = getOwnMetadata(KEYS.INJECTED_PROPS, target) as
+    | Record<string, Record<string, unknown>>
+    | undefined;
 
   if (!hasParentClass(target)) {
     return ownProps;
   }
 
-  // 递归获取父类的 INJECTED_PROPS
   const parentProps = getInjectedProps(Object.getPrototypeOf(target));
 
   if (parentProps || ownProps) {
