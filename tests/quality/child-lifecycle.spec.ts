@@ -20,11 +20,11 @@ describe('子容器销毁后从父容器 children 中移除', () => {
     const parent = new Container();
     const child = parent.createChild();
 
-    expect(parent.children?.has(child)).toBe(true);
+    expect(parent.getChildren()?.has(child)).toBe(true);
 
     child.destroy();
 
-    expect(parent.children?.has(child)).toBe(false);
+    expect(parent.getChildren()?.has(child)).toBe(false);
 
     parent.destroy();
   });
@@ -35,14 +35,14 @@ describe('子容器销毁后从父容器 children 中移除', () => {
     const child2 = parent.createChild();
     const child3 = parent.createChild();
 
-    expect(parent.children?.size).toBe(3);
+    expect(parent.getChildren()?.size).toBe(3);
 
     child2.destroy();
 
-    expect(parent.children?.has(child1)).toBe(true);
-    expect(parent.children?.has(child2)).toBe(false);
-    expect(parent.children?.has(child3)).toBe(true);
-    expect(parent.children?.size).toBe(2);
+    expect(parent.getChildren()?.has(child1)).toBe(true);
+    expect(parent.getChildren()?.has(child2)).toBe(false);
+    expect(parent.getChildren()?.has(child3)).toBe(true);
+    expect(parent.getChildren()?.size).toBe(2);
 
     parent.destroy();
   });
@@ -86,11 +86,11 @@ describe('父容器销毁后所有子容器的 parent 为 undefined', () => {
     parent.createChild();
     parent.createChild();
 
-    expect(parent.children?.size).toBe(2);
+    expect(parent.getChildren()?.size).toBe(2);
 
     parent.destroy();
 
-    expect(parent.children).toBeUndefined();
+    expect(parent._children).toBeUndefined();
   });
 });
 
@@ -142,9 +142,9 @@ describe('destroy 递归销毁所有子容器', () => {
     expect(leaf.parent).toBeUndefined();
 
     // 所有层级的 children 都应为 undefined
-    expect(root.children).toBeUndefined();
-    expect(mid.children).toBeUndefined();
-    expect(leaf.children).toBeUndefined();
+    expect(root._children).toBeUndefined();
+    expect(mid._children).toBeUndefined();
+    expect(leaf._children).toBeUndefined();
   });
 
   test('宽度优先：父容器有多个子容器时全部递归销毁', () => {
@@ -251,7 +251,7 @@ describe('destroy 后容器状态完全清理', () => {
 
     container.destroy();
 
-    expect(container.children).toBeUndefined();
+    expect(container._children).toBeUndefined();
   });
 
   test('destroy 后容器的 activation/deactivation handler 为 undefined', () => {

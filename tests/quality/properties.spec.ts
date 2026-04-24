@@ -452,7 +452,7 @@ describe('Feature: code-quality-optimization, Property 9: 递归销毁容器树'
         }
 
         // 根容器的 children 应为 undefined
-        expect(root.children).toBeUndefined();
+        expect(root._children).toBeUndefined();
       }),
       { numRuns: 100 }
     );
@@ -480,7 +480,7 @@ describe('Feature: code-quality-optimization, Property 9: 递归销毁容器树'
           expect((child as any)._bindings.size).toBe(0);
           expect(child.parent).toBeUndefined();
         }
-        expect(root.children).toBeUndefined();
+        expect(root._children).toBeUndefined();
       }),
       { numRuns: 100 }
     );
@@ -510,12 +510,12 @@ describe('Feature: code-quality-optimization, Property 10: 子容器销毁后从
             targetChild.destroy();
 
             // 验证被销毁的子容器不在父容器的 children 中
-            expect(parent.children?.has(targetChild)).toBeFalsy();
+            expect(parent.getChildren()?.has(targetChild)).toBeFalsy();
 
             // 验证其他子容器仍在
             for (let i = 0; i < childCount; i++) {
               if (i !== destroyIndex) {
-                expect(parent.children?.has(children[i])).toBe(true);
+                expect(parent.getChildren()?.has(children[i])).toBe(true);
               }
             }
           } finally {

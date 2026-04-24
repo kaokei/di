@@ -177,17 +177,17 @@ function isBound<T>(token: CommonToken<T>): boolean;
 
 判断当前容器以及所有父级容器是否绑定了指定的 token。
 
-## Container#children
+## Container#getChildren
 
 ```ts
-public children?: Set<Container>;
+function getChildren(): Set<Container> | undefined;
 ```
 
-`children` 是可选的公开属性，类型为 `Set<Container> | undefined`，用于记录当前容器的所有直接子容器。
+返回当前容器的所有直接子容器集合。若尚未创建任何子容器，返回 `undefined`，需由调用方自行判空。
 
-- 初始状态下 `children` 为 `undefined`，只有在第一次调用 `createChild()` 后才会被初始化为 `Set`
-- 每次调用 `createChild()` 时，新创建的子容器会自动被添加到父容器的 `children` 集合中
-- 当调用子容器的 `destroy()` 时，子容器会自动从父容器的 `children` 集合中移除
+- 每次调用 `createChild()` 时，新创建的子容器会自动加入集合
+- 当子容器调用 `destroy()` 时，会自动从该集合中移除
+- 内部使用私有属性 `_children` 存储，请勿直接访问 `_children`，应始终通过 `getChildren()` 获取
 
 ## Container#createChild
 
@@ -200,10 +200,10 @@ function createChild(): Container;
 ```ts
 const childContainer = new Container();
 childContainer.parent = this;
-if (!this.children) {
-  this.children = new Set();
+if (!this._children) {
+  this._children = new Set();
 }
-this.children.add(childContainer);
+this._children.add(childContainer);
 return childContainer;
 ```
 
@@ -218,7 +218,7 @@ function destroy(): void;
 
 注意 `inversify` 中并没有提供这个方法。
 
-`destroy` 会递归销毁所有子容器（遍历 `children` 集合，对每个子容器调用 `destroy()`），销毁完成后将自身从父容器的 `children` 集合中移除。
+`destroy` 会递归销毁所有子容器（遍历 `getChildren()` 返回的集合，对每个子容器调用 `destroy()`），销毁完成后将自身从父容器的子容器集合中移除。
 
 **容器销毁后，任何对 `get()` 或 `getAsync()` 的调用都会抛出 `ContainerDestroyedError`**，而不是静默返回或抛出其他错误，便于快速定位误用销毁容器的问题。
 
@@ -230,7 +230,7 @@ const child2 = parent.createChild();
 // 递归销毁 parent 及其所有子容器（child1、child2 也会被一并销毁）
 parent.destroy();
 
-// 也可以单独销毁某个子容器，child1 会自动从 parent.children 中移除
+// 也可以单独销毁某个子容器，child1 会自动从父容器的子容器集合中移除
 child2.destroy();
 ```
 
