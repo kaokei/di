@@ -420,6 +420,16 @@ decorate(Inject(B), A, 'b');
 
 [详细说明参考错误类文档](./ERRORS.md)。
 
+## 元数据 API
+
+本库导出了三个底层元数据操作函数：
+
+- `defineMetadata(target, metadata)`：将元数据对象关联到 target。
+- `getOwnMetadata(key, target)`：获取 target 自身的元数据值，不沿继承链查找。
+- `getMetadata(key, target)`：获取元数据值，沿继承链向上查找。
+
+[详细说明参考元数据 API 文档](./CACHEMAP.md)。
+
 ## 类型导出
 
 本库导出了多个 TypeScript 类型
