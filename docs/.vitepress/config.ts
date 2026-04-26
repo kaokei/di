@@ -74,6 +74,7 @@ export default defineConfig({
             { text: 'Binding 文档', link: '/api/BINDING' },
             { text: 'decorate 文档', link: '/api/DECORATE' },
             { text: 'LazyInject 文档', link: '/api/LAZY_INJECT' },
+            { text: '元数据管理文档', link: '/api/CACHEMAP' },
             { text: '错误类文档', link: '/api/ERRORS' },
             { text: '类型导出文档', link: '/api/TYPES' },
           ],
