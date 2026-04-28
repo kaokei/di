@@ -1,16 +1,16 @@
 # 装饰器速查表
 
-| 装饰器 | 类型 | 无括号调用 | 有括号调用 | 依赖 `@Injectable` | 依赖 `@Inject` | 可在 `decorate()` 中使用 |
-|--------|------|:-----------:|:-----------:|:------------------:|:---------------:|:---------------------:|
-| `@Injectable` | 类装饰器 | ✗ | ✓ | — | ✗ | ✗ |
-| `@Inject` | 属性装饰器 | ✗ | ✓ | ✓ | — | ✓ |
-| `@Self` | 属性装饰器 | ✗ | ✓ | ✓ | ✓ | ✓ |
-| `@SkipSelf` | 属性装饰器 | ✗ | ✓ | ✓ | ✓ | ✓ |
-| `@Optional` | 属性装饰器 | ✗ | ✓ | ✓ | ✓ | ✓ |
-| `@PostConstruct` | 方法装饰器 | ✗ | ✓ | ✓ | ✗ | ✓ |
-| `@PreDestroy` | 方法装饰器 | ✗ | ✓ | ✓ | ✗ | ✓ |
-| `@LazyInject` | 属性装饰器 | ✗ | ✓ | ✗ | ✗ | ✗ |
-| `@autobind` | 方法装饰器 | ✓ | ✗ | ✗ | ✗ | ✗ |
+| 装饰器 | 无括号调用 | 有括号调用 | 依赖 `@Injectable` | 依赖 `@Inject` | 支持 `decorate()` |
+|--------|:-----------:|:-----------:|:------------------:|:---------------:|:---------------------:|
+| `@Injectable`<br/>class decorator | ✗ | ✓ | — | ✗ | ✗ |
+| `@Inject`<br/>field decorator | ✗ | ✓ | ✓ | — | ✓ |
+| `@Self`<br/>field decorator | ✗ | ✓ | ✓ | ✓ | ✓ |
+| `@SkipSelf`<br/>field decorator | ✗ | ✓ | ✓ | ✓ | ✓ |
+| `@Optional`<br/>field decorator | ✗ | ✓ | ✓ | ✓ | ✓ |
+| `@PostConstruct`<br/>method decorator | ✗ | ✓ | ✓ | ✗ | ✓ |
+| `@PreDestroy`<br/>method decorator | ✗ | ✓ | ✓ | ✗ | ✓ |
+| `@LazyInject`<br/>field decorator | ✗ | ✓ | ✗ | ✗ | ✗ |
+| `@autobind`<br/>method decorator | ✓ | ✗ | ✗ | ✗ | ✗ |
 
 **说明：**
 
