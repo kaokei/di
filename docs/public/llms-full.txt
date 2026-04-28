@@ -566,6 +566,62 @@ decorate(PostConstruct(), A, 'init');
 
 ---
 
+## 元数据 API
+
+本库导出三个底层元数据操作函数，供高级用例直接读写类元数据：
+
+```ts
+import { defineMetadata, getOwnMetadata, getMetadata } from '@kaokei/di';
+```
+
+### defineMetadata
+
+```ts
+function defineMetadata(target: CommonToken, metadata: Record<string, unknown>): void;
+```
+
+将 `metadata` 对象关联到 `target`。由 `@Injectable` 和 `decorate()` 在内部调用，将 Stage 3 装饰器写入的 `context.metadata` 存储到全局 CacheMap。每次调用都会替换原有条目，并自动使 `getInjectedProps` 的缓存失效。
+
+### getOwnMetadata
+
+```ts
+function getOwnMetadata(key: string, target: CommonToken): unknown;
+```
+
+获取 `target` **自身**的元数据值，不沿继承链向上查找。等价于 `Reflect.getOwnMetadata(key, target)`。
+
+### getMetadata
+
+```ts
+function getMetadata(key: string, target: CommonToken): unknown;
+```
+
+获取元数据值，沿继承链向上查找直到找到为止。等价于 `Reflect.getMetadata(key, target)`。
+
+| | `getOwnMetadata` | `getMetadata` |
+|---|---|---|
+| 查找范围 | 只查 target 自身 | 沿原型链向上查找 |
+| 子类覆盖父类 | 不会看到父类值 | 优先返回子类值 |
+| 适用场景 | 判断某类是否自身定义了某元数据 | 获取实际生效的元数据值 |
+
+---
+
+## 装饰器速查表
+
+| 装饰器 | 类型 | 支持无括号调用 | 支持有括号调用 | 需要配合 `@Injectable` | 需要配合 `@Inject` | 可在 `decorate()` 中使用 |
+|--------|------|:-----------:|:-----------:|:------------------:|:---------------:|:---------------------:|
+| `@Injectable` | 类装饰器 | ✗ | ✓ | — | ✗ | ✗ |
+| `@Inject` | 属性装饰器 | ✗ | ✓ | ✓ | — | ✓ |
+| `@Self` | 属性装饰器 | ✗ | ✓ | ✓ | ✓ | ✓ |
+| `@SkipSelf` | 属性装饰器 | ✗ | ✓ | ✓ | ✓ | ✓ |
+| `@Optional` | 属性装饰器 | ✗ | ✓ | ✓ | ✓ | ✓ |
+| `@PostConstruct` | 方法装饰器 | ✗ | ✓ | ✓ | ✗ | ✓ |
+| `@PreDestroy` | 方法装饰器 | ✗ | ✓ | ✓ | ✗ | ✓ |
+| `@LazyInject` | 属性装饰器 | ✗ | ✓ | ✗ | ✗ | ✗ |
+| `@autobind` | 方法装饰器 | ✓ | ✗ | ✗ | ✗ | ✗ |
+
+---
+
 ## 错误类
 
 共 8 个错误类，继承关系：

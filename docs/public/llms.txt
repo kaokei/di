@@ -73,13 +73,14 @@ export class A {
 
 ## 主要 API
 
-- [Container](https://di.kaokei.com/api/CONTAINER.html) — 容器，核心类（含 `tryGet`、`rebind` 等）
+- [Container](https://di.kaokei.com/api/CONTAINER.html) — 容器，核心类（含 `tryGet`、`rebind`、`getChildren` 等）
 - [Binding](https://di.kaokei.com/api/BINDING.html) — 绑定配置（`to` / `toSelf` / `toConstantValue` / `toDynamicValue` / `toService`）
 - [Token & LazyToken](https://di.kaokei.com/api/) — Token 类型定义
 - [@Injectable / @Inject / @Self / @SkipSelf / @Optional](https://di.kaokei.com/api/) — 装饰器
 - [@PostConstruct / @PreDestroy](https://di.kaokei.com/api/) — 生命周期装饰器
 - [@LazyInject / createLazyInject](https://di.kaokei.com/api/LAZY_INJECT.html) — 懒注入
 - [decorate](https://di.kaokei.com/api/DECORATE.html) — 无装饰器语法时的替代方案
+- [元数据 API](https://di.kaokei.com/api/CACHEMAP.html) — `defineMetadata` / `getOwnMetadata` / `getMetadata`
 - [错误类](https://di.kaokei.com/api/ERRORS.html) — 8 个错误类，支持 `instanceof` 判断
 - [类型导出](https://di.kaokei.com/api/TYPES.html) — TypeScript 类型
 
