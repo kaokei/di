@@ -46,6 +46,7 @@ export default defineConfig({
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/' },
       { text: 'API', link: '/api/' },
+      { text: 'Decorator', link: '/decorator/' },
       { text: 'Example', link: '/examples/' },
       { text: 'Note', link: '/note/01.什么是Token' },
     ],
@@ -78,12 +79,6 @@ export default defineConfig({
             { text: '错误类文档', link: '/api/ERRORS' },
             { text: '类型导出文档', link: '/api/TYPES' },
           ],
-        },
-      ],
-      '/examples/': [
-        {
-          text: 'CodeSandbox 在线示例',
-          link: '/examples/',
         },
       ],
       '/note/': [

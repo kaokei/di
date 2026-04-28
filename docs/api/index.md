@@ -443,25 +443,3 @@ decorate(Inject(B), A, 'b');
 - BindingDeactivationHandler
 
 [详细说明参考类型导出文档](./TYPES.md)。
-
-## 装饰器速查表
-
-| 装饰器 | 类型 | 支持无括号调用 | 支持有括号调用 | 需要配合 `@Injectable` | 需要配合 `@Inject` | 可在 `decorate()` 中使用 |
-|--------|------|:-----------:|:-----------:|:------------------:|:---------------:|:---------------------:|
-| `@Injectable` | 类装饰器 | ✗ | ✓ | — | ✗ | ✗ |
-| `@Inject` | 属性装饰器 | ✗ | ✓ | ✓ | — | ✓ |
-| `@Self` | 属性装饰器 | ✗ | ✓ | ✓ | ✓ | ✓ |
-| `@SkipSelf` | 属性装饰器 | ✗ | ✓ | ✓ | ✓ | ✓ |
-| `@Optional` | 属性装饰器 | ✗ | ✓ | ✓ | ✓ | ✓ |
-| `@PostConstruct` | 方法装饰器 | ✗ | ✓ | ✓ | ✗ | ✓ |
-| `@PreDestroy` | 方法装饰器 | ✗ | ✓ | ✓ | ✗ | ✓ |
-| `@LazyInject` | 属性装饰器 | ✗ | ✓ | ✗ | ✗ | ✗ |
-| `@autobind` | 方法装饰器 | ✓ | ✗ | ✗ | ✗ | ✗ |
-
-**说明：**
-
-- **支持无括号调用**：可直接写 `@autobind`，无需 `@autobind()`。
-- **支持有括号调用**：需要写成 `@Inject(token)` 或 `@PostConstruct()` 形式（即使无参数也需要括号）。
-- **需要配合 `@Injectable`**：该装饰器需要在同一个类上同时添加 `@Injectable()`，否则元数据无法被容器读取。`@LazyInject` 和 `@autobind` 通过 `addInitializer` 在实例创建时直接生效，不依赖 `@Injectable`。
-- **需要配合 `@Inject`**：`@Self`、`@SkipSelf`、`@Optional` 是对注入行为的修饰，必须与 `@Inject` 配合使用才有意义。
-- **可在 `decorate()` 中使用**：`decorate()` 内部模拟了 `@Injectable` 的行为，支持属性装饰器和方法装饰器，但不支持需要 `addInitializer` 的装饰器（`@LazyInject`、`@autobind`）。
