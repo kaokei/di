@@ -20,7 +20,7 @@
     "./package.json": "./package.json"
   },
   "sideEffects": false,
-  "homepage": "https://github.com/kaokei/di",
+  "homepage": "https://di.kaokei.com/",
   "author": "kaokei",
   "license": "MIT",
   "bugs": {
