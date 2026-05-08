@@ -1,0 +1,47 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "@kaokei/di",
+  "description": "轻量级 TypeScript 依赖注入库，使用 TC39 Stage 3 装饰器，不依赖 reflect-metadata，支持属性注入和循环依赖检测。InversifyJS 的 tiny 替代方案（gzip ~3kB）。",
+  "folders": ["src", "docs", "examples"],
+  "excludeFolders": [
+    "docs/.vitepress/cache",
+    "docs/.vitepress/dist",
+    "docs/public",
+    "docs/superpowers"
+  ],
+  "excludeFiles": [
+    "CLAUDE.md",
+    ".editorconfig",
+    ".eslintignore",
+    ".gitignore",
+    ".nvmrc",
+    ".prettierrc",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    "tsconfig.app.json",
+    "tsconfig.json",
+    "tsconfig.node.json",
+    "tsconfig.vitest.inversify.json",
+    "tsconfig.vitest.json",
+    "vite.config.inversify.ts",
+    "vite.config.ts"
+  ],
+  "rules": [
+    "使用 TC39 Stage 3 装饰器，不需要 tsconfig 的 experimentalDecorators 选项",
+    "不需要安装或导入 reflect-metadata，也不需要 emitDecoratorMetadata",
+    "默认单例模式（Singleton），使用 inTransientScope() 切换为非单例",
+    "使用 @Inject() 装饰器进行属性注入，支持循环依赖",
+    "使用 @Injectable() 装饰器标记可注入类",
+    "可以使用 Token<T> 代替类作为token，支持类型推导",
+    "不支持symbol或者字符串作为token",
+    "使用 @Self、@SkipSelf、@Optional 控制依赖解析范围",
+    "使用 @PostConstruct 和 @PreDestroy 管理生命周期",
+    "Container 支持父子层级，get() 时自动向上查找父容器"
+  ],
+  "previousVersions": [
+    { "tag": "v5.0.8", "title": "v5.0.8 (latest)" },
+    { "tag": "v5.0.0", "title": "v5.0.0" },
+    { "tag": "v4.0.0", "title": "v4.0.0" },
+    { "tag": "v3.0.0", "title": "v3.0.0" }
+  ]
+}
