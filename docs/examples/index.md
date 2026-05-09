@@ -29,5 +29,7 @@ URL 格式：`https://codesandbox.io/p/sandbox/github/kaokei/di/tree/main/exampl
 | [21-token-type-decoupling](https://codesandbox.io/p/sandbox/github/kaokei/di/tree/main/examples/21-token-type-decoupling)      | TokenType 解耦：使用 Token + TokenType 实现服务间解耦  |
 | [22-autobind](https://codesandbox.io/p/sandbox/github/kaokei/di/tree/main/examples/22-autobind)                                | autobind：自动绑定方法 this，解决回调丢失 this 问题    |
 | [23-error-chain](https://codesandbox.io/p/sandbox/github/kaokei/di/tree/main/examples/23-error-chain)                          | 错误链路追踪：BindingNotFoundError 展示完整依赖路径    |
+| [24-constructor-injection](https://codesandbox.io/p/sandbox/github/kaokei/di/tree/main/examples/24-constructor-injection)      | 构造函数注入替代方案：用 toDynamicValue 向构造传参     |
+| [25-multiple-implementations](https://codesandbox.io/p/sandbox/github/kaokei/di/tree/main/examples/25-multiple-implementations) | 同一接口多种实现：用 Token 实例区分不同实现            |
 
 每个示例目录包含独立的 `package.json`（依赖已发布的 `@kaokei/di` 版本）和 `tsconfig.json`，与主包构建流程完全隔离，可直接在 CodeSandbox 中运行。

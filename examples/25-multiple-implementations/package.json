@@ -1,0 +1,17 @@
+{
+  "name": "di-example-25-multiple-implementations",
+  "version": "1.0.0",
+  "description": "同一接口多种实现：使用 Token 实例区分不同实现",
+  "type": "module",
+  "scripts": {
+    "start": "vite"
+  },
+  "dependencies": {
+    "@kaokei/di": "^5.0.0"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-decorators": "^7.29.0",
+    "@rollup/plugin-babel": "^7.0.0",
+    "vite": "^6.0.0"
+  }
+}

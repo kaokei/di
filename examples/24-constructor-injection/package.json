@@ -1,0 +1,17 @@
+{
+  "name": "di-example-24-constructor-injection",
+  "version": "1.0.0",
+  "description": "构造函数注入替代方案：使用 toDynamicValue 向构造函数传递依赖",
+  "type": "module",
+  "scripts": {
+    "start": "vite"
+  },
+  "dependencies": {
+    "@kaokei/di": "^5.0.0"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-decorators": "^7.29.0",
+    "@rollup/plugin-babel": "^7.0.0",
+    "vite": "^6.0.0"
+  }
+}
