@@ -10,6 +10,16 @@ import type {
   DeactivationHandler,
 } from './interfaces';
 
+/**
+ * 依赖注入容器。
+ *
+ * @example 基本用法
+ * ```typescript
+ * const container = new Container();
+ * container.bind(MyService).toSelf();
+ * const myService = container.get(MyService);
+ * ```
+ */
 export class Container {
   // 实例到容器的映射表，用于 @LazyInject 查找实例所属容器
   // 仅 Instance 类型的 binding 会注册映射（_registerInstance 仅在 _resolveInstanceValue 中调用）
