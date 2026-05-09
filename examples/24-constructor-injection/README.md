@@ -1,9 +1,6 @@
-# 示例 24：构造函数注入替代方案
+# 示例 24：通过 toDynamicValue 向构造函数传递运行时参数
 
-TC39 Stage 3 装饰器规范不支持参数装饰器（Parameter Decorator），因此本库无法像
-InversifyJS 那样通过装饰器标注构造函数参数来实现依赖注入。
-
-本示例展示了使用 `toDynamicValue` 工厂函数作为替代方案：在工厂函数内部从容器获取依赖，再手动向构造函数传递参数。
+本示例展示如何使用 `toDynamicValue` 工厂函数向构造函数传递运行时参数——在工厂函数内部从容器获取依赖，再传入构造函数创建实例。适用于配置项、环境变量等需要在构造时注入的运行时值。
 
 ## 展示的特性
 
@@ -30,17 +27,15 @@ container.bind(HTTP_CLIENT).toDynamicValue((ctx) => {
   const baseUrl = ctx.container.get(BASE_URL);
   const timeout = ctx.container.get(TIMEOUT);
   return new DefaultHttpClient(baseUrl, timeout);
-  //       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  //       相当于"构造函数注入"
 });
 ```
 
-这种方式与 `@Injectable()` + `@Inject()` 属性注入的区别：
+两者分别适用不同场景：
 
 | 方式 | 场景 | 构造函数参数 |
 |------|------|-------------|
-| `@Inject()` 属性注入 | 类内声明依赖，容器自动创建实例 | **不支持**（Stage 3 无参数装饰器） |
-| `toDynamicValue` 工厂 | 需要向构造函数传递运行时常量/配置 | **支持** |
+| `@Inject()` 属性注入 | 类内声明依赖，容器自动创建实例 | 不适用（属性注入） |
+| `toDynamicValue` 工厂 | 需要向构造函数传递运行时常量/配置 | 适用 |
 
 ## 适合人群
 

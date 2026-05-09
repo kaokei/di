@@ -1,11 +1,7 @@
 # 示例 25：同一接口多种实现
 
 在依赖注入中，经常需要为同一个接口提供多种不同的实现（如不同环境使用不同 Logger、
-不同支付渠道使用不同 Gateway 等）。
-
-本库不支持 InversifyJS 风格的命名绑定（named binding）。替代方案是使用不同的
-`Token<T>` 实例来区分——每个 `Token<T>` 实例都是类型安全的唯一标识符，与具体实现类
-组合即可实现多实现注入。
+不同支付渠道使用不同 Gateway 等）。使用不同的 `Token<T>` 实例来区分——每个实例都是类型安全的唯一标识符，与具体实现类组合即可完成多实现注入。
 
 ## 展示的特性
 
@@ -60,7 +56,7 @@ class UserService {
    - ❌ `container.bind(TOKEN).toSelf(ImplementationClass)` — `toSelf()` 不接受参数
    - ✅ 如果 token 本身就是一个 class：`container.bind(ImplementationClass).toSelf()`
 2. **每个 Token 实例都是独立的**，即使泛型参数相同，`new Token<T>('A')` 和 `new Token<T>('B')` 是两个完全不同的标识符
-3. **不支持符号或字符串作为 token**，只能使用 class 或 Token 实例
+3. Token 只能是 class 或 Token 实例，不能是 symbol 或字符串
 
 ## 与 InversifyJS 命名绑定的对比
 

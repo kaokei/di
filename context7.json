@@ -37,8 +37,8 @@
     "使用 @Self、@SkipSelf、@Optional 控制依赖解析范围",
     "使用 @PostConstruct 和 @PreDestroy 管理生命周期",
     "Container 支持父子层级，get() 时自动向上查找父容器",
-    "不支持构造函数参数注入（Stage 3 无参数装饰器），使用 toDynamicValue 工厂函数在创建时向构造函数传递运行时参数",
-    "使用不同的 Token 实例区分同一接口的不同实现，替代 InversifyJS 的 named binding"
+    "使用 toDynamicValue 工厂函数在创建实例时向构造函数传递运行时参数（配置项、环境变量等）",
+    "使用不同的 Token 实例区分同一接口的不同实现，每个 Token 绑定一个实现类"
   ],
   "previousVersions": [
     { "tag": "v5.0.8", "title": "v5.0.8 (latest)" },
