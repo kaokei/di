@@ -44,7 +44,8 @@
     "使用不同的 Token 实例区分同一接口的不同实现，每个 Token 绑定一个实现类"
   ],
   "previousVersions": [
-    { "tag": "v5.0.8", "title": "v5.0.8 (latest)" },
+    { "tag": "v5.0.9", "title": "v5.0.9 (latest)" },
+    { "tag": "v5.0.8", "title": "v5.0.8" },
     { "tag": "v5.0.0", "title": "v5.0.0" },
     { "tag": "v4.0.0", "title": "v4.0.0" },
     { "tag": "v3.0.0", "title": "v3.0.0" }
