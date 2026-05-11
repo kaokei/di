@@ -36,7 +36,7 @@ pnpm docs:dev
 |------|------|
 | `container.ts` | `Container` class — manages bindings, resolves tokens, supports parent/child hierarchy |
 | `binding.ts` | `Binding` class — fluent API (`to`, `toSelf`, `toConstantValue`, `toDynamicValue`, `inTransientScope`), lifecycle, injection |
-| `decorator.ts` | All Stage 3 decorators: `@Injectable`, `@Inject`, `@Self`, `@SkipSelf`, `@Optional`, `@PostConstruct`, `@PreDestroy`, `@LazyInject`, `@autobind`, and the `decorate()` helper |
+| `decorator.ts` | All Stage 3 decorators: `@Injectable`, `@Inject`, `@Self`, `@SkipSelf`, `@Optional`, `@PostConstruct`, `@PreDestroy`, `@LazyInject`, and the `decorate()` helper |
 | `token.ts` | `Token<T>` and `LazyToken<T>` — typed tokens for non-class bindings |
 | `cachemap.ts` | WeakMap-based metadata store — links constructor → metadata for injected props and lifecycle hooks |
 | `constants.ts` | `KEYS`, `STATUS`, `BINDING` enums, `ERRORS` messages, `hasOwn`, `isObject` |

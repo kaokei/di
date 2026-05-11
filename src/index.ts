@@ -35,7 +35,6 @@ export {
   decorate,
   LazyInject,
   createLazyInject,
-  autobind,
 } from './decorator';
 
 // 错误类导出

@@ -124,6 +124,5 @@ class A {
 | 装饰器 | 原因 |
 |--------|------|
 | `@LazyInject(token)` | 依赖 `addInitializer` 在实例上定义 getter/setter |
-| `@autobind` | 依赖 `addInitializer` 在实例上绑定 `this` |
 
 > **注意**：`@Injectable` 无需也不应通过 `decorate` 调用，`decorate` 内部已自动模拟其行为。

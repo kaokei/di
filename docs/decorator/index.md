@@ -10,15 +10,13 @@
 | `@PostConstruct`<br/>method decorator | ✗ | ✓ | ✓ | ✗ | ✓ |
 | `@PreDestroy`<br/>method decorator | ✗ | ✓ | ✓ | ✗ | ✓ |
 | `@LazyInject`<br/>field decorator | ✗ | ✓ | ✗ | ✗ | ✗ |
-| `@autobind`<br/>method decorator | ✓ | ✗ | ✗ | ✗ | ✗ |
 
 **说明：**
 
-- **支持无括号调用**：可直接写 `@autobind`，不支持 `@autobind()`。
 - **支持有括号调用**：需要写成 `@Inject(token)` 或 `@PostConstruct()` 形式（即使无参数也需要括号）。
-- **需要配合 `@Injectable`**：该装饰器需要在同一个类上同时添加 `@Injectable()`，否则元数据无法被容器读取。`@LazyInject` 和 `@autobind` 通过 `addInitializer` 在实例创建时直接生效，不依赖 `@Injectable`。
+- **需要配合 `@Injectable`**：该装饰器需要在同一个类上同时添加 `@Injectable()`，否则元数据无法被容器读取。`@LazyInject` 通过 `addInitializer` 在实例创建时直接生效，不依赖 `@Injectable`。
 - **需要配合 `@Inject`**：`@Self`、`@SkipSelf`、`@Optional` 是对注入行为的修饰，必须与 `@Inject` 配合使用才有意义。
-- **可在 `decorate()` 中使用**：`decorate()` 内部模拟了 `@Injectable` 的行为，支持属性装饰器和方法装饰器，但不支持需要 `addInitializer` 的装饰器（`@LazyInject`、`@autobind`）。
+- **可在 `decorate()` 中使用**：`decorate()` 内部模拟了 `@Injectable` 的行为，支持属性装饰器和方法装饰器，但不支持需要 `addInitializer` 的装饰器（如 `@LazyInject`）。
 
 ## 各装饰器简介
 
@@ -118,15 +116,3 @@
 属性装饰器，延迟注入依赖，在首次访问属性时才从容器中解析。不需要配合 `@Injectable`。
 
 [详细说明](../api/LAZY_INJECT)
-
----
-
-### @autobind
-
-```ts
-@autobind
-```
-
-方法装饰器（无括号），自动绑定方法的 `this` 到实例，解决方法作为回调传递时丢失 `this` 的问题。
-
-[详细说明](../api/#autobind)

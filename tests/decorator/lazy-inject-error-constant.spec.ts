@@ -1,12 +1,12 @@
 /**
- * 验证 decorate() 对依赖 context.addInitializer 的装饰器（@LazyInject、@autobind）
+ * 验证 decorate() 对依赖 context.addInitializer 的装饰器（@LazyInject）
  * 会抛出明确错误，而非静默失效。
  *
  * 原因：addInitializer 回调需要在每次 new ClassName() 时对真实实例执行，
  * decorate() 无法介入实例化流程，因此明确禁止此类用法。
  */
 
-import { LazyInject, autobind, decorate } from '@/decorator';
+import { LazyInject, decorate } from '@/decorator';
 import { ERRORS } from '@/constants';
 
 describe('decorate() 不支持依赖 addInitializer 的装饰器', () => {
@@ -33,18 +33,6 @@ describe('decorate() 不支持依赖 addInitializer 的装饰器', () => {
 
     expect(() => {
       decorate(LazyInject(null as any), TestService, 'dep');
-    }).toThrow(ERRORS.DECORATE_NOT_SUPPORT_INITIALIZER);
-  });
-
-  test('decorate(autobind, ...) 应抛出 DECORATE_NOT_SUPPORT_INITIALIZER 错误', () => {
-    class MyService {
-      greet() {
-        return 'hello';
-      }
-    }
-
-    expect(() => {
-      decorate(autobind, MyService, 'greet');
     }).toThrow(ERRORS.DECORATE_NOT_SUPPORT_INITIALIZER);
   });
 });
