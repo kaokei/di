@@ -446,31 +446,6 @@ class StudentService {
 
 方法装饰器，在 `container.unbind` 时自动调用，用于清理资源。
 
-### @autobind
-
-```ts
-@autobind
-```
-
-方法装饰器（无括号），自动绑定方法的 `this` 到实例，解决方法作为回调传递时丢失 `this` 的问题。通过 `context.addInitializer` 在实例创建时执行 `bind(this)`。
-
-```ts
-@Injectable()
-class UserService {
-  name = 'Alice';
-
-  @autobind
-  greet() {
-    return `Hello, ${this.name}`;
-  }
-}
-
-const { greet } = container.get(UserService);
-greet(); // "Hello, Alice" ✅
-```
-
----
-
 ## @LazyInject / createLazyInject
 
 ```ts
@@ -562,7 +537,6 @@ decorate(PostConstruct(), A, 'init');
 | 装饰器 | 原因 |
 |--------|------|
 | `@LazyInject(token)` | 依赖 `addInitializer` 在实例上定义 getter/setter |
-| `@autobind` | 依赖 `addInitializer` 在实例上绑定 `this` |
 
 ---
 
@@ -618,7 +592,6 @@ function getMetadata(key: string, target: CommonToken): unknown;
 | `@PostConstruct` | 方法装饰器 | ✗ | ✓ | ✓ | ✗ | ✓ |
 | `@PreDestroy` | 方法装饰器 | ✗ | ✓ | ✓ | ✗ | ✓ |
 | `@LazyInject` | 属性装饰器 | ✗ | ✓ | ✗ | ✗ | ✗ |
-| `@autobind` | 方法装饰器 | ✓ | ✗ | ✗ | ✗ | ✗ |
 
 ---
 
